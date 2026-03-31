@@ -57,7 +57,24 @@ Com base no que o usuario descreveu, busque APENAS o que tem relacao:
 
 NAO busque coisas sem relacao com o que esta sendo planejado.
 
-#### Etapa 3: Leitura dos fontes encontrados
+#### Etapa 3: Enriquecimento com plugins (automatico)
+
+Ao encontrar funcoes padrao Protheus no codigo (ex: MATA410, FWFormModel, MsExecAuto), use os plugins de documentacao para entender o contexto:
+
+- **claude-tdn:tdn-docs** — buscar documentacao no TDN para funcoes/rotinas padrao encontradas, entender PEs disponiveis e parametros
+- **protheus-toolkit:docs** ou **advpl-specialist:docs** — buscar funcoes nativas, tabelas SX, parametros MV referenciados no codigo
+
+Estas consultas sao automaticas e rapidas — enriquecem o resumo sem interferir no fluxo.
+
+#### Etapa 4: Mini-review do codigo existente (perguntar ao usuario)
+
+Se a exploracao encontrou codigo relevante, pergunte:
+
+> Encontrei [N] fontes relacionados. Quer que eu faca uma analise rapida da qualidade desse codigo antes de prosseguir?
+
+Se o usuario aceitar, use **advpl-specialist:review** ou **protheus-toolkit:review** para identificar problemas que o PRD deveria considerar (ex: codigo legado que precisa refatoracao, vulnerabilidades, performance).
+
+#### Etapa 5: Leitura dos fontes encontrados
 - Read nos fontes relevantes (headers + logica principal)
 - Entender: o que ja faz, como faz, o que pode ser reutilizado, o que precisa mudar
 - Se encontrar utilitarios compartilhados usados pelo tema, ler tambem
@@ -71,6 +88,7 @@ Encontrei codigo relacionado ao que voce descreveu:
 
 - [Arquivo1.prw] — PE da MATA410 que ja valida campo X_CUSTOM
   -> Pode ser estendido para incluir a nova validacao
+  -> Doc TDN: MATA410 aceita PE "MT410LOK" para validacao de linha
 - [Arquivo2.tlpp] — API REST que ja faz POST para sistema externo
   -> Padrao de integracao que podemos seguir
 - Tabela ZB0 (documentada no CLAUDE.md) — fila de pedidos
@@ -96,6 +114,16 @@ A partir da resposta, aprofunde naturalmente. Exemplos de perguntas de acompanha
 - "Existe alguma regra de negocio especifica que eu preciso entender?"
 
 Faca NO MAXIMO 2-3 perguntas por vez. Aguarde a resposta antes de continuar.
+
+#### Enriquecimento automatico durante a entrevista
+
+Quando o usuario mencionar um **modulo Protheus** (ex: "Compras", "Faturamento", SIGACOM, SIGAFAT), use automaticamente **protheus-toolkit:business-modules** para carregar a referencia do modulo — tabelas, rotinas, PEs disponiveis, integracoes. Isso permite fazer perguntas mais especificas e informadas.
+
+Quando o usuario descrever um **fluxo de negocio** (ex: "pedido vira nota fiscal que gera financeiro"), pergunte:
+
+> Quer que eu consulte o fluxo padrao do Protheus para esse processo? Assim posso comparar com o que voce precisa e identificar onde a customizacao entra.
+
+Se aceitar, use **protheus-toolkit:process** ou **advpl-specialist:process** para mapear o fluxo padrao e identificar gaps.
 
 ### Passo 4: Aprofundamento adaptativo
 
@@ -135,6 +163,22 @@ Com todas as informacoes coletadas, gere o PRD usando o template abaixo. Exiba o
 Se uma secao nao se aplica, escreva "Nao se aplica" em vez de omiti-la.
 Se houve exploracao no Passo 2, inclua a secao "Codigo Existente Relacionado".
 Se informacoes estao faltando, sinalize como "A definir" no documento.
+
+#### Enriquecimento automatico com plugins na geracao
+
+Ao gerar o PRD, use automaticamente **protheus-toolkit:protheus-data-model** para validar se o modelo de dados proposto segue os padroes Protheus (xFilial, campos obrigatorios, tipos corretos).
+
+Para a secao "Decisoes de Implementacao", consulte o plugin especializado conforme o tipo de customizacao:
+
+| Se o PRD envolve... | Usar plugin | Para recomendar... |
+|---------------------|------------|-------------------|
+| Tela ou cadastro | **protheus-toolkit:protheus-mvc** | MVC vs AxCadastro, com justificativa |
+| API REST | **protheus-toolkit:protheus-rest** | Padrao de endpoint, autenticacao, JSON |
+| Job/processo batch | **protheus-toolkit:protheus-jobs** | Padrao de Job (RpcSetEnv, controle de execucao) |
+| Relatorio | **protheus-toolkit:protheus-reports** | TReport vs FWMSPrinter vs FwPrinterXlsx |
+| Tela com browse/grid | **protheus-toolkit:protheus-screens** | Tipo de browse/grid adequado |
+
+Consulte APENAS o plugin pertinente ao tipo da customizacao — nao carregue todos.
 
 ---
 
@@ -276,7 +320,17 @@ Se o usuario responder sim:
 3. Pergunte em qual diretorio salvar (sugira o diretorio atual do projeto)
 4. Use a ferramenta Write para criar o arquivo
 
-Se responder nao, encerre normalmente.
+Se responder nao, siga para o Passo 7.
+
+### Passo 7: Validacao do PRD (perguntar ao usuario)
+
+Apos exibir o PRD (e opcionalmente gravar), pergunte:
+
+> Quer que eu faca um interrogatorio no PRD para validar as decisoes?
+
+Se o usuario aceitar, invoque a skill **interrogatorio-advpl** passando o PRD como contexto. Ela vai questionar cada aspecto do plano ate garantir que nao ficou nenhuma lacuna.
+
+Se o usuario recusar, encerre normalmente.
 
 ## Regras
 
