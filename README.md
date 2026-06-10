@@ -11,7 +11,6 @@ Skills customizadas para desenvolvimento ADVPL/TLPP no TOTVS Protheus, usadas co
 | `planejar-advpl` | Processo completo de planejamento de customizacao Protheus em 8 etapas — ideia, pesquisa, interrogatorio, PRD, kanban, QA, limpeza pre-producao e aplicacao |
 | `prd-protheus` | Gera PRDs (Documentos de Requisitos) para customizacoes Protheus via entrevista conversacional |
 | `interrogatorio-advpl` | Stress-test de planos de customizacao — questiona cada aspecto ate validar todas as decisoes |
-| `apontamento-gerar` | Gera apontamento de trabalho para o cliente |
 
 ### Dicionario de dados (Configurador)
 
@@ -24,25 +23,14 @@ Skills customizadas para desenvolvimento ADVPL/TLPP no TOTVS Protheus, usadas co
 
 | Skill | Descricao |
 |-------|-----------|
-| `entry-point-designer` | Projeta e documenta Pontos de Entrada (User Function, PARAMIXB, retorno) seguindo padrao TOTVS |
-| `mvc-generator` | Gera estrutura MVC (ModelDef, ViewDef, MenuDef, BrowseDef) — Modelo 1 e Modelo 3, com validacoes, gatilhos e hooks |
-| `tlpp-rest-endpoint-generator` | Gera endpoints REST TLPP via anotacoes (@Get, @Post, @Put, @Patch, @Delete) seguindo padroes TTALK |
-| `query-builder` | Monta queries SQL otimizadas e seguras para tabelas Protheus — filtro D_E_L_E_T_, filial, indices SIX, versoes Embedded SQL e Workarea |
 | `fwmsprinter-pdf` | Referencia para criacao de PDFs com FWMSPrinter — coordenadas, metodos, layout |
-
-### Revisao de SQL
-
-| Skill | Descricao |
-|-------|-----------|
-| `sql-code-review` | Revisao de qualidade, seguranca e manutenibilidade de SQL (PostgreSQL, SQL Server, Oracle) — SQL injection, controle de acesso, anti-patterns |
-| `sql-optimization` | Tuning de performance e estrategia de indices — analise de plano de execucao, paginacao, operacoes em lote |
 
 ### Sessao e setup
 
 | Skill | Descricao |
 |-------|-----------|
 | `claudesql-setup` | Configura a API ClaudeSQL no ambiente Protheus para queries read-only via Claude |
-| `session-summary` | Gera resumo denso da sessao atual (decisoes, padroes, arquivos, pendencias) para reload apos `/clear` |
+| `session-summary` | Gera resumo denso da sessao atual (decisoes, padroes, arquivos, pendencias) para reload apos `/clear`. Detecta `.claude/plans/<slug>/` e entra em modo referencial quando ha plano via `planejar-advpl` |
 | `session-resume` | Recarrega o resumo gerado por `session-summary`, restaurando contexto apos `/clear` |
 
 ## Instalacao
@@ -66,21 +54,17 @@ Exemplos:
 - `/interrogatorio-advpl` — validar plano de customizacao
 - `/protheus-consulta-padrao` — desenhar uma F3 / SXB nova
 - `/protheus-configurador-dicionario` — criar campo / tabela / indice / parametro
-- `/entry-point-designer` — projetar um ponto de entrada
-- `/mvc-generator` — gerar esqueleto MVC
-- `/tlpp-rest-endpoint-generator` — gerar endpoint REST TLPP
-- `/query-builder` — montar SQL para tabela Protheus
 - `/fwmsprinter-pdf` — referencia para PDFs
+- `/claudesql-setup` — instalar/configurar ClaudeSQL no ambiente
 - `/session-summary [nome]` — salvar resumo da sessao
 - `/session-resume [nome]` — restaurar resumo apos `/clear`
 
 ## Fluxo recomendado
 
 1. **Planejamento** — `/planejar-advpl` estrutura a customizacao (aciona `prd-protheus` e `interrogatorio-advpl` nas etapas certas) e produz o pacote em `.claude/plans/<slug>/`.
-2. **Implementacao** — geracao de codigo com `/mvc-generator`, `/entry-point-designer`, `/tlpp-rest-endpoint-generator`, `/query-builder`, `/fwmsprinter-pdf`.
-3. **Dicionario** — `/protheus-configurador-dicionario` desenha tabelas / campos / indices / parametros novos e gera o checklist em `pre-producao.md`. Para F3 / consultas padrao, `/protheus-consulta-padrao`.
-4. **Revisao** — `/sql-code-review` e `/sql-optimization` para SQL.
-5. **Sessoes longas** — `/session-summary` ao final; `/session-resume` para retomar apos `/clear`.
+2. **Dicionario** — `/protheus-configurador-dicionario` desenha tabelas / campos / indices / parametros novos e gera o checklist em `pre-producao.md`. Para F3 / consultas padrao, `/protheus-consulta-padrao`.
+3. **Implementacao** — geracao de codigo (`/fwmsprinter-pdf` para PDFs) e consulta direta ao banco via `/claudesql-setup`.
+4. **Sessoes longas** — `/session-summary` ao final; `/session-resume` para retomar apos `/clear`. O `session-summary` detecta automaticamente se ha plano em `.claude/plans/<slug>/` e referencia em vez de duplicar.
 
 ## Convencoes
 
