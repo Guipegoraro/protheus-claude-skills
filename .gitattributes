@@ -1,0 +1,9 @@
+# Normaliza fim de linha: LF no repositório e no checkout (evita divergência Windows/Linux)
+* text=auto eol=lf
+
+# Binários comuns
+*.png binary
+*.jpg binary
+*.gif binary
+*.app binary
+*.zip binary
