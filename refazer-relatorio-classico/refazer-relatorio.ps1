@@ -10,7 +10,8 @@ param(
 #  repo com nome z*.prw) numa copia customizada compilavel SEM chave:
 #    - funcao principal (1a declaracao) -> User Function  z<Nome>
 #    - demais funcoes                    -> Static Function z<Nome>
-#    - todas as chamadas/declaracoes     -> prefixo z   (regra \bNome( )
+#    - declaracoes (mesmo sem "()")      -> prefixo z   (ancora ^KW Nome\b)
+#    - chamadas/referencias              -> prefixo z   (regra \bNome( )
 #    - StaticCall(A,B)                   -> &("StaticCall(A,B)")  (macro-exec)
 #  NAO toca strings, aliases Nome->, #include nem comentarios (regra do "(").
 #  NAO edita/renomeia o .ch (copiar o .ch e passo a parte, verbatim).
@@ -78,8 +79,18 @@ $text = $scRe.Replace($text, {
 $scComplex = $scTotal - $scCount
 if ($scComplex -gt 0) { Write-Warning ("{0} StaticCall( em forma complexa (>2 args ou args aninhados) - converter manualmente para macro" -f $scComplex) }
 
-# 4) Renomeia SO chamadas/declaracoes: \bNome(  ->  zNome(
-#    (ignora strings "Nome", aliases Nome->, #include "Nome.CH" e comentarios: nenhum tem "(" logo apos)
+# 4a) Renomeia as DECLARACOES (inicio de linha), INDEPENDENTE de terem "(".
+#     Cobre "Function Nome" sem parenteses: a regra \bNome( do 4b renomeia a CHAMADA
+#     (zNome()) mas deixaria a DECLARACAO como Nome -> chamada a funcao inexistente.
+#     Ancorada em ^KW e com \b apos o nome (nao pega ImpItem dentro de ImpItemR4).
+foreach ($n in $names) {
+    $rd = [regex]('(?im)^([ \t]*(?:User[ \t]+Function|Static[ \t]+Function|Function)[ \t]+)' + [regex]::Escape($n) + '\b')
+    $text = $rd.Replace($text, '${1}' + $Prefix + $n)
+}
+
+# 4b) Renomeia CHAMADAS/REFERENCIAS: \bNome(  ->  zNome(
+#     (ignora strings "Nome", aliases Nome->, #include "Nome.CH" e comentarios: nenhum tem "(" logo apos;
+#      as declaracoes ja viraram zNome no 4a, entao \bNome( nao as reprefixa)
 foreach ($n in $names) {
     $r = [regex]::new('(?i)\b' + [regex]::Escape($n) + '[ \t]*\(')
     $text = $r.Replace($text, ($Prefix + $n + '('))
@@ -95,6 +106,16 @@ foreach ($d in $decls) {
     }
 }
 
+# 6) Auto-verificacao: toda declaracao tem de ter saido prefixada. Tripwire para o
+#    caso historico da declaracao sem "()" que escapava da renomeacao (ver 4a).
+$postBad = @()
+foreach ($m in $declRe.Matches($text)) {
+    if ($m.Groups[2].Value -cnotlike "$Prefix*") { $postBad += $m.Groups[2].Value }
+}
+if ($postBad.Count -gt 0) {
+    Write-Warning ("Declaracoes SEM prefixo apos transformacao: {0} - arquivo nao sera gravado; revisar" -f (($postBad | Select-Object -Unique) -join ', '))
+}
+
 # Relatorio
 "===== $Path ====="
 "Main (User Function): U_$Prefix$main"
@@ -107,10 +128,14 @@ foreach ($d in $decls) {
     "  - {0,-16} {1}" -f $finalKw, ($Prefix + $_.Name)
 }) -join "`n"
 
+$temFalha = $collision -or ($postBad.Count -gt 0)
+
 if ($DryRun) {
     "`n[DRYRUN] nenhuma alteracao gravada."
+} elseif ($temFalha) {
+    "`n[ABORTADO] falha detectada (colisao 10-char ou declaracao sem prefixo) - arquivo NAO gravado."
 } else {
     [System.IO.File]::WriteAllText($Path, $text, $enc)
     "`n[GRAVADO] ok."
 }
-if ($collision) { exit 2 }
+if ($temFalha) { exit 2 }
