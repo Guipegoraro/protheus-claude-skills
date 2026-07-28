@@ -1,0 +1,7 @@
+{
+  "default": "dev",
+  "environments": {
+    "dev":  { "baseUrl": "http://HOST:PORTA/api/api", "username": "USUARIO", "password": "SENHA", "tenantId": "EMPRESA,FILIAL" },
+    "prod": { "baseUrl": "http://HOST:PORTA/api/api", "username": "USUARIO", "password": "SENHA", "tenantId": "EMPRESA,FILIAL" }
+  }
+}

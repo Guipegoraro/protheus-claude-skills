@@ -8,3 +8,7 @@ query-builder/
 sql-code-review/
 sql-optimization/
 tlpp-rest-endpoint-generator/
+
+# Config local do genericquery (contem senha) — nunca versionar
+.genericquery.json
+**/.genericquery.json
