@@ -35,10 +35,23 @@ Concrete walk-throughs. Each one is the recipe you'd hand to a Protheus admin to
 | ZA0_USER | C | 6 | 0 | Usuário | `@!` | R | S | yes | — |
 | ZA0_OBSERV | M | 0 | 0 | Observação | — | R | N | yes | — |
 
+**Helps de campo** (F1 — required, one per field, self-contained end-user text):
+
+| Campo | Help |
+| --- | --- |
+| ZA0_CLIENT | `Código do cliente cujo limite de crédito foi alterado. Pressione F3 para pesquisar o cadastro de clientes.` |
+| ZA0_LOJA | `Loja do cliente. Junto com o código do cliente, identifica a unidade cujo limite foi alterado.` |
+| ZA0_DTALT | `Data em que a alteração do limite de crédito foi efetivada no cadastro do cliente.` |
+| ZA0_VLANT | `Valor do limite de crédito vigente antes desta alteração, em reais.` |
+| ZA0_VLNOV | `Novo valor do limite de crédito atribuído ao cliente nesta alteração, em reais.` |
+| ZA0_USER | `Código do usuário do sistema que efetuou a alteração do limite de crédito.` |
+| ZA0_OBSERV | `Justificativa ou observações sobre a alteração do limite. Texto livre, opcional.` |
+
 Notes:
 
 - `ZA0_CLIENT` and `ZA0_LOJA` should carry `X3_GRPSXG` linking to the standard customer-code group (`031` or whatever SXG group SA1 uses on this environment). Verify via `FWSX3Util():GetAllGroupFields(cGrp)` before fixing the group code.
 - `ZA0_CLIENT` gets `X3_F3 = "SA1"` for the F3 lookup.
+- The help texts explain the field on their own — no ticket/PRD reference, no bare internal names.
 
 **SIX rows**:
 
@@ -72,6 +85,14 @@ Both indexes get nicknames so the code that uses them is independent of TOTVS re
 | X3_BROWSE | S |
 | X3_PROPRI | U (auto) |
 | X3_FOLDER | folder where the cadastral fields live (often 1) |
+
+**Help de campo** (F1):
+
+```
+Limite de crédito específico deste cliente, em reais. Quando preenchido com valor maior que zero, sobrepõe o limite de crédito padrão da empresa na análise de crédito dos pedidos de venda. Quando zero, o sistema usa o limite padrão configurado pelo administrador.
+```
+
+Note the help stands on its own — it explains the override behaviour in words instead of citing `MV_ESCRDLM` or the project documentation.
 
 No SIX needed (existing SA1 indexes cover most queries; if the customer wants a "filter by credit limit" report, a new index can be added later).
 
@@ -189,7 +210,11 @@ Changing `Z01.XG_SIZE` to `14` updates the size on all three tables atomically.
 
 ## 9. The pre-producao.md checklist
 
-Every example above should land as a row in `.claude/plans/<slug>/pre-producao.md`. Template:
+Every example above should land as a row in `.claude/plans/<slug>/pre-producao.md`.
+
+**Everything in this file is copy-pasteable.** The operator applies it by copying values straight into Configurador screens, so every value is the literal content to be typed — complete, exactly as it goes into the screen. No placeholders (`<...>`, `a definir`), no ellipses (`…`), no prose mixed into value cells ("yes, financeiro module" is prose; the cell carries the literal choice). Short values go in table cells; multi-line/long values (help de campo, X3_RELACAO expressions, combo lists) each get their own fenced code block so one selection copies the whole value.
+
+Template:
 
 ```markdown
 # Pre-produção — <slug>
@@ -202,18 +227,32 @@ Every example above should land as a row in `.claude/plans/<slug>/pre-producao.m
 
 ## SX3 — campos novos
 
-| Tabela | Campo | Tipo | Tamanho | Decimal | Título | Picture | Context | Obrigat | Used | X3_F3 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| SA1 | A1_CREDLIM | N | 14 | 2 | Limite crédito | @E 99,999,999.99 | R | N | financeiro | — |
-| ZA0 | ZA0_FILIAL | C | 2 | 0 | Filial | @! | R | key | — | — |
-| …
+| Tabela | Campo | Tipo | Tamanho | Decimal | Título | Descrição | Picture | Context | Obrigat | Used | X3_F3 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| SA1 | A1_CREDLIM | N | 14 | 2 | Limite crédito | Limite de crédito por cliente | @E 99,999,999.99 | R | N | financeiro | — |
+| ZA0 | ZA0_FILIAL | C | 2 | 0 | Filial | Filial do sistema | @! | R | N | key | — |
+
+## Helps de campo (F1)
+
+Um bloco por campo — copiar o texto inteiro para o help do campo no Configurador.
+
+### SA1 → A1_CREDLIM
+
+```
+Limite de crédito específico deste cliente, em reais. Quando preenchido com valor maior que zero, sobrepõe o limite de crédito padrão da empresa na análise de crédito dos pedidos de venda. Quando zero, o sistema usa o limite padrão configurado pelo administrador.
+```
+
+### ZA0 → ZA0_FILIAL
+
+```
+Filial do sistema à qual este registro pertence. Preenchida automaticamente.
+```
 
 ## SIX — índices novos
 
 | Tabela | Ordem | Chave | Descrição | Nickname | ShowPesq |
 | --- | --- | --- | --- | --- | --- |
 | ZA0 | 1 | ZA0_FILIAL+ZA0_CLIENT+ZA0_LOJA+DTOS(ZA0_DTALT) | Por cliente + data | ZA0CDT | S |
-| …
 
 ## SX6 — parâmetros novos
 
@@ -225,7 +264,7 @@ Every example above should land as a row in `.claude/plans/<slug>/pre-producao.m
 
 1. SXG (grupos novos, se houver)
 2. SX2 (tabelas novas)
-3. SX3 (campos)
+3. SX3 (campos, incluindo o help de campo de cada um)
 4. SIX (índices)
 5. Atualizar base de dados (modo exclusivo)
 6. SX6 (parâmetros)

@@ -8,6 +8,7 @@ The SX3 carries every column-level attribute for every table the system knows ab
 - Field types
 - Real vs virtual fields (`X3_CONTEXT`)
 - Use, key, alterable, mandatory — the binary fields
+- Help de campo (F1) — required for every new field
 - Triggers (SX7)
 - SXG — Field Groups
 - Field-creation workflow
@@ -96,6 +97,29 @@ These four flags ride inside a small set of attributes that look like strings bu
 
 **Critical**: in older versions these fields were binary; from 12.1.7 they became character but with opaque encoding. Direct manipulation (`Bin2Str`, `SubStr`, `Alltrim`) breaks across versions. **Always use the helper functions**.
 
+## Help de campo (F1) — required for every new field
+
+Every field has a **help** — the text the user sees pressing **F1** on the field. It is a dictionary artifact like the field itself: it lives in the help repository (help files, or the `HELP` table when the environment uses dicionário no banco), keyed by the field name, and is maintained through the Configurador together with the field (the field editing screen has the help text area; "Helps de campos" are also carried by Gestão de Ambientes projects).
+
+**A field specification is not complete without its help text.** Whenever this skill produces an SX3 spec (tables in chat, `pre-producao.md` rows), it MUST include a `Help` entry per field, written out in full — not "a definir", not a pointer.
+
+### How to write the help text
+
+The help is read by an **end user** inside the ERP, months or years after the deploy, with none of the development context. Write it accordingly:
+
+- **Self-contained.** The text must explain the field on its own. It must NOT depend on, cite, or assume the documentation used during development — no ticket numbers, PRD, plano, e-mails, meeting notes, `.claude/plans/` paths, or "conforme especificação".
+- Say **what the field means**, **how to fill it** (valid values, format, what each combo option does), and **what the system does with it** (which routine/behaviour it affects).
+- Mention a parameter or another field only by explaining the behaviour in words (e.g. "se zero, o sistema usa o limite padrão configurado pelo administrador"), never as a bare internal reference the user can't act on.
+- PT-BR, 2–6 short sentences. Fill ENG/SPA variants only if the environment is multi-language.
+
+Example, field `A1_CREDLIM`:
+
+> ✅ `Limite de crédito específico deste cliente, em reais. Quando preenchido com valor maior que zero, sobrepõe o limite de crédito padrão da empresa na análise de crédito dos pedidos de venda. Quando zero, o sistema usa o limite padrão configurado pelo administrador. Informe zero para desativar o limite específico.`
+
+> ❌ `Campo criado conforme ticket 00006939 / PRD ideal-integracao. Ver documentação do projeto.` — depends on dev documentation; the user has no access to it.
+
+> ❌ `Limite de crédito. Sobrepõe MV_ESCRDLIM.` — bare parameter name, no behaviour explained.
+
 ## Triggers (SX7)
 
 A field can fire an SX7 gatilho when it changes value. The link is `X3_TRIGGER = 'S'` plus one or more SX7 rows keyed by `X7_CAMPO`. See the `entry-point-designer` skill for hooks and the SX7 reference below.
@@ -155,10 +179,11 @@ For a custom field `A1_DTLIMITE` (date) on the standard SA1:
    - Usado: yes (which modules).
    - Browse: yes/no.
    - Obrigatório: no.
-7. Click **Salvar**.
-8. Back on the field list, click the **confirm** (checkmark) icon.
-9. Back on the table list, click **Atualizar base de dados**.
-10. Confirm in modo exclusivo. The Configurador creates the physical column.
+7. Fill the **Help de campo** (F1) with the text from the spec — self-contained, end-user language (see "Help de campo (F1)" above). E.g.: `Data limite para o cliente regularizar a análise de crédito. Após esta data, novos pedidos de venda ficam bloqueados para liberação manual pelo financeiro. Deixe em branco para não aplicar prazo.`
+8. Click **Salvar**.
+9. Back on the field list, click the **confirm** (checkmark) icon.
+10. Back on the table list, click **Atualizar base de dados**.
+11. Confirm in modo exclusivo. The Configurador creates the physical column.
 
 **Document this in `.claude/plans/<slug>/pre-producao.md`** with every attribute, so the same steps are reproducible on production.
 

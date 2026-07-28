@@ -26,11 +26,12 @@ These are non-negotiable. Flag any deviation in code review.
 1. **All dictionary changes go through the Configurador.** Source-level `RecLock("SX3")` / `PutSX3` / `PutSX6` / `RecLock("SX2")` are forbidden in customisation fontes. They belong only to migrators that own the dictionary at upgrade time. Reasons: cache inconsistency, broken transactions, conflict with UPDDISTR.
 2. **Customer-owned tables use the `Z??` or `SZ?` namespace only.** `Z?` for compact 3-char aliases (`ZA0`, `ZB1`), `SZ?` for legacy 3-char (`SZ0`, `SZ1`). Any other prefix risks collision with a future TOTVS release.
 3. **Customer-owned parameters use `MV_*` with a customer-prefixed name** — typically `MV_ES*` (cliente) or `MV_FS*` (fábrica de software). Never reuse a TOTVS parameter name with different semantics.
-4. **Document every dictionary change in `.claude/plans/<slug>/pre-producao.md`** before applying it. The deploy is manual via Configurador; the document is the deploy checklist.
+4. **Document every dictionary change in `.claude/plans/<slug>/pre-producao.md`** before applying it. The deploy is manual via Configurador; the document is the deploy checklist. **Every value in it is copy-pasteable**: the literal, complete content the operator will paste into the Configurador screen — no placeholders, no ellipses, no prose mixed into value cells; long values (help de campo, expressions, combo lists) in their own fenced code blocks. See the template in [examples.md](examples.md).
 5. **"Atualizar base de dados" requires exclusive mode** — no user can have the affected table open. Schedule the step for off-hours or block access before running.
 6. **Never read `X3_USADO`, `X3_RESERV`, `X3_OBRIGAT` as raw strings.** They are binary in older versions, character in 12.1.7+, and the encoding is opaque. Use `X3Uso()`, `X3Reserv()`, `X3Obrigat()`, `X3Chave()`, `X3Alteravel()`. Direct `Bin2Str` / `SubStr` / `Alltrim` on these will break across versions.
 7. **The size of a field with a `X3_GRPSXG` group is governed by the SXG group, not by `X3_TAMANHO`.** Changing the SX3 size when an SXG group exists does nothing; you must change the SXG instead.
 8. **Custom fields on standard TOTVS tables stay under the table's prefix.** Adding `Z_MYFIELD` to SA1 is wrong; the field must be `A1_MYFLD` with `X3_PROPRI = 'U'`. The Configurador sets `X3_PROPRI = 'U'` automatically when a logged-in customer user creates a field.
+9. **Every new field ships with its help (F1) text, written at spec time.** The field spec (chat tables, `pre-producao.md`) includes the full help text per field. The text is written for the end user and is self-contained — it must not depend on or reference the documentation used during development (ticket, PRD, plano, e-mails). See "Help de campo (F1)" in [fields.md](fields.md).
 
 ## Workflow checklist
 
@@ -44,12 +45,15 @@ When the user wants to design or modify a dictionary entry, walk through this:
         - Field on TOTVS table: <prefix>_NAME with X3_PROPRI = 'U'
         - Parameter: MV_ES* (cliente) or MV_FS* (fábrica)
 - [ ] 3. For new fields: assign SXG group if a sibling field exists (B1_COD-like cases)
-- [ ] 4. For new indexes: assign a NICKNAME so the order is stable across versions
-- [ ] 5. Write each row to .claude/plans/<slug>/pre-producao.md with all attributes
-- [ ] 6. In Configurador: Base de Dados → Dicionário → Bases de Dados → select table → Editar
-- [ ] 7. Add the field/index/etc. via the corresponding sub-screen
-- [ ] 8. Confirm at the table level, then "Atualizar base de dados" (exclusive mode)
-- [ ] 9. Validate physically: SQL/APSDU shows the column with the expected DDL
+- [ ] 4. For new fields: write the help (F1) text — self-contained, end-user language,
+        no reference to dev documentation (fields.md → "Help de campo (F1)")
+- [ ] 5. For new indexes: assign a NICKNAME so the order is stable across versions
+- [ ] 6. Write each row to .claude/plans/<slug>/pre-producao.md with all attributes
+        (fields include the help text)
+- [ ] 7. In Configurador: Base de Dados → Dicionário → Bases de Dados → select table → Editar
+- [ ] 8. Add the field/index/etc. via the corresponding sub-screen (fields: fill the help too)
+- [ ] 9. Confirm at the table level, then "Atualizar base de dados" (exclusive mode)
+- [ ] 10. Validate physically: SQL/APSDU shows the column with the expected DDL
 ```
 
 ## Configurador menu paths
