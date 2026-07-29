@@ -21,6 +21,14 @@ todas as funções um prefixo (`z`) para não colidir com o padrão do RPO, expo
 principal como `User Function` (`U_z...`), e diferir `StaticCall` para runtime
 via macro-execução.
 
+## Arquivos desta skill
+
+| Arquivo | Papel |
+|---|---|
+| `refazer-relatorio.ps1` | Engine: transforma o fonte in-place (`-DryRun`, `-Prefix`, `-SkipComments`) |
+| `validar-relatorio.ps1` | Validação pós-engine, PASS/FAIL + exit 2 (`-IncludeDir`) |
+| `lib-segmentos.ps1` | Separa código × comentário e preserva a largura das caixas. Dot-source dos dois acima — **não rodar direto** |
+
 ## Pré-requisitos / entradas
 
 1. **Código do relatório clássico** (ex.: `FINR130`, `MATR320`). Se o usuário só
@@ -64,19 +72,31 @@ via macro-execução.
   **remove esse bloco automaticamente** (troca por um comentário-marcador) e o
   validador **falha** se sobrar uso ativo de `VldDescRel`. Fontes baixados do
   portal ANTES da trava não têm o bloco (nesse caso o engine remove 0 e segue).
-- **Prefixo `z`** em TODAS as funções do fonte; a principal vira `User Function`,
+- **Prefixo `z`** em TODAS as funções do fonte; o entry-point vira `User Function`,
   as demais `Static Function`. (Evita `C2021 Redefinition` contra o RPO padrão.)
-- **Regra dos 10 caracteres** (`advpl-nome-funcao-10-caracteres`): os nomes já
-  prefixados devem ser distintos nos 10 primeiros chars. O engine checa e ABORTA
-  (exit 2) se houver colisão — nesse caso renomear manualmente.
+  Uma `User Function` que já exista no fonte é **mantida** — ver a nota de
+  entry-point no passo 3.
+- **Regra dos 10 caracteres** (`advpl-nome-funcao-10-caracteres`): os **símbolos**
+  gerados devem ser distintos nos 10 primeiros chars — `User Function X` gera
+  `U_X`, as demais geram `X`. O engine checa e ABORTA (exit 2) se houver colisão;
+  nesse caso renomear a função ofensora manualmente e rodar de novo.
 - **`StaticCall(A,B)` → `&("StaticCall(A,B)")`**: sem chave de compilação, o
   `StaticCall` para static de outro fonte padrão não linka; a macro `&(...)`
   compila em runtime (não precisa de chave). Confirmado pelo usuário como a
   técnica correta.
-- **NÃO tocar**: strings literais (`"FINR130"`, ID do TReport), aliases de
-  work-area (`'FTITPAI'`, `FTITPAI->`), `#include`, nem comentários. O engine só
-  renomeia o padrão `\bNome(` (chamada/declaração) — o que naturalmente pula
-  esses casos, porque nenhum deles tem `(` logo após o nome.
+- **Código e comentário têm regras DIFERENTES.** O engine separa os dois antes de
+  renomear (`lib-segmentos.ps1`); sem essa separação o cabeçalho padrão TOTVS sai
+  meio renomeado e com a caixa torta.
+  - **No código**: renomeia declaração, `Nome(` e `U_Nome(`. Não toca alias de
+    work-area (`FTITPAI->`) nem `#include` — nenhum tem `(` logo após o nome.
+    Strings **continuam** valendo como código de propósito: `&("zFoo()")` precisa
+    do prefixo para a macro achar a função.
+  - **No comentário**: renomeia o nome **mesmo sem `(`** — é o formato do
+    cabeçalho box-art (`│Funçäo │ FINR130 │`, `│Sintaxe │ FINR130(void) │`).
+    Em linha de caixa o engine **reabsorve o caractere a mais comendo um espaço
+    da folga** (nunca um TAB, nunca juntando palavra), para a borda direita não
+    sair de coluna. Sem folga, avisa o número da linha.
+  - `-SkipComments` desliga a parte de comentário, se algum dia atrapalhar.
 - **NÃO editar o `.ch`**: copiar verbatim. As `STRxxxx` resolvem em runtime via
   `FWI18NLang("<CODIGO>", ...)` contra os `.tres` padrão já presentes no RPO.
 - **Dicionário**: este processo NUNCA cria SX1/SX3/SX6. Os relatórios reusam o
@@ -105,10 +125,14 @@ e **CRLF**:
 
 ### 3. Transformar (engine PowerShell)
 Rodar o engine `refazer-relatorio.ps1` (mesma pasta desta skill). Ele faz, nesta
-ordem: (0) **remove a trava `VldDescRel`**; (1) detecta as funções; (2) checa a
-regra dos 10 chars; (3) `StaticCall` → macro; (4) prefixa nomes; (5) ajusta
-palavra-chave. **Sempre `-DryRun` primeiro** para conferir funções detectadas,
-trava removida e regra dos 10 chars, e só então aplicar:
+ordem: (0) **remove a trava `VldDescRel`**; (1) separa código × comentário e
+detecta as funções — só as declaradas em **código**, para não pegar código
+comentado; (2) checa a regra dos 10 chars; (3) num passe único por linha:
+`StaticCall` → macro, prefixa declaração / `Nome(` / `U_Nome(` no código, prefixa
+o nome nos comentários e **reajusta a largura das linhas de caixa**; ajusta a
+palavra-chave (`User`/`Static Function`) na mesma passada.
+**Sempre `-DryRun` primeiro** para conferir funções detectadas, trava removida e
+regra dos 10 chars, e só então aplicar:
 ```powershell
 # dry-run (não grava; mostra funções, StaticCall e colisão)
 & "<skill>\refazer-relatorio.ps1" -Path "<repo>\src\<modulo>\relatorios\z<codigo>.prw" -DryRun
@@ -118,9 +142,13 @@ trava removida e regra dos 10 chars, e só então aplicar:
 Se o dry-run acusar **colisão de 10 chars**, resolver manualmente (renomear a
 função ofensora com sufixo curto) antes de aplicar.
 
-> O engine assume que a **1ª declaração** do fonte é a função principal
-> (entry-point). Vale para relatórios TReport padrão (`Function <CODIGO>()` no
-> topo). Se não for, ajustar manualmente.
+> **Entry-point**: se o fonte **já tem** uma `User Function`, ela é o entry-point e
+> o engine a mantém (não cria uma segunda). Se não tem, a **1ª declaração** vira a
+> `User Function` — caso normal do TReport clássico (`Function <CODIGO>()` no topo).
+> Isso cobre o clássico que declara um wrapper `Function TECR012()` chamando
+> `U_TECR012()`: o wrapper vira `Static Function zTECR012()` e passa a chamar
+> `U_zTECR012()` (a NOSSA cópia, não a padrão do RPO). Sem esse tratamento saíam
+> duas `User Function` de mesmo nome → `C2021` na compilação.
 
 ### 4. Copiar o include (.ch) — VERBATIM, sem editar
 Para a pasta include do Protheus do ambiente (fora do sandbox do file-tools; use
@@ -143,26 +171,37 @@ compilar**. Rodar SEMPRE após o engine (e após copiar o `.ch`):
 (`-IncludeDir` é opcional; sem ela, a checagem de includes é pulada com `SKIP`.)
 
 O script (`validar-relatorio.ps1`) reporta PASS/FAIL e **exit 2** se algo falhar.
-Checagens:
+Ele usa a mesma separação código × comentário do engine, então comentário nunca
+dispara checagem de código (e vice-versa). Checagens:
 1. Todas as funções com prefixo `z`.
 2. Exatamente **1** `User Function` (o entry-point).
 3. Nenhuma `Function` pública sobrando (todas `Static`, fora a principal).
-4. Regra dos **10 caracteres** (colisão C2021).
-5. **Nenhuma chamada crua** das próprias funções (toda chamada virou `z…(`) —
-   pega qualquer call site que o engine tenha deixado passar.
+4. Regra dos **10 caracteres** (colisão C2021) sobre o **símbolo gerado** —
+   `User Function X` gera `U_X`, as demais geram `X`. São espaços distintos: um
+   fonte com `Static Function zTECR012` **e** `User Function zTECR012` não colide.
+5. **Nenhuma chamada crua** das próprias funções — pega tanto `Nome(` quanto
+   `U_Nome(` (esta última chamaria a função PADRÃO do RPO, não a cópia).
 6. `StaticCall` → `&("StaticCall(…)")` (nenhum cru).
 7. **Trava `VldDescRel` removida** (sem uso ativo — senão o relatório nasce
    travado no release 12.1.2510+ e dá `Return` sem rodar).
-8. **Perigo real**: nenhuma função própria (agora `Static`) chamada via
-   macro/`ExecBlock`/`RunDef` — macro **não enxerga** `Static`. Se aparecer,
+8. **Perigo real**: nenhuma função própria (agora `Static`) executada **por nome**
+   em `&("z…(")` / `ExecBlock("z…")` — macro **não enxerga** `Static`. Se aparecer,
    converter essa função de volta para `User Function` (ou tratar caso a caso).
+   Passar a função como argumento (`&(cVar):Set(zFoo(x))`) **não** é perigo: ali
+   `zFoo` é código compilado, não faz parte da macro.
 9. Fim de linha **CRLF** (sem LF solto — gotcha `Syntax Error` do AdvPL,
    ver [[advpl-lf-crlf-syntax-error]]).
 10. Todos os `#include` referenciados existem na pasta include.
+11. **AVISO** (não reprova): comentário que ainda cita o nome antigo. Só afeta
+    documentação, nunca compilação.
 
 > Só aceite avançar com **RESULTADO: PASS**. Qualquer FAIL: corrigir antes de
 > compilar (renomear função em colisão de 10 chars; reprefixar call site perdido;
 > reverter para `User Function` a que é chamada por macro; copiar include que falta).
+
+> **Fonte com LF solto acontece de verdade** — ~8% dos fontes do portal vêm com
+> quebra `LF` em vez de `CRLF`. O engine **normaliza sozinho** e informa quantas
+> linhas converteu (`-KeepEol` desliga, mas aí o item 9 reprova).
 
 ### 6. Conferência visual (diff) — recomendado
 
@@ -175,9 +214,11 @@ puro num arquivo temporário):
 git diff --no-index --ignore-cr-at-eol "<fonte original>" "<repo>\src\<modulo>\relatorios\z<codigo>.prw"
 ```
 
-Toda linha `-/+` deve ser declaração ou chamada de função (prefixo `z`) ou o wrap
-do `StaticCall`. Strings de ID, `#include`, args literais e comentários devem ficar
-idênticos. Se aparecer qualquer outra mudança, investigar.
+Toda linha `-/+` deve ser uma destas três: declaração/chamada de função com prefixo
+`z`; o wrap do `StaticCall`; ou linha de **comentário** onde só o nome ganhou o `z`
+(nas linhas de caixa, com a largura preservada — confira que a borda direita
+continua na mesma coluna das linhas vizinhas). `#include`, alias `Nome->`, ID do
+TReport e args literais ficam idênticos. Qualquer outra mudança, investigar.
 
 ### 7. Compilar e testar (única prova 100%)
 
@@ -215,5 +256,12 @@ Um de-para Smart View → clássico levou a 4 relatórios reaproveitados:
 | Entradas e Saídas (ESTSV017) | **MATR320** | `src/estoque/relatorios/zmatr320.prw` | 5 |
 
 Caso instrutivo (FINR130): `FTITPAI` é ao mesmo tempo **função** (`FTITPAI()`) e
-**alias** de work-area (`'FTITPAI'`, `FTITPAI->`). A regra `\bNome(` renomeou só
+**alias** de work-area (`'FTITPAI'`, `FTITPAI->`). A regra `Nome(` renomeou só
 a função (`zFTITPAI()`), deixando o alias intacto — exatamente o desejado.
+
+Segundo caso instrutivo (também FINR130): o fonte tem **29 linhas de cabeçalho
+box-art**. Antes da separação código × comentário, as 7 que traziam o nome com
+parêntese (`│Sintaxe e │ FINR130(void)`) eram renomeadas e ganhavam 1 coluna —
+borda direita da caixa torta —, enquanto as 18 que traziam o nome sem parêntese
+(`│Funçào │ FINR130 │`) ficavam documentando uma função que não existia mais.
+Hoje as 29 saem renomeadas e com a largura original.

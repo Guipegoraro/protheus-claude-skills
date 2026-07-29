@@ -11,6 +11,8 @@ param(
 #  Saida: PASS/FAIL por item + RESULTADO final (exit 0 = ok, 2 = falhou).
 # ============================================================================
 
+. (Join-Path $PSScriptRoot 'lib-segmentos.ps1')
+
 $enc   = [System.Text.Encoding]::GetEncoding(28591)   # Latin-1: le bytes 1:1
 $text  = [System.IO.File]::ReadAllText($Path, $enc)
 $bytes = [System.IO.File]::ReadAllBytes($Path)
@@ -20,10 +22,17 @@ function Chk($n, $ok, $d="") {
     if (-not $ok) { $script:fail++ }
 }
 
-$declRe = [regex]'(?im)^[ \t]*(User[ \t]+Function|Static[ \t]+Function|Function)[ \t]+(\w+)'
+# Separa CODIGO x COMENTARIO: as checagens de codigo nao podem disparar por causa
+# de um comentario, e a checagem de comentario nao pode olhar o codigo.
+$doc     = Split-AdvplText $text
+$codigo  = ($doc | ForEach-Object { ($_.Segs | Where-Object { -not $_.C } | ForEach-Object { $_.T }) -join '' }) -join "`n"
+
+$declRe = [regex]'(?i)^[ \t]*(User[ \t]+Function|Static[ \t]+Function|Function)[ \t]+(\w+)'
 $decls = @()
-foreach ($m in $declRe.Matches($text)) {
-    $decls += [pscustomobject]@{ Keyword=($m.Groups[1].Value -replace '[ \t]+',' '); Name=$m.Groups[2].Value }
+foreach ($ln in $doc) {
+    if ($ln.Segs.Count -eq 0 -or $ln.Segs[0].C) { continue }
+    $m = $declRe.Match($ln.Segs[0].T)
+    if ($m.Success) { $decls += [pscustomobject]@{ Keyword=($m.Groups[1].Value -replace '[ \t]+',' '); Name=$m.Groups[2].Value } }
 }
 if ($decls.Count -eq 0) { Write-Error "Nenhuma funcao encontrada em $Path"; exit 1 }
 
@@ -39,11 +48,14 @@ Chk "Exatamente 1 User Function (entry-point)" ($u.Count -eq 1) ("achou " + $u.C
 $p = @($decls | Where-Object { $_.Keyword -ieq 'Function' })
 Chk "Nenhuma 'Function' publica sobrando (fora a principal)" ($p.Count -eq 0) ($p.Name -join ', ')
 
-# 2) Regra dos 10 caracteres (C2021)
+# 2) Regra dos 10 caracteres (C2021) sobre o SIMBOLO gerado: User Function vira
+#    U_<nome>, Static/Function ficam com o nome puro. Sao espacos distintos --
+#    "Function X" e "User Function X" no mesmo fonte nao colidem.
 $trunc = @{}; $col = @()
 foreach ($d in $decls) {
-    $t = ($d.Name.ToUpper()).Substring(0, [Math]::Min(10, $d.Name.Length))
-    if ($trunc.ContainsKey($t)) { $col += ("$($trunc[$t]) vs $($d.Name) [$t]") } else { $trunc[$t] = $d.Name }
+    $sym = $(if ($d.Keyword -ieq 'User Function') { "U_" + $d.Name } else { $d.Name }).ToUpper()
+    $t   = $sym.Substring(0, [Math]::Min(10, $sym.Length))
+    if ($trunc.ContainsKey($t)) { $col += ("$($trunc[$t]) vs $sym [$t]") } else { $trunc[$t] = $sym }
 }
 Chk "Regra dos 10 caracteres (sem colisao C2021)" ($col.Count -eq 0) ($col -join '; ')
 
@@ -54,8 +66,10 @@ $bases = @($decls | ForEach-Object { if ($_.Name -like "$Prefix*") { $_.Name.Sub
 $leftover = @()
 foreach ($b in $bases) {
     if ([string]::IsNullOrEmpty($b)) { continue }
-    $re = [regex]('(?i)(?<![0-9A-Za-z_])' + [regex]::Escape($b) + '[ \t]*\(')
-    if ($re.IsMatch($text)) { $leftover += $b }
+    #  Base(  ou  U_Base(  -- a 2a forma escapa do lookbehind por causa do "_" e
+    #  chamaria a funcao PADRAO do RPO em vez da nossa copia.
+    $re = [regex]('(?i)(?<![0-9A-Za-z_])(U_)?' + [regex]::Escape($b) + '[ \t]*\(')
+    if ($re.IsMatch($codigo)) { $leftover += $b }
 }
 Chk "Sem chamada crua das proprias funcoes (todas com $Prefix)" ($leftover.Count -eq 0) ($leftover -join ', ')
 
@@ -71,16 +85,43 @@ Chk "StaticCall convertido p/ macro &(...)" ($scBare -eq 0) ("$scBare cru(s)")
 $trava = ([regex]'(?i)(VldDescRel[ \t]*\(|"VldDescRel")').Matches($text).Count
 Chk "Trava de descontinuacao (VldDescRel) removida" ($trava -eq 0) ("ainda ha $trava uso(s) ativo(s) - relatorio nasceria travado")
 
-# 5) PERIGO: funcao propria (agora Static) chamada via macro/ExecBlock -> macro nao enxerga Static.
-#    Lista linhas com &(/ExecBlock/RunDef E um z<base>( , exceto a linha do StaticCall wrap.
+# 5) PERIGO: funcao propria (agora Static) executada por NOME em runtime -> macro e
+#    ExecBlock so enxergam funcao publica/User, nunca Static.
+#    So conta quando o nome esta DENTRO da string executada:
+#        &("zFoo(...)")            |  ExecBlock("zFoo",...)
+#    Uma chamada normal como  &(cVar):Cell(x):SetPicture(zFoo(y))  NAO e perigo:
+#    zFoo ali e argumento compilado, nao faz parte da macro.
 $ownAlt = ($bases | Where-Object { $_ } | ForEach-Object { [regex]::Escape($Prefix + $_) }) -join '|'
 $suspect = @()
 if ($ownAlt) {
-    $mr = [regex]('(?im)^.*(&\(|ExecBlock|RunDef|RunBlock).*\b(' + $ownAlt + ')[ \t]*\(.*$')
-    $suspect = @($mr.Matches($text) | ForEach-Object { $_.Value.Trim() } | Where-Object { $_ -notmatch '(?i)StaticCall' })
+    $reMacro = [regex]('(?i)&\([ \t]*"[^"]*(?<![0-9A-Za-z_])(?:' + $ownAlt + ')[ \t]*\(')
+    $reExec  = [regex]('(?i)\b(?:ExecBlock|RunDef|RunBlock)[ \t]*\([ \t]*"(?:' + $ownAlt + ')"')
+    $linhas  = $codigo -split "`n"
+    for ($i = 0; $i -lt $linhas.Count; $i++) {
+        if ($linhas[$i] -match '(?i)StaticCall') { continue }        # wrap gerado pelo engine
+        if ($reMacro.IsMatch($linhas[$i]) -or $reExec.IsMatch($linhas[$i])) { $suspect += ("L" + ($i+1) + ": " + $linhas[$i].Trim()) }
+    }
 }
-Chk "Nenhuma funcao propria (Static) chamada via macro/ExecBlock" ($suspect.Count -eq 0)
+Chk "Nenhuma funcao propria (Static) executada por nome em macro/ExecBlock" ($suspect.Count -eq 0)
 foreach ($s in $suspect) { "     ! $s" }
+
+# 5b) AVISO (nao reprova): nome de funcao propria SEM prefixo sobrando em comentario.
+#     Nao quebra compilacao -- e cabecalho box-art documentando funcao que nao existe mais.
+$staleCom = @()
+foreach ($b in $bases) {
+    if ([string]::IsNullOrEmpty($b)) { continue }
+    $re = [regex]('(?i)(?<![0-9A-Za-z_])(U_)?' + [regex]::Escape($b) + '(?![0-9A-Za-z_])')
+    for ($i = 0; $i -lt $doc.Count; $i++) {
+        foreach ($sg in $doc[$i].Segs) {
+            if ($sg.C -and $re.IsMatch($sg.T)) { $staleCom += ("L" + ($i+1) + ": " + $b); break }
+        }
+    }
+}
+if ($staleCom.Count -eq 0) { "PASS  Comentarios sem nome de funcao antigo" }
+else {
+    "AVISO Comentarios ainda citam o nome antigo (nao reprova; so documentacao):"
+    foreach ($s in ($staleCom | Select-Object -First 10)) { "     ~ $s" }
+}
 
 # 6) Fim de linha CRLF (gotcha AdvPL: LF solto -> 'Syntax Error')
 $crlf = 0; $lf = 0
