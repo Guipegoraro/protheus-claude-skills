@@ -1,7 +1,7 @@
 # Protheus Claude Skills
 
 Skills customizadas para desenvolvimento TOTVS Protheus — ADVPL, TLPP, PO-UI e SQL — usadas com [Claude Code](https://claude.ai/claude-code).
-
+aviso: nem todas as skills aqui listadas foram desenvolvidas por mim, aqui é basicamente um espelho da minha pasta de skills. Algumas das notáveis que desenvolvi é "Planejar ADPVPL" e as de configurador.
 ## Instalacao
 
 1. Clone este repositorio em `~/.claude/skills/`:
