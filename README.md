@@ -6,7 +6,7 @@ Skills customizadas para desenvolvimento TOTVS Protheus — ADVPL, TLPP, PO-UI e
 
 Este repositorio e um espelho da minha pasta de skills e mistura **tres origens distintas**:
 
-1. **Autorais (Guilherme Pegoraro)** — criadas por mim para o meu fluxo de consultoria Protheus: `planejar-advpl`, `interrogatorio-advpl`, `prd-protheus`, `protheus-configurador-dicionario`, `protheus-consulta-padrao`, `po-ui-app`, `protheus-api-poui`, `refazer-relatorio-classico`, `apontamento-gerar`, `session-summary`, `session-resume`.
+1. **Autorais (Guilherme Pegoraro)** — criadas por mim para o meu fluxo de consultoria Protheus: `planejar-advpl`, `interrogatorio-advpl`, `prd-protheus`, `protheus-configurador-dicionario`, `protheus-consulta-padrao`, `refazer-relatorio-classico`, `apontamento-gerar`, `session-summary`, `session-resume`.
 2. **Comunidade TOTVS/engpro** — skills de terceiros (autoria Melkz Siqueira / Engenharia Protheus, MIT; `genericquery` de Johnni Moraes - TSC), adaptadas ao meu ambiente: `code-review`, `mvc-generator`, `entry-point-designer`, `tlpp-rest-endpoint-generator`, `fwrest-client-generator`, `fwmsprinter-pdf`, `data-dictionary-lookup`, `genericquery`. A antiga trinca SQL (query-builder / sql-code-review / sql-optimization, MIT) foi fundida e reescrita como `sql-protheus` a partir de pesquisa TDN/fontes-padrao (08/2026).
 3. **Adaptadas de [mattpocock/skills](https://github.com/mattpocock/skills)** (MIT, Matt Pocock) — skills de processo genericas, portadas quase-verbatim com adaptacoes minimas ao ecossistema Protheus (`.claude/plans/<slug>/` como tracker local): `grilling`, `domain-modeling`, `wayfinder`, `diagnosing-bugs`, `writing-great-skills`.
 
