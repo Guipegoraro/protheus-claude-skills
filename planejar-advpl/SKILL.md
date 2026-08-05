@@ -17,6 +17,18 @@ Ao ser invocada, SEMPRE verifique primeiro se existe um plano em andamento:
 4. Se existir `wayfinder-map.md` na pasta do slug: leia-o antes de tudo — "Decisions so far" sao decisoes JA tomadas (a Etapa 3 pergunta apenas o que estiver aberto; o PRD sintetiza delas), e as linhas de "Out of scope" do mapa vao para a secao `## Fora de escopo / rejeitado` do plano.md
 5. Se nao existir plano, inicie pela Etapa 1
 
+## Auto-sizing: a complexidade determina a profundidade
+
+O processo nao tem um peso unico. Dimensione pelas respostas da Etapa 1 (ou pelo argumento do usuario, ex: "escopo pequeno"):
+
+| Porte | Sinais | Etapas |
+|-------|--------|--------|
+| **Pequeno** | <= 3 fontes, escopo cabe em 1 frase, causa/solucao conhecida | 1 (slug + plano.md minimo) → 5 (kanban de 1-3 tasks) → 6 (QA reduzido). Pular 2-4 registrando "Pulada — porte pequeno" |
+| **Medio** | 1 modulo, decisoes fechaveis numa sessao | Todas as 8, na profundidade padrao |
+| **Grande/nebuloso** | Muitas frentes, decisoes do cliente sem forma, semanas | `/wayfinder` ANTES; esta skill retoma quando o caminho estiver claro |
+
+**Valvula de seguranca (obrigatoria):** mesmo no porte pequeno, ANTES de implementar liste os passos atomicos. Se aparecerem **mais de 5 passos ou dependencias entre eles**, PARE e volte ao processo completo — o porte estava errado, nao o processo.
+
 ## Estrutura de arquivos
 
 ### Todos os artefatos da customizacao ficam em `.claude/plans/<slug>/`
@@ -33,6 +45,9 @@ Ao ser invocada, SEMPRE verifique primeiro se existe um plano em andamento:
   qa.md               # Plano de testes para execucao humana
   pre-producao.md     # Campos/parametros/indices a criar no Configurador (criado sob demanda)
   perguntas-cliente.md # Duvidas em aberto aguardando resposta do cliente (criado sob demanda)
+  casos-e-regras.md   # Canone de regras de negocio RN/CB (criado quando a 1a regra com fonte aparecer)
+  divergencias.md     # Diario de divergencias IA x realidade do ambiente (criado no 1o caso)
+  fixes/              # Bug-specs de correcoes pos-kanban (criado no 1o bug)
 ```
 
 `pre-producao.md` e `perguntas-cliente.md` sao criados **sob demanda** — quando a primeira necessidade aparecer (campo novo a criar, pergunta sem fonte do cliente). Nao precisa criar vazio.
@@ -67,6 +82,11 @@ Com as respostas, **defina o slug** (`<feature-slug>[-<ticket>]`) e crie a pasta
 
 Ao criar o `plano.md`, leia `templates/plano.md` (nesta skill) e use-o na integra — inclusive a secao `## Fora de escopo / rejeitado` (uma linha por conceito descartado + motivo duravel + fonte; consultar antes de re-propor algo ao cliente).
 
+**Docs com ciclo de vida (portes medio/grande):**
+- Inicie um repo git PROPRIO em `.claude/` do projeto (`git -C .claude init`), separado do repo de entrega — docs internos nao vao ao remote do cliente. Commit `docs: <mudanca>` ao fim de cada sessao/lote: sem historico, corpo diverge de cabecalho sem rastro.
+- Duravel x andaime: docs que acompanham o produto (catalogo de erros, padroes aprovados, manual da customizacao) vivem numa pasta de docs JUNTO dos fontes; `.claude/plans/` e andaime de desenvolvimento. Prever a promocao dos duraveis ao fim.
+- Conflito entre documentos: vale o mais recente, e o conflito e REGISTRADO, nunca sobrescrito em silencio. Afirmacao de doc de referencia que divergir do ambiente real → registrar em `divergencias.md`.
+
 Atualize a etapa e avance.
 
 **Concluida quando:** pasta `.claude/plans/<slug>/` criada com `plano.md` preenchido conforme o template e usuario confirmou o slug.
@@ -92,6 +112,15 @@ A pesquisa segue ordem fixa — TDN do modulo padrao TOTVS **antes** de abrir qu
 **Heuristica "duas tabelas paralelas = pergunta":** se aparecer no codebase uma tabela custom (`Z**`) que parece duplicar o papel de uma tabela padrao (ex: SZ2 paralela a SG2, SZ3 paralela a SHY), **parar e perguntar antes de seguir**: *"o padrao TOTVS nao cobre isso? por que o cliente duplicou?"*. Pode existir um parametro que ativa o comportamento padrao equivalente — ou a duplicacao tem motivo historico que muda o desenho da solucao.
 
 **Pergunta padrao para mandar ao cliente cedo:** *"Lista de parametros MV do modulo e valores atuais (vs default). Quais foram modificados ao longo do tempo, e por que?"*. Pode ser extraida por SQL: `SELECT X6_VAR, X6_CONTEUD, X6_DEFAULT FROM SX6 WHERE X6_FIL = '<filial>' ORDER BY X6_VAR` — filtrar depois pelos prefixos do modulo.
+
+### Checklist de ambiente (perguntar CEDO — resposta tardia ja forcou replanejamento inteiro)
+
+- [ ] Da para testar o EFEITO FINAL no ambiente (faturar, emitir, calcular)? Se nao: qual o nivel de evidencia possivel, declarado desde ja?
+- [ ] Existe base isolada para testes/TDD?
+- [ ] O release/licenca do cliente suporta a UI planejada (PO-UI exige cloud/MPP — confirmar ANTES de prometer tela)?
+- [ ] Integracao: o cliente aceita API ou so arquivo?
+- [ ] Quem sobe/reinicia servidor de dev/TST?
+- [ ] Massa de teste REAL do cliente disponivel? Catalogar CEDO (vira golden files) — massa sintetica inventada na hora do codigo e mentirosa.
 
 ### O que pesquisar
 
@@ -119,6 +148,8 @@ Segue a ordem da secao "Ordem obrigatoria" acima — TDN do modulo antes do code
 5. **Agentes especializados** — use os agents de docs-reference e process-consultant quando necessario.
 
 **Fallback de ferramentas:** se `tdn_search`/`tdn_fetch` (plugin claude-tdn) ou os agents docs-reference/process-consultant estiverem indisponiveis, use o MCP `advpl-tlpp-mcp-docs` ou pesquisa na TDN via curl (paginas TOTVS retornam 403 no WebFetch; curl com UA de navegador funciona).
+
+**Antes de fixar um padrao/processo proprio** (ciclo de teste, padrao de codigo, padrao de tela): pesquisar o padrao OFICIAL primeiro — TOTVS/TDN para plataforma, docs da Anthropic para praticas com IA — e adaptar por decisao registrada, nao inventar do zero.
 
 ### Validacao Obrigatoria (nao pular)
 
@@ -190,6 +221,10 @@ As decisoes tomadas durante o interrogatorio devem ser **registradas no `plano.m
 - **Indice**: Criar SIX para ZXX com campos ZXX_FILIAL+ZXX_COD
 - ...
 ```
+
+**Regras de negocio com fonte do cliente** ganham ID e canone proprio: crie `casos-e-regras.md` (leia `templates/casos-e-regras.md` nesta skill) — RN-xx/CB-xx citados em fonte, kanban e QA; os demais docs citam o ID, nunca reescrevem o texto.
+
+**Interrogatorio por artefato:** em portes medio/grande, artefatos duraveis que virarao gabarito (padroes de codigo, arquitetura, modelagem) merecem interrogatorio dedicado proprio, item a item com status de aprovacao — o artefato so vira gabarito citavel depois de sobreviver ao proprio interrogatorio.
 
 ### Mapa de decisoes para validacao com o cliente (`decisoes-cliente.md`)
 
@@ -267,6 +302,15 @@ Ao trabalhar em um item:
 - Maximo 2 itens em DOING simultaneamente
 - Se uma tarefa crescer demais, quebre em sub-tarefas
 - Se descobrir trabalho nao previsto, adicione como nova TASK em TODO
+- Bug descoberto apos o kanban montado: criar bug-spec em `fixes/` (leia `templates/bug-spec.md` nesta skill) — a spec dirige a correcao; causa raiz e achado de investigacao
+
+### Execucao delegada (opcional, portes medio/grande)
+
+Quando as tasks forem implementadas por agentes (subagente ou bridge externo), a sessao principal vira planner/reviewer e o par que disciplina a execucao e:
+
+- **Brief por task**: leia `templates/brief.md` (nesta skill) — auto-contido, fonte normativa, comandos literais, brief >1 pagina = task gorda.
+- **Agente executor do projeto**: leia `templates/agente-executor.md` (nesta skill) — instanciado UMA vez em `.claude/agents/` do projeto, versionado; as regras operacionais moram nele, nao repetidas em cada brief.
+- **Invariante**: nenhuma entrega de agente fecha sem analise da sessao principal (checklist objetivo) — o revisor valida FATOS em lote (campo por dicionario, assinatura por fonte real) antes de devolver rodada, e refaz a varredura em vez de confiar no relatorio do agente.
 
 Atualize o `plano.md` e avance.
 
@@ -285,6 +329,8 @@ Sugira a execucao do QA **somente quando TODOS os itens do kanban estiverem em D
 ### Template do qa.md
 
 Ao criar o `qa.md`, leia `templates/qa.md` (nesta skill) e use-o na integra (testes funcionais, regressao, borda e resumo final).
+
+**Passada regra → codigo:** se existe `casos-e-regras.md`, rode a varredura no sentido REGRA → codigo (para cada RN/CB: onde esta implementada e o comportamento bate?) — comentario convicto e defeito sao indistinguiveis na leitura do fonte; so o confronto fonte-do-cliente x comportamento pega regra contrariada. Instrucoes no proprio template.
 
 **Concluida quando:** `qa.md` criado com cenarios funcionais, de regressao e de borda, e — apos execucao humana — resumo final preenchido com "Aprovado: Sim".
 
@@ -425,40 +471,17 @@ Marque a etapa como concluida e finalize o plano.
 ## Fluxo Completo
 
 ```
-/planejar-advpl
-    │
-    ├─ Plano existente? → Ler plano.md → Retomar etapa atual
-    │
-    ├─ Etapa 1: Ideia
-    │   └─ Perguntar (incl. ticket) → Definir slug → Criar .claude/plans/<slug>/plano.md
-    │
-    ├─ Etapa 2: Pesquisa
-    │   └─ Agentes + TDN + Codebase → research.md
-    │
-    ├─ Etapa 3: Duvidas
-    │   ├─ /interrogatorio-advpl → Decisoes no plano.md
-    │   └─ Gerar decisoes-cliente.md (mapa para o cliente revisar,
-    │      com changelog no proprio arquivo)
-    │
-    ├─ Etapa 4: PRD
-    │   └─ /prd-protheus → prd.md
-    │
-    ├─ Etapa 5: Kanban
-    │   └─ Quebrar PRD → kanban.md → Implementar
-    │
-    ├─ Etapa 6: QA
-    │   └─ qa.md → Sugerir execucao quando TODO kanban estiver em DONE
-    │
-    ├─ Etapa 7: Limpeza pre-producao
-    │   └─ Remover refs a .claude/plans/<slug>/* dos fontes → grep zero residual (arquivos do plano permanecem)
-    │
-    └─ Etapa 8: Aplicar em producao
-        └─ Validar dicionario em PROD → compilar RPO → smoke test → notificar cliente
+/planejar-advpl → retomada (plano existente? wayfinder-map?) → auto-sizing
+  1 Ideia (slug + plano.md)          → 2 Pesquisa (research.md)
+  3 Duvidas (interrogatorio → decisoes + decisoes-cliente.md [+ casos-e-regras.md])
+  4 PRD (sintese → prd.md)           → 5 Kanban (camadas/gates → implementar)
+  6 QA (qa.md + passada regra→codigo) → 7 Limpeza (grep zero residual)
+  8 Producao (dicionario PROD → RPO → smoke test → notificar cliente)
 ```
 
 ## Regras gerais
 
-- **Uma etapa por vez** — nao pule etapas, cada uma alimenta a proxima
+- **Uma etapa por vez** — nao pule etapas, cada uma alimenta a proxima (excecoes: pulo declarado pelo auto-sizing de porte pequeno, sempre registrado no plano.md, ou pedido do usuario)
 - **Sempre atualize o plano.md** ao concluir cada etapa
 - **Peca confirmacao** do usuario antes de avancar para a proxima etapa
 - **Se o usuario pedir para pular uma etapa**, registre no plano.md como "Pulada — motivo: [razao]"

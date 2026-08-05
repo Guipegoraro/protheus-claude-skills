@@ -4,9 +4,6 @@ apontamento-gerar/
 # Skills instaladas (TOTVS / marketplace) — nao redistribuir
 entry-point-designer/
 mvc-generator/
-query-builder/
-sql-code-review/
-sql-optimization/
 tlpp-rest-endpoint-generator/
 
 # Config local do genericquery (contem senha) — nunca versionar

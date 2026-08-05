@@ -7,12 +7,12 @@ Skills customizadas para desenvolvimento TOTVS Protheus — ADVPL, TLPP, PO-UI e
 Este repositorio e um espelho da minha pasta de skills e mistura **tres origens distintas**:
 
 1. **Autorais (Guilherme Pegoraro)** — criadas por mim para o meu fluxo de consultoria Protheus: `planejar-advpl`, `interrogatorio-advpl`, `prd-protheus`, `protheus-configurador-dicionario`, `protheus-consulta-padrao`, `po-ui-app`, `protheus-api-poui`, `refazer-relatorio-classico`, `apontamento-gerar`, `session-summary`, `session-resume`.
-2. **Comunidade TOTVS/engpro** — skills de terceiros (autoria Melkz Siqueira / Engenharia Protheus, MIT; `genericquery` de Johnni Moraes - TSC), adaptadas ao meu ambiente: `code-review`, `mvc-generator`, `entry-point-designer`, `tlpp-rest-endpoint-generator`, `fwrest-client-generator`, `fwmsprinter-pdf`, `data-dictionary-lookup`, `query-builder`, `sql-code-review`, `sql-optimization`, `genericquery`.
+2. **Comunidade TOTVS/engpro** — skills de terceiros (autoria Melkz Siqueira / Engenharia Protheus, MIT; `genericquery` de Johnni Moraes - TSC), adaptadas ao meu ambiente: `code-review`, `mvc-generator`, `entry-point-designer`, `tlpp-rest-endpoint-generator`, `fwrest-client-generator`, `fwmsprinter-pdf`, `data-dictionary-lookup`, `genericquery`. A antiga trinca SQL (query-builder / sql-code-review / sql-optimization, MIT) foi fundida e reescrita como `sql-protheus` a partir de pesquisa TDN/fontes-padrao (08/2026).
 3. **Adaptadas de [mattpocock/skills](https://github.com/mattpocock/skills)** (MIT, Matt Pocock) — skills de processo genericas, portadas quase-verbatim com adaptacoes minimas ao ecossistema Protheus (`.claude/plans/<slug>/` como tracker local): `grilling`, `domain-modeling`, `wayfinder`, `diagnosing-bugs`, `writing-great-skills`.
 
 Credito e licenca de cada origem permanecem nos respectivos arquivos.
 
-> **Nota:** algumas skills de terceiros listadas acima estao no `.gitignore` deste repositorio (nao redistribuidas): `apontamento-gerar`, `entry-point-designer`, `mvc-generator`, `query-builder`, `sql-code-review`, `sql-optimization` e `tlpp-rest-endpoint-generator`. Elas existem no meu espelho local e aparecem aqui como documentacao do conjunto completo, mas um clone fresco nao as inclui.
+> **Nota:** algumas skills de terceiros listadas acima estao no `.gitignore` deste repositorio (nao redistribuidas): `apontamento-gerar`, `entry-point-designer`, `mvc-generator` e `tlpp-rest-endpoint-generator`. Elas existem no meu espelho local e aparecem aqui como documentacao do conjunto completo, mas um clone fresco nao as inclui.
 ## Instalacao
 
 1. Clone este repositorio em `~/.claude/skills/`:
@@ -79,9 +79,7 @@ Quase todas sao **user-invoked** (`disable-model-invocation: true`): so carregam
 
 | Skill | Descricao |
 |-------|-----------|
-| `query-builder` | Queries seguras e otimizadas para tabelas Protheus (D_E_L_E_T_, filial, FWExecStatement vs Workarea) |
-| `sql-optimization` | Tuning de queries, estrategia de indices e analise de plano de execucao (PostgreSQL, SQL Server, Oracle) |
-| `sql-code-review` | Review de SQL — seguranca (injection), qualidade e anti-padroes |
+| `sql-protheus` | SQL AdvPL/TLPP completo: construir (FWExecStatement, Embedded SQL), revisar (injection, filtros mandatorios) e otimizar (indices SIX, paginacao, cross-database MSSQL/Oracle/Postgres). Reescrita 08/2026 sobre pesquisa TDN |
 | `genericquery` | Consulta tabelas Protheus via API nativa genericQuery (OAuth2 + REST) sem acesso direto ao banco |
 
 ### Qualidade
@@ -116,8 +114,8 @@ As skills de AdvPL/TLPP tambem aproveitam, quando disponiveis, um MCP de documen
 
 1. **Planejamento** — para esforcos grandes demais para uma sessao, `/wayfinder` monta o mapa de decisoes primeiro; `/planejar-advpl` estrutura a customizacao (aciona `prd-protheus` e `interrogatorio-advpl` nas etapas certas) e produz o pacote em `.claude/plans/<slug>/`.
 2. **Dicionario** — `/protheus-configurador-dicionario` desenha tabelas / campos / indices / parametros novos e gera o checklist em `pre-producao.md`. Para F3 / consultas padrao, `/protheus-consulta-padrao`.
-3. **Implementacao** — MVC (`/mvc-generator`), REST (`/tlpp-rest-endpoint-generator`, `/protheus-api-poui`), frontend (`/po-ui-app`), PDFs (`/fwmsprinter-pdf`), integracoes (`/fwrest-client-generator`) e consulta direta ao banco via `/genericquery` + `/query-builder`.
-4. **Qualidade** — `/code-review` e `/sql-code-review` antes de aplicar.
+3. **Implementacao** — MVC (`/mvc-generator`), REST (`/tlpp-rest-endpoint-generator`, `/protheus-api-poui`), frontend (`/po-ui-app`), PDFs (`/fwmsprinter-pdf`), integracoes (`/fwrest-client-generator`) e consulta direta ao banco via `/genericquery` + `/sql-protheus`.
+4. **Qualidade** — `/code-review` e `/sql-protheus` (branch de review) antes de aplicar.
 5. **Sessoes longas** — `/session-summary` ao final; `/session-resume` para retomar apos `/clear`.
 
 ## Convencoes

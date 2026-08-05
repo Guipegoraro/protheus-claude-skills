@@ -84,7 +84,7 @@ Use cautiously — expression indexes are not portable across all backends (Post
 - The filtered selectivity is poor (low cardinality column like a `S/N` flag).
 - The table is high-write, low-read.
 
-Use the `query-builder` skill to pick an existing SIX index before creating a new one.
+Use the `sql-protheus` skill to pick an existing SIX index before creating a new one.
 
 ## UPDDISTR behaviour
 
