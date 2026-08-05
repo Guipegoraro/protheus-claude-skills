@@ -57,7 +57,7 @@ Required sections (in this order):
 10. **Plano B**: alternative filter syntax (no `@`) for environments where push-down doesn't work, with explicit instructions to switch the doc and kanban after the test.
 11. **Resumo SXB (referência técnica)**: only at the END, the raw SXB rows table for the technically-inclined consultor who wants to audit later. Mark it explicitly as "the Configurador generates these — don't type them directly".
 
-The consultor reading this doc may not be the developer who designed the consulta. Write so a new person on the team can apply it without having to ask. A concrete example to follow is `.claude/plans/baixa-pre-requisicao-transferencia-013575/pre-producao.md` (section 2).
+The consultor reading this doc may not be the developer who designed the consulta. Write so a new person on the team can apply it without having to ask — the 11-section structure above is the template.
 
 If the user asks for the consulta and you're not generating `pre-producao.md` at the same time, **remind them** that the implementation hand-off needs the doc — half-finished consultas trip on deploy day.
 
@@ -98,7 +98,7 @@ When you need to verify the current state of a consulta on the **product** (stan
 - `language-system-docs-search` for the official TDN documentation of any XB_TIPO.
 - `code-search` to find how a `ConPad1` / `FWLookUp` is invoked in standard Protheus sources.
 
-This MCP exposes the **reference TOTVS base**, not the customer's environment. Customer-side state (which consultas they actually have, with their customisations) must come from a customer-side query (ClaudeSQL) or the user.
+This MCP exposes the **reference TOTVS base**, not the customer's environment. Customer-side state (which consultas they actually have, with their customisations) must come from a customer-side query (`/genericquery`) or the user.
 
 ## Detailed references
 

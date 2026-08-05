@@ -1,7 +1,18 @@
 # Protheus Claude Skills
 
 Skills customizadas para desenvolvimento TOTVS Protheus — ADVPL, TLPP, PO-UI e SQL — usadas com [Claude Code](https://claude.ai/claude-code).
-aviso: nem todas as skills aqui listadas foram desenvolvidas por mim, aqui é basicamente um espelho da minha pasta de skills. Algumas das notáveis que desenvolvi é "Planejar ADPVPL" e as de configurador.
+
+## Origem das skills (merge de tres fontes)
+
+Este repositorio e um espelho da minha pasta de skills e mistura **tres origens distintas**:
+
+1. **Autorais (Guilherme Pegoraro)** — criadas por mim para o meu fluxo de consultoria Protheus: `planejar-advpl`, `interrogatorio-advpl`, `prd-protheus`, `protheus-configurador-dicionario`, `protheus-consulta-padrao`, `po-ui-app`, `protheus-api-poui`, `refazer-relatorio-classico`, `apontamento-gerar`, `session-summary`, `session-resume`.
+2. **Comunidade TOTVS/engpro** — skills de terceiros (autoria Melkz Siqueira / Engenharia Protheus, MIT; `genericquery` de Johnni Moraes - TSC), adaptadas ao meu ambiente: `code-review`, `mvc-generator`, `entry-point-designer`, `tlpp-rest-endpoint-generator`, `fwrest-client-generator`, `fwmsprinter-pdf`, `data-dictionary-lookup`, `query-builder`, `sql-code-review`, `sql-optimization`, `genericquery`.
+3. **Adaptadas de [mattpocock/skills](https://github.com/mattpocock/skills)** (MIT, Matt Pocock) — skills de processo genericas, portadas quase-verbatim com adaptacoes minimas ao ecossistema Protheus (`.claude/plans/<slug>/` como tracker local): `grilling`, `domain-modeling`, `wayfinder`, `diagnosing-bugs`, `writing-great-skills`.
+
+Credito e licenca de cada origem permanecem nos respectivos arquivos.
+
+> **Nota:** algumas skills de terceiros listadas acima estao no `.gitignore` deste repositorio (nao redistribuidas): `apontamento-gerar`, `entry-point-designer`, `mvc-generator`, `query-builder`, `sql-code-review`, `sql-optimization` e `tlpp-rest-endpoint-generator`. Elas existem no meu espelho local e aparecem aqui como documentacao do conjunto completo, mas um clone fresco nao as inclui.
 ## Instalacao
 
 1. Clone este repositorio em `~/.claude/skills/`:
@@ -25,6 +36,18 @@ Invoque via slash command (`/<skill-name>`) ou mencione o tema na conversa — o
 | `planejar-advpl` | Processo completo de planejamento de customizacao Protheus em 8 etapas — ideia, pesquisa, interrogatorio, PRD, kanban, QA, limpeza pre-producao e aplicacao |
 | `prd-protheus` | Gera PRDs (Documentos de Requisitos) para customizacoes Protheus via entrevista conversacional |
 | `interrogatorio-advpl` | Stress-test de planos de customizacao — questiona cada aspecto ate validar todas as decisoes |
+
+### Processo generico (adaptadas de mattpocock/skills)
+
+Quase todas sao **user-invoked** (`disable-model-invocation: true`): so carregam quando voce digita `/<nome>`, custo zero de contexto nas demais sessoes. Apenas `grilling` e `domain-modeling` sao model-invoked, com descriptions de uma linha.
+
+| Skill | Descricao |
+|-------|-----------|
+| `wayfinder` | Planeja trabalho grande demais para uma sessao como mapa de decision tickets em `.claude/plans/<slug>/` — fog of war, 1 decisao por sessao, mapa como indice |
+| `grilling` | Primitiva de entrevista: uma pergunta por vez, com recomendacao anexa, ate entendimento compartilhado. `interrogatorio-advpl` = grilling + 10 dimensoes Protheus |
+| `domain-modeling` | Glossario vivo do dominio do cliente (CONTEXT.md) + ADRs de um paragrafo para decisoes dificeis de reverter |
+| `diagnosing-bugs` | Debug disciplinado: construir o feedback loop red-capable ANTES de formar teoria; multi-hipotese falsificavel; logs com prefixo unico para cleanup |
+| `writing-great-skills` | Meta-skill para escrever/manter skills — invocacao, information hierarchy, leading words, catalogo de failure modes (+ GLOSSARY.md) |
 
 ### PO-UI (frontend Angular + backend Protheus)
 
@@ -59,6 +82,7 @@ Invoque via slash command (`/<skill-name>`) ou mencione o tema na conversa — o
 | `query-builder` | Queries seguras e otimizadas para tabelas Protheus (D_E_L_E_T_, filial, FWExecStatement vs Workarea) |
 | `sql-optimization` | Tuning de queries, estrategia de indices e analise de plano de execucao (PostgreSQL, SQL Server, Oracle) |
 | `sql-code-review` | Review de SQL — seguranca (injection), qualidade e anti-padroes |
+| `genericquery` | Consulta tabelas Protheus via API nativa genericQuery (OAuth2 + REST) sem acesso direto ao banco |
 
 ### Qualidade
 
@@ -70,7 +94,6 @@ Invoque via slash command (`/<skill-name>`) ou mencione o tema na conversa — o
 
 | Skill | Descricao |
 |-------|-----------|
-| `claudesql-setup` | Configura a API ClaudeSQL no ambiente Protheus para queries read-only via Claude |
 | `session-summary` | Gera resumo denso da sessao atual (decisoes, padroes, arquivos, pendencias) para reload apos `/clear`. Detecta `.claude/plans/<slug>/` e entra em modo referencial quando ha plano via `planejar-advpl` |
 | `session-resume` | Recarrega o resumo gerado por `session-summary`, restaurando contexto apos `/clear` |
 | `apontamento-gerar` | Gera apontamento de trabalho para o cliente |
@@ -91,9 +114,9 @@ As skills de AdvPL/TLPP tambem aproveitam, quando disponiveis, um MCP de documen
 
 ## Fluxo recomendado
 
-1. **Planejamento** — `/planejar-advpl` estrutura a customizacao (aciona `prd-protheus` e `interrogatorio-advpl` nas etapas certas) e produz o pacote em `.claude/plans/<slug>/`.
+1. **Planejamento** — para esforcos grandes demais para uma sessao, `/wayfinder` monta o mapa de decisoes primeiro; `/planejar-advpl` estrutura a customizacao (aciona `prd-protheus` e `interrogatorio-advpl` nas etapas certas) e produz o pacote em `.claude/plans/<slug>/`.
 2. **Dicionario** — `/protheus-configurador-dicionario` desenha tabelas / campos / indices / parametros novos e gera o checklist em `pre-producao.md`. Para F3 / consultas padrao, `/protheus-consulta-padrao`.
-3. **Implementacao** — MVC (`/mvc-generator`), REST (`/tlpp-rest-endpoint-generator`, `/protheus-api-poui`), frontend (`/po-ui-app`), PDFs (`/fwmsprinter-pdf`), integracoes (`/fwrest-client-generator`) e consulta direta ao banco via `/claudesql-setup` + `/query-builder`.
+3. **Implementacao** — MVC (`/mvc-generator`), REST (`/tlpp-rest-endpoint-generator`, `/protheus-api-poui`), frontend (`/po-ui-app`), PDFs (`/fwmsprinter-pdf`), integracoes (`/fwrest-client-generator`) e consulta direta ao banco via `/genericquery` + `/query-builder`.
 4. **Qualidade** — `/code-review` e `/sql-code-review` antes de aplicar.
 5. **Sessoes longas** — `/session-summary` ao final; `/session-resume` para retomar apos `/clear`.
 

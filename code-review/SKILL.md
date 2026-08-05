@@ -39,8 +39,6 @@ This skill uses progressive disclosure. The SKILL.md body covers the review work
 | [references/code-quality-patterns.md](references/code-quality-patterns.md) | Reviewing **performance, legacy code, metadata access, or compilation** issues | Loop/transaction anti-patterns, ISAM migration, deprecated API replacements, SX* metadata access table, encoding rules |
 | [references/documentation-and-conventions.md](references/documentation-and-conventions.md) | Reviewing **ProtheusDOC, naming conventions, clean code**, or **TLPP-specific** patterns | ProtheusDOC tag reference, common documentation mistakes, variable naming/scope conventions, TLPP type annotations, namespace, Try-Catch |
 
-> Also refer to [references/sonarqube-rules-reference.md](../references/sonarqube-rules-reference.md) for the complete SonarQube rules reference shared across skills.
-
 ---
 
 ## Review Process
@@ -142,6 +140,11 @@ For `.tlpp` files: verify file extension consistency, type annotations on variab
 
 Check syntax errors (**CA0000**), file encoding (Windows-1252), INI references (**CA1005**), and I18N compliance (**CA2016**).
 
+### 9. Ecosystem Rules (override the references above)
+
+- Dictionary mutation in customisation source (`PutSX3`, `PutSX6`, `PutMV`, `PutSX1`, `RecLock` on SX*/SXB) = **CRITICAL** — dictionary changes go through the Configurador only (skill `protheus-configurador-dicionario`).
+- Business-rule block (`Return ""`, error status) without a client source comment (`// Ref: <e-mail/ticket/data>`) and leftover `TODO Pergunta` markers = **MAJOR** — open questions belong in `.claude/plans/<slug>/perguntas-cliente.md`, interim behavior stays permissive (log/aviso).
+
 ---
 
 ## Report Format
@@ -217,8 +220,6 @@ Output the review as follows:
 ---
 
 ## Quick Reference: All SonarQube Rules
-
-For the complete rule definitions, severity levels, prohibited patterns, and required alternatives, consult [references/sonarqube-rules-reference.md](../references/sonarqube-rules-reference.md).
 
 | Group | Rules | Focus |
 |-------|-------|-------|

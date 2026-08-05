@@ -7,6 +7,8 @@ description: Creates REST APIs in Protheus (TLPP annotations, WSRESTFUL, FWAdapt
 
 Backend counterpart of skill `po-ui-app`. The integration point is the TOTVS API contract — implement it exactly and the PO-UI dynamic pages work with zero frontend code.
 
+> Skill `tlpp-rest-endpoint-generator` covers the detailed `oRest`/TTALK reference.
+
 **Output language rule: all user-facing output — code comments, commit messages, chat responses — in PT-BR. Identifiers in English/Protheus conventions.**
 
 ## Workflow for a new endpoint

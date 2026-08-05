@@ -42,6 +42,7 @@ Antes de coletar qualquer coisa, verifique se existe um plano da skill `planejar
    - `decisoes-cliente.md` — decisoes que aguardam revisao do cliente
    - `pre-producao.md` — campos/tabelas/parametros/consultas a aplicar no Configurador
    - `perguntas-cliente.md` — duvidas abertas
+   - `wayfinder-map.md` + `wayfinder/` — mapa de decisoes (via /wayfinder); em modo referencial, decisoes resolvidas vivem nos tickets, nao no resumo
 
 **Se existe plano**, o resumo entra em **modo referencial**: cada secao numerada do template aponta para o artefato canonico em vez de copiar o conteudo. O resumo so detalha o que e:
 

@@ -123,7 +123,7 @@ Use the `advpl-tlpp-mcp-docs` MCP to inspect the **standard TOTVS dictionary**:
 - `execute-sql` against `SX2T10`, `SX3T10`, `SX6T10`, `SIXT10`, `SXGT10` to see the standard rows.
 - `code-search` to find how TOTVS sources consume a particular field (e.g. `B1_DESC` references) before extending it.
 
-This MCP reflects the reference TOTVS base, not the customer environment. For customer-side state (what the customer actually has), use ClaudeSQL or ask the user. Never assume.
+This MCP reflects the reference TOTVS base, not the customer environment. For customer-side state (what the customer actually has), use `/genericquery` or ask the user. Never assume.
 
 ## Detailed references
 

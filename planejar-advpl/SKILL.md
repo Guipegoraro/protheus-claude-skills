@@ -1,6 +1,6 @@
 ---
 name: planejar-advpl
-description: Use when starting a new Protheus customization or feature, or mentions "planejar", "planejar advpl", "nova feature", "nova customizacao", "planejar customizacao". Guides through 6 stages - idea, research, interrogation, PRD, kanban, and QA for ADVPL/TLPP development.
+description: Use when starting a new Protheus customization or feature, or mentions "planejar", "planejar advpl", "nova feature", "nova customizacao", "planejar customizacao". Guides through 8 stages - idea, research, interrogation, PRD, kanban, QA, pre-production cleanup, and production deploy for ADVPL/TLPP development.
 ---
 
 # Planejar ADVPL
@@ -14,7 +14,8 @@ Ao ser invocada, SEMPRE verifique primeiro se existe um plano em andamento:
 1. Liste `.claude/plans/` para ver planos existentes
 2. Se o usuario mencionar uma feature existente, leia o `plano.md` correspondente
 3. Retome da etapa atual indicada no `plano.md`
-4. Se nao existir plano, inicie pela Etapa 1
+4. Se existir `wayfinder-map.md` na pasta do slug: leia-o antes de tudo — "Decisions so far" sao decisoes JA tomadas (a Etapa 3 pergunta apenas o que estiver aberto; o PRD sintetiza delas), e as linhas de "Out of scope" do mapa vao para a secao `## Fora de escopo / rejeitado` do plano.md
+5. Se nao existir plano, inicie pela Etapa 1
 
 ## Estrutura de arquivos
 
@@ -60,38 +61,15 @@ Pergunte ao usuario:
 - **Numero do ticket** (tspace/jira/e-mail) — se nao houver, registrar "sem ticket" e seguir
 - Existe alguma referencia ou solicitacao documentada?
 
+**Escopo grande ou nebuloso demais?** Se as respostas revelarem um esforco que nao cabe numa sessao de planejamento — muitas frentes, decisoes que dependem do cliente ainda sem forma, semanas de trabalho — sugira ao usuario rodar `/wayfinder` primeiro (mapa de decisoes em `.claude/plans/<slug>/`, uma decisao por sessao) e retomar esta skill quando o caminho estiver claro.
+
 Com as respostas, **defina o slug** (`<feature-slug>[-<ticket>]`) e crie a pasta `.claude/plans/<slug>/` com o `plano.md`. Os demais arquivos (`research.md`, `decisoes-cliente.md`, `prd.md`, `kanban.md`, `qa.md`, `pre-producao.md`, `perguntas-cliente.md`) sao adicionados nas etapas seguintes, conforme necessidade.
 
-Template do `plano.md`:
-
-```markdown
-# Plano: [Nome da Feature]
-
-| Campo | Valor |
-|-------|-------|
-| **Cliente** | [NOME] |
-| **Modulo** | [MODULO] |
-| **Projeto** | [PASTA DO PROJETO] |
-| **Ticket** | [NUMERO ou "sem ticket"] |
-| **Slug** | [feature-slug-ticket — usado em .claude/plans/] |
-| **Criado** | [DATA] |
-| **Etapa atual** | 1 - Ideia |
-
-## Descricao
-[Resumo do que sera construido, 2-3 frases]
-
-## Etapas
-- [x] 1. Ideia — definida
-- [ ] 2. Pesquisa
-- [ ] 3. Duvidas
-- [ ] 4. PRD
-- [ ] 5. Kanban
-- [ ] 6. QA
-- [ ] 7. Limpeza pre-producao
-- [ ] 8. Aplicar em producao
-```
+Ao criar o `plano.md`, leia `templates/plano.md` (nesta skill) e use-o na integra — inclusive a secao `## Fora de escopo / rejeitado` (uma linha por conceito descartado + motivo duravel + fonte; consultar antes de re-propor algo ao cliente).
 
 Atualize a etapa e avance.
+
+**Concluida quando:** pasta `.claude/plans/<slug>/` criada com `plano.md` preenchido conforme o template e usuario confirmou o slug.
 
 ---
 
@@ -133,11 +111,14 @@ Use agentes e plugins (TDN, codebase exploration) para investigar:
 
 Segue a ordem da secao "Ordem obrigatoria" acima — TDN do modulo antes do codebase do cliente.
 
+0. **CONTEXT.md e ADRs** — se existirem (raiz do projeto ou `.claude/plans/<slug>/`), leia antes: vocabulario do cliente e decisoes ja firmadas. Termo do cliente ambiguo ou novo durante a pesquisa → skill `domain-modeling`.
 1. **TDN do modulo padrao** — use o plugin MCP do TDN (tdn_search/tdn_fetch) para o manual operacional, lista de parametros MV (por label/categoria, nao so por nome) e lista de tabelas. Esta etapa NAO e opcional.
 2. **Codebase do cliente** — explore o diretorio do projeto para encontrar customizacoes existentes. **Apos** o mapeamento do padrao, nunca antes.
 3. **TDN para funcoes/PEs especificos** — depois que o desenho da solucao comeca a tomar forma, validar funcoes do framework e PEs individuais.
 4. **Web** — busque na web quando necessario para informacoes complementares.
 5. **Agentes especializados** — use os agents de docs-reference e process-consultant quando necessario.
+
+**Fallback de ferramentas:** se `tdn_search`/`tdn_fetch` (plugin claude-tdn) ou os agents docs-reference/process-consultant estiverem indisponiveis, use o MCP `advpl-tlpp-mcp-docs` ou pesquisa na TDN via curl (paginas TOTVS retornam 403 no WebFetch; curl com UA de navegador funciona).
 
 ### Validacao Obrigatoria (nao pular)
 
@@ -152,10 +133,10 @@ Apos identificar funcoes e tabelas na pesquisa livre, execute antes de avancar:
 1. `tdn_search` com apenas o nome da funcao (ex: "MsExecAuto", "FWRest")
 2. Se encontrar resultado: `tdn_fetch` para obter parametros, retorno e observacoes
 3. Registre no `research.md` > secao "Validacao TDN": nome, parametros, retorno, status
-4. Se nao encontrar: registre como "sem documentacao TDN" e consulte as skills do protheus-toolkit
+4. Se nao encontrar: registre como "sem documentacao TDN" e consulte as skills locais (`mvc-generator`, `data-dictionary-lookup`) ou o MCP `advpl-tlpp-mcp-docs`
 
 **Dicionario — para cada tabela identificada:**
-1. `dicionario_fetch` com o alias da tabela (ex: "SA1", "SC5")
+1. `dicionario_fetch` com o alias da tabela (ex: "SA1", "SC5") — se indisponivel, use o MCP `advpl-tlpp-mcp-docs` ou pesquisa na TDN via curl
 2. Registre no `research.md` > secao "Dicionario de Dados": campos relevantes, tipo, tamanho, indices disponiveis
 
 **Dicionario REAL do cliente — buscar customizacoes nas tabelas envolvidas (nao pular):**
@@ -173,6 +154,8 @@ ORDER BY X3_ARQUIVO, X3_ORDEM
 
 (SQL sempre ANSI — o banco do cliente varia entre projetos. Incluir tambem `SELECT INDICE, ORDEM, CHAVE FROM SIX<EMP> WHERE INDICE IN (...)` se a customizacao depende de chave/indice.)
 
+Se o projeto tiver `.genericquery.json`, rode a consulta voce mesmo via skill `genericquery` em vez de pedir ao usuario.
+
 Com o resultado, registrar no `research.md` secao "Dicionario REAL do cliente":
 1. **Campos custom** (`?_Z*` ou sem prefixo Z mas ausentes do dicionario de referencia) de cada tabela envolvida — podem mudar o desenho (campo que a feature precisa pode ja existir).
 2. **Tamanhos/tipos divergentes do padrao** — reforca o uso de `TamSX3` e afeta layout de arquivos/integracoes.
@@ -181,70 +164,11 @@ Com o resultado, registrar no `research.md` secao "Dicionario REAL do cliente":
 
 ### Template do research.md
 
-```markdown
-# Pesquisa: [Nome da Feature]
-
-**Data:** [DATA]
-**Cliente:** [NOME] | **Modulo:** [MODULO]
-
----
-
-## Rotinas Padrao Envolvidas
-| Rotina | Descricao | Relevancia |
-|--------|-----------|-----------|
-| MATA010 | Cadastro de Produtos | Sera consultada para... |
-
-## Tabelas
-| Alias | Descricao | Uso | Campos-chave |
-|-------|-----------|-----|-------------|
-| SA1 | Clientes | Leitura | A1_COD, A1_LOJA |
-| ZXX | [Custom] | Gravacao | ZXX_COD |
-
-## Pontos de Entrada
-| PE | Rotina | Descricao | Relevante porque |
-|----|--------|-----------|-----------------|
-| MT010INC | MATA010 | Inclusao de produto | Podemos usar para... |
-
-## Parametros MV
-| Parametro | Descricao | Valor padrao | Impacto |
-|-----------|-----------|-------------|---------|
-| MV_EXEMPLO | Descricao | .T. | Afeta... |
-
-## Funcoes do Framework
-| Funcao/Metodo | Uso planejado |
-|---------------|--------------|
-| FWFormModel | Base do cadastro MVC |
-
-## Validacao TDN
-| Funcao/Metodo | Parametros | Retorno | Status TDN |
-|---------------|------------|---------|------------|
-| MsExecAuto | ... | Logico | Documentado |
-| FWFormModel | ... | Objeto | Sem doc TDN — ref: skill protheus-mvc |
-
-## Dicionario de Dados
-### SA1 — Clientes
-| Campo | Tipo | Tam | Descricao |
-|-------|------|-----|-----------|
-| A1_COD | C | 6 | Codigo do cliente |
-| A1_LOJA | C | 2 | Loja |
-
-**Indices disponiveis:** A1_COD+A1_LOJA (unico), ...
-
-## Customizacoes Existentes no Cliente
-| Fonte | Descricao | Relacao com esta feature |
-|-------|-----------|------------------------|
-| BRNCUST01.prw | Customizacao de PCP | Sera modificado para... |
-
-## Integracoes
-| Sistema/Modulo | Tipo | Descricao |
-|---------------|------|-----------|
-| Fiscal (SIGAFIS) | Trigger | Geracao de nota ao... |
-
-## Notas e Descobertas
-- [Anotacoes livres sobre o que foi descoberto durante a pesquisa]
-```
+Ao criar o `research.md`, leia `templates/research.md` (nesta skill) e use-o na integra.
 
 Apos preencher o research.md, atualize o `plano.md` e avance.
+
+**Concluida quando:** `research.md` criado com as validacoes obrigatorias registradas (Parametros MV, Validacao TDN, Dicionario de Dados, Dicionario REAL do cliente) e `plano.md` atualizado.
 
 ---
 
@@ -292,118 +216,13 @@ escopo. E diferente do `plano.md`:
   mudanca substantiva entra no changelog do proprio arquivo** — nunca
   sobrescreva uma decisao antiga sem registrar.
 
-#### Estrutura recomendada
+#### Template e regras
 
-```text
-COMPILADO DE DECISÕES - [NOME DA FEATURE]
-Ticket: [referência externa - tspace/jira/e-mail]
-
-================================================================
-1. [TEMA - ex: MODELO DE DADOS]
-================================================================
-
-1.1 [Decisão direta em uma frase. Quando o cliente vai conferir
-    no Configurador, cite parâmetro/tabela/campo com nome exato.]
-
-1.2 [Quando a decisão tem motivo importante, inclua "Motivo: ..."
-    em frase curta logo abaixo.]
-
-================================================================
-2. [TEMA - ex: CÁLCULO X]
-================================================================
-
-2.1 ...
-2.2 ...
-
-================================================================
-N. PARÂMETROS NOVOS PARA CRIAR NO CONFIGURADOR
-================================================================
-
-NOME_PARAM   default "valor"
-    Descrição curta
-
-JÁ EXISTENTES - só validar default em PROD:
-- PARAM_X  -> deve ser "valor esperado"
-
-================================================================
-*** PERGUNTAS EM ABERTO ***
-================================================================
-
-1) [Pergunta direta para o cliente, com contexto curto + qual
-   comportamento está em vigor enquanto não responde.]
-
-================================================================
-CHANGELOG
-================================================================
-
-[YYYY-MM-DD] - Versão inicial enviada ao cliente.
-
-[YYYY-MM-DD] - [Descrição da mudança em uma frase].
-    Fonte: [e-mail Fulano / ticket 00011638 / ata reunião DD/MM].
-    Item afetado: seção X.Y.
-```
-
-#### Temas tipicos por modulo
-
-Use como ponto de partida, ajuste ao caso:
-
-- **Financeiro / Faturamento**: modelo de dados, formula de calculo,
-  regras especiais (cliente/natureza/tipo), parametros, como o
-  numero/saldo e atualizado, integracoes.
-- **Compras**: modelo de dados, regras de aprovacao, parametros de
-  alcada, integracoes (portal/ERP externo), tela vs job.
-- **Estoque/PCP**: estrutura de produto, regras de movimentacao,
-  regras de bloqueio/liberacao, atualizacoes em massa.
-- **Importacao (EIC)**: chaves de processo (HAWB customizado vs
-  padrao), integracoes com despachantes, fluxo de aprovacao.
-
-#### Regras de linguagem (load-bearing)
-
-- **Participio passado impessoal** — mesma voz dos apontamentos:
-  "Considerados apenas titulos baixados", "Excluidos titulos do
-  tipo INV". Evitar primeira pessoa ("decidimos", "fizemos").
-- **Citar nomes de cliente/processo** quando ja sao conhecidos do
-  cliente: "clientes 42671051 e 52085074", "processo 59533".
-- **Citar parametros** com codigo exato do SX6 (`ASC_ASC06A001`,
-  `MV_PAR01`) — o cliente confere no Configurador.
-- **Citar tabelas e campos custom** com prefixo Z** (SZN, ZN_VLRNUM)
-  — sao reais e podem aparecer em telas/relatorios/queries.
-- **NAO citar** nomes de funcoes ADVPL/TLPP, classes, namespaces,
-  variaveis internas, design patterns ou decisoes de implementacao
-  (lock-by-name, idempotencia, begin transaction, FWPreparedStatement,
-  alias temporario, etc). Se nao agrega ao entendimento do cliente,
-  fica de fora.
-- **Acentuacao correta** — o documento e lido por humano, nao por
-  AppServer. `cálculo`, `parâmetro`, `função`, `decisões`, etc.
-- **Pendencias para o cliente** ficam no bloco final "PERGUNTAS EM
-  ABERTO". Sempre inclua: pergunta, contexto curto, qual
-  comportamento esta em vigor enquanto nao responde.
-
-#### Changelog — formato e regras
-
-O bloco CHANGELOG fica no fim do arquivo. Cada entrada:
-
-1. **Data ISO** (`YYYY-MM-DD`)
-2. **Descricao em uma frase** do que mudou.
-3. **Fonte** (em linha indentada): de onde veio a mudanca —
-   e-mail, ticket, ata de reuniao, nome da pessoa. **Nunca
-   omitir** — sem fonte a mudanca nao tem rastreabilidade.
-4. **Item afetado**: numero da secao + tema (ex: "secao 6.5
-   cobertura de POs sem SW6").
-
-Ordem cronologica: mais antigo no topo, mais novo no fim. **Nunca
-reescreva entrada antiga** — se uma decisao foi reposta, registre
-uma nova linha "decisao X revertida apos resposta do Fulano".
-
-Quando uma pergunta em aberto for respondida pelo cliente:
-
-1. Move o item da secao "PERGUNTAS EM ABERTO" para a secao tematica
-   apropriada (vira decisao consolidada).
-2. Registra no changelog: `[DATA] - Q1 respondida por Fulano,
-   mantida soma direta. Fonte: e-mail 12/05. Item afetado: secao 2.1.`
-3. Ajusta o fonte ADVPL se a resposta mudou comportamento.
+Ao criar ou revisar o `decisoes-cliente.md`, leia `templates/decisoes-cliente.md` (nesta skill) e siga-o na integra — contem a estrutura do documento, temas tipicos por modulo, regras de linguagem (load-bearing) e formato/regras do changelog.
 
 Atualize o `plano.md` e avance.
+
+**Concluida quando:** decisoes do interrogatorio registradas na secao `## Decisoes` do `plano.md` e `decisoes-cliente.md` gerado (versao inicial com changelog) para envio ao cliente.
 
 ---
 
@@ -416,9 +235,11 @@ Invoque a skill `/prd-protheus` passando:
 - A pesquisa realizada (Etapa 2)
 - As decisoes tomadas (Etapa 3)
 
-O PRD gerado deve ser salvo como `prd.md` na pasta do plano.
+As decisoes ja estao em `plano.md`/`decisoes-cliente.md` — a `/prd-protheus` deve SINTETIZAR a partir delas, nao re-entrevistar o usuario. Salvar o resultado como `prd.md` na mesma pasta do plano.
 
 Atualize o `plano.md` e avance.
+
+**Concluida quando:** `prd.md` salvo na pasta do plano, sintetizado a partir das decisoes existentes, e `plano.md` atualizado.
 
 ---
 
@@ -430,50 +251,17 @@ Atualize o `plano.md` e avance.
 
 Com base no PRD, crie tarefas atomicas — cada uma implementavel em uma sessao de trabalho.
 
-```markdown
-# Kanban: [Nome da Feature]
+Ao criar o `kanban.md`, leia `templates/kanban.md` (nesta skill) e use-o na integra (inclui o formato de task concluida em DONE).
 
-**Ultima atualizacao:** [DATA]
-
----
-
-## TODO
-
-### TASK-001: [Titulo descritivo]
-- **Descricao**: O que fazer
-- **Arquivos**: `path/to/file.prw`, `path/to/file2.tlpp`
-- **Complexidade**: Baixa | Media | Alta
-- **Dependencias**: Nenhuma | TASK-XXX
-- **Criterio de aceite**: O que define "pronto"
-
-### TASK-002: [Titulo descritivo]
-...
-
----
-
-## DOING
-
-(vazio no inicio)
-
----
-
-## DONE
-
-(vazio no inicio)
-```
+**Fatiamento tracer-bullet:** cada card deve atravessar o caminho completo (fonte → dicionario → tela/endpoint) e ser demonstravel/testavel sozinho — nada de cards "so backend" ou "so tela" que dependem um do outro para provar valor. Excecao: refactors largos usam o padrao expand–contract (expandir estrutura nova / migrar em lotes / contrair removendo a antiga), um card por fase.
 
 ### Durante a implementacao
 
 Ao trabalhar em um item:
 1. Mova de TODO para DOING
-2. Ao concluir, mova para DONE e adicione:
-   ```markdown
-   ### TASK-001: [Titulo] ✓
-   - **O que foi feito**: Resumo do que foi implementado
-   - **Arquivos modificados**: Lista final dos arquivos tocados
-   - **Observacoes**: Qualquer nota relevante
-   ```
+2. Ao concluir, mova para DONE usando o formato do template
 3. Atualize `**Ultima atualizacao**` no topo
+4. Necessidade nova de campo/parametro/indice/consulta F3 no meio de um card → skills `protheus-configurador-dicionario` / `protheus-consulta-padrao` (elas gravam o `pre-producao.md`)
 
 ### Regras do Kanban
 - Maximo 2 itens em DOING simultaneamente
@@ -481,6 +269,8 @@ Ao trabalhar em um item:
 - Se descobrir trabalho nao previsto, adicione como nova TASK em TODO
 
 Atualize o `plano.md` e avance.
+
+**Concluida quando (criacao):** `kanban.md` criado com tarefas atomicas cobrindo todo o PRD, cada uma com criterio de aceite. **Implementacao concluida quando:** todas as tasks em DONE.
 
 ---
 
@@ -494,70 +284,9 @@ Sugira a execucao do QA **somente quando TODOS os itens do kanban estiverem em D
 
 ### Template do qa.md
 
-```markdown
-# QA: [Nome da Feature]
+Ao criar o `qa.md`, leia `templates/qa.md` (nesta skill) e use-o na integra (testes funcionais, regressao, borda e resumo final).
 
-**Data de criacao:** [DATA]
-**Executor:** [HUMANO]
-**Status:** Pendente | Em execucao | Concluido
-
----
-
-## Pre-requisitos
-- [ ] Todos os fontes compilados sem erro
-- [ ] Dicionario atualizado (SX3/SIX/SX1/SX5)
-- [ ] Ambiente de teste configurado (filial, usuario)
-
----
-
-## Testes Funcionais
-
-### CT-001: [Cenario de teste]
-- **Pre-condicoes**: O que precisa estar configurado
-- **Passos**:
-  1. Passo 1
-  2. Passo 2
-  3. Passo 3
-- **Resultado esperado**: O que deve acontecer
-- **Resultado**: [ ] Passou / [ ] Falhou
-- **Observacoes**:
-
-### CT-002: [Cenario de teste]
-...
-
----
-
-## Testes de Regressao
-
-> O que NAO pode quebrar — funcionalidades existentes que a customizacao toca.
-
-### RT-001: [Funcionalidade existente]
-- **Rotina**: [Nome da rotina padrao]
-- **Teste**: Verificar que [comportamento] continua funcionando
-- **Resultado**: [ ] Passou / [ ] Falhou
-- **Observacoes**:
-
----
-
-## Testes de Borda
-
-### BT-001: [Cenario limite]
-- **Cenario**: [Ex: campo vazio, valor negativo, registro duplicado]
-- **Resultado esperado**: [Mensagem de erro, bloqueio, etc.]
-- **Resultado**: [ ] Passou / [ ] Falhou
-
----
-
-## Resumo Final
-| Tipo | Total | Passou | Falhou |
-|------|-------|--------|--------|
-| Funcionais | 0 | 0 | 0 |
-| Regressao | 0 | 0 | 0 |
-| Borda | 0 | 0 | 0 |
-
-**Aprovado**: [ ] Sim / [ ] Nao
-**Observacoes finais**:
-```
+**Concluida quando:** `qa.md` criado com cenarios funcionais, de regressao e de borda, e — apos execucao humana — resumo final preenchido com "Aprovado: Sim".
 
 ---
 
@@ -629,6 +358,8 @@ Adicione secao:
 
 Atualize o `plano.md` e avance.
 
+**Concluida quando:** grep confirma zero ocorrencias residuais nos fontes e secao "Limpeza pre-producao (Etapa 7)" registrada no `plano.md` com todos os itens marcados.
+
 ---
 
 ## Etapa 8: Aplicar em producao
@@ -686,6 +417,8 @@ Se algo critico falhar:
 ```
 
 Marque a etapa como concluida e finalize o plano.
+
+**Concluida quando:** secao "Deploy em producao (Etapa 8)" registrada no `plano.md` com smoke test passado e cliente notificado.
 
 ---
 

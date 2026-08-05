@@ -84,8 +84,6 @@ This skill uses progressive disclosure. The SKILL.md body covers the architectur
 | [references/fwrest-client-templates.md](references/fwrest-client-templates.md) | Generating **any FWRest call** — GET, POST, PUT, DELETE, JSON parsing, error handling, file upload (.gz), header construction | Full code templates for all 4 HTTP verbs, JSON body construction, response parsing, generic error-handling wrapper |
 | [references/fwrest-authentication-patterns.md](references/fwrest-authentication-patterns.md) | Implementing **HTTP Basic**, **Bearer Token / JWT**, **API Key**, or **OAuth 2.0 (client credentials / authorization code)** authentication | Header templates for each auth scheme, token-refresh pattern, secret storage guidance |
 
-> Also refer to [references/sonarqube-rules-reference.md](../references/sonarqube-rules-reference.md) for the complete SonarQube rules reference shared across skills.
-
 ---
 
 ## Generation Workflow
@@ -178,8 +176,6 @@ Use the checklist below to verify the generated code covers all requirements.
 - [ ] No UI functions (`MsgAlert`, `MsgYesNo`, `Aviso`, `Help`) inside the call path of a transaction or scheduled job
 - [ ] Includes in lowercase (e.g., `#include "totvs.ch"`)
 - [ ] No use of `RpcSetEnv` inside REST endpoint handlers that themselves invoke FWRest — environment must already be prepared
-
-> Refer to [references/sonarqube-rules-reference.md](../references/sonarqube-rules-reference.md) for the complete SonarQube rules reference.
 
 ---
 

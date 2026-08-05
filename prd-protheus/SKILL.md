@@ -1,6 +1,6 @@
 ---
 name: prd-protheus
-description: Use quando o usuario quiser criar um PRD para customizacao Protheus, ou mencionar "PRD", "documento de requisitos", "requisitos do projeto", "escopo da customizacao", "levantamento de requisitos", "especificacao", "planejar customizacao", "nova feature protheus".
+description: Use quando o usuario quiser criar um PRD para customizacao Protheus, ou mencionar "PRD", "documento de requisitos", "requisitos do projeto", "escopo da customizacao", "levantamento de requisitos", "especificacao", "nova feature protheus".
 ---
 
 # PRD para Customizacoes Protheus
@@ -14,6 +14,17 @@ TODO o output deve ser em Portugues Brasileiro.
 NUNCA crie GitHub Issues. O PRD e sempre exibido como texto na conversa.
 
 ## Processo
+
+### Passo 0: Verificar se veio do planejar-advpl (modo sintese)
+
+Se esta skill foi invocada a partir do **planejar-advpl** (existe `.claude/plans/<slug>/plano.md` da customizacao em questao), **NAO re-entreviste o usuario**:
+
+1. Leia `plano.md` e `decisoes-cliente.md` da pasta `.claude/plans/<slug>/`.
+2. SINTETIZE o PRD a partir das decisoes ja registradas, usando o template abaixo.
+3. Pergunte APENAS o que estiver genuinamente em aberto (lacunas reais, nao confirmacao do que ja foi decidido).
+4. Salve o resultado como `prd.md` na mesma pasta `.claude/plans/<slug>/`.
+
+O modo entrevista completo (Passos 1 a 7) continua valendo para uso standalone da skill.
 
 ### Passo 1: Detectar contexto do projeto
 
@@ -64,6 +75,8 @@ Ao encontrar funcoes padrao Protheus no codigo (ex: MATA410, FWFormModel, MsExec
 - **claude-tdn:tdn-docs** — buscar documentacao no TDN para funcoes/rotinas padrao encontradas, entender PEs disponiveis e parametros
 - **protheus-toolkit:docs** ou **advpl-specialist:docs** — buscar funcoes nativas, tabelas SX, parametros MV referenciados no codigo
 
+Se algum plugin nao estiver disponivel, siga sem ele usando o MCP `advpl-tlpp-mcp-docs` (docs, code-search, dicionario) e a exploracao do codigo.
+
 Estas consultas sao automaticas e rapidas — enriquecem o resumo sem interferir no fluxo.
 
 #### Etapa 4: Mini-review do codigo existente (perguntar ao usuario)
@@ -72,7 +85,7 @@ Se a exploracao encontrou codigo relevante, pergunte:
 
 > Encontrei [N] fontes relacionados. Quer que eu faca uma analise rapida da qualidade desse codigo antes de prosseguir?
 
-Se o usuario aceitar, use **advpl-specialist:review** ou **protheus-toolkit:review** para identificar problemas que o PRD deveria considerar (ex: codigo legado que precisa refatoracao, vulnerabilidades, performance).
+Se o usuario aceitar, use **advpl-specialist:review** ou **protheus-toolkit:review** (se indisponiveis, use a skill local `code-review` ou faca a analise diretamente) para identificar problemas que o PRD deveria considerar (ex: codigo legado que precisa refatoracao, vulnerabilidades, performance).
 
 #### Etapa 5: Leitura dos fontes encontrados
 - Read nos fontes relevantes (headers + logica principal)
@@ -117,13 +130,13 @@ Faca NO MAXIMO 2-3 perguntas por vez. Aguarde a resposta antes de continuar.
 
 #### Enriquecimento automatico durante a entrevista
 
-Quando o usuario mencionar um **modulo Protheus** (ex: "Compras", "Faturamento", SIGACOM, SIGAFAT), use automaticamente **protheus-toolkit:business-modules** para carregar a referencia do modulo — tabelas, rotinas, PEs disponiveis, integracoes. Isso permite fazer perguntas mais especificas e informadas.
+Quando o usuario mencionar um **modulo Protheus** (ex: "Compras", "Faturamento", SIGACOM, SIGAFAT), use automaticamente **protheus-toolkit:business-modules** para carregar a referencia do modulo — tabelas, rotinas, PEs disponiveis, integracoes. Se o plugin nao estiver disponivel, siga sem ele usando o MCP `advpl-tlpp-mcp-docs` (product-docs-search, dicionario). Isso permite fazer perguntas mais especificas e informadas.
 
 Quando o usuario descrever um **fluxo de negocio** (ex: "pedido vira nota fiscal que gera financeiro"), pergunte:
 
 > Quer que eu consulte o fluxo padrao do Protheus para esse processo? Assim posso comparar com o que voce precisa e identificar onde a customizacao entra.
 
-Se aceitar, use **protheus-toolkit:process** ou **advpl-specialist:process** para mapear o fluxo padrao e identificar gaps.
+Se aceitar, use **protheus-toolkit:process** ou **advpl-specialist:process** para mapear o fluxo padrao e identificar gaps. Se indisponiveis, use o MCP `advpl-tlpp-mcp-docs` (product-docs-search).
 
 ### Passo 4: Aprofundamento adaptativo
 
@@ -179,6 +192,8 @@ Para a secao "Decisoes de Implementacao", consulte o plugin especializado confor
 | Tela com browse/grid | **protheus-toolkit:protheus-screens** | Tipo de browse/grid adequado |
 
 Consulte APENAS o plugin pertinente ao tipo da customizacao — nao carregue todos.
+
+Se qualquer plugin desta etapa nao estiver disponivel, siga sem ele usando o MCP `advpl-tlpp-mcp-docs` e a exploracao do codigo existente.
 
 ---
 
@@ -315,10 +330,9 @@ Apos exibir o PRD completo na conversa, pergunte:
 > Gostaria de gravar isso em um arquivo?
 
 Se o usuario responder sim:
-1. Sugira um nome de arquivo baseado no conteudo, ex: `PRD-integracao-fusion-pedidos.md`
-2. Pergunte se quer usar esse nome ou outro
-3. Pergunte em qual diretorio salvar (sugira o diretorio atual do projeto)
-4. Use a ferramenta Write para criar o arquivo
+1. Sugira `.claude/plans/<slug>/prd.md` — se nao houver plano, pergunte ticket + descricao curta para montar o slug (convencao: `<feature-slug>[-<ticket>]`)
+2. Pergunte se quer usar esse caminho ou outro
+3. Use a ferramenta Write para criar o arquivo
 
 Se responder nao, siga para o Passo 7.
 
