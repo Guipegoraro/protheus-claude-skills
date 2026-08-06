@@ -238,6 +238,82 @@ externos chamados por `ExecBlock` (ex.: `F620QRY`, `FR150FLT`, `F130QRY`,
 `FR130TELC`) e grupos de pergunta SX1. **Se o relatório clássico rodava nesse
 cliente, a cópia `z` roda igual.**
 
+### 7.1 Relatório chamado por rotina padrão via parâmetro `MV_*` — shim PARAMIXB (OBRIGATÓRIO)
+
+Vários clássicos não são chamados só pelo menu: a rotina padrão os invoca por um
+parâmetro SX6 que aponta para um RDMAKE de usuário. O fonte padrão sempre segue
+esta forma (exemplo do `mata120.prx`, validado via MCP):
+
+```advpl
+Function A120Impri( cAlias, nRecno, nOpc )         // funcao de impressao da rotina
+Local cPrinter := SuperGetMv("MV_PCOMPRA" ,, "")   // parametro aponta o RDMAKE
+If !Empty( cPrinter ) .And. ExistBlock( cPrinter )
+    ExecBlock( cPrinter, .F., .F., { cAlias, nRecno, nOpc } )  // rotina de USUARIO
+Else
+    MATR110( cAlias, nRecno, nOpc )                            // padrao: posicional
+EndIf
+```
+
+**Consequência:** ao apontar o `MV_*` para a cópia `z` (valor **sem** `U_`, ex.:
+`ZMATR110`), a chamada vira **ExecBlock** → os argumentos chegam na private
+**`PARAMIXB`** e os parâmetros posicionais da `User Function` chegam **Nil**.
+No MATR110 isso zera `lAuto := (nReg != Nil)` e o relatório passa a imprimir pela
+**faixa de perguntas** em vez do **registro selecionado** no browse.
+
+**Rotinas que usam esse mecanismo** (levantado com `code-search` no MCP
+`advpl-tlpp-mcp-docs` sobre os fontes padrão):
+
+| Rotina | Função de impressão | Parâmetro SX6 | O que vai no `ExecBlock` |
+|---|---|---|---|
+| MATA110 | `A110Impri(cAlias,nRecno,nOpc)` | `MV_SOLIMPR` | `{ cAlias, nRecno, nOpc }` |
+| MATA113 | `A113Impri(cAlias,nRecno,nOpc)` | `MV_SOLIMPR` | `{ cAlias, nRecno, nOpc }` |
+| MATA120 | `A120Impri(cAlias,nRecno,nOpc)` | `MV_PCOMPRA` | `{ cAlias, nRecno, nOpc }` |
+| MATA123 | `A123Impri(cAlias,nRecno,nOpc)` | `MV_PCOMPRA` | `{ cAlias, nRecno, nOpc }` |
+| MATA103 | `A103Impri(cAlias,nRecno,nOpc)` | `MV_PIMPNFE` | `{ cAlias, nRecno, nOpc }` |
+| MATA125 | `A125Impri(cAlias,nRecno,nOpcx)` | `MV_CONTPAR` | `{ cAlias, nRecno, nOpcx }` — e **usa o retorno** do ExecBlock |
+| MATA105 | `A105Imprim(cAlias,nReg,nOpcx)` | `MV_RELSALM` | **`{ SCP->CP_EMISSAO, SCP->CP_NUM }`** — conteúdo diferente! |
+| MATA415 | `A415Impri()` | `MV_ORCIMPR` | **sem argumentos** — depende do registro posicionado |
+| LOJA010 | `lj010Orc()` | `MV_SCRORC` / `MV_SCRPED` | **sem argumentos** |
+
+**Nunca presuma o conteúdo do `PARAMIXB`** — as duas últimas linhas da tabela
+mostram por quê: o MATA105 passa **campos** (`CP_EMISSAO`, `CP_NUM`), não
+alias/recno; MATA415 e LOJA010 não passam nada. Antes de escrever o shim,
+confirme o contrato da **sua** rotina:
+
+1. No MCP `advpl-tlpp-mcp-docs`, `code-search` por `"<ROTINA>Impri MV_ ExecBlock"`
+   (ex.: `"A120Impri MV_PCOMPRA ExecBlock"`).
+2. Leia o array do `ExecBlock`: ele é **exatamente** o conteúdo de `PARAMIXB`, na ordem.
+3. Mapeie cada posição para os parâmetros da sua cópia `z`.
+
+**Correção (caso com argumentos)** — inserir logo após os `Local` da função
+principal, ANTES de qualquer uso dos parâmetros (no MATR110, antes do
+`Private lAuto := (nReg!=Nil)`):
+
+```advpl
+// Quando chamado via MV_PCOMPRA, a rotina padrao (A120Impri) executa este relatorio
+// por ExecBlock; nesse caso os parametros chegam pela variavel private PARAMIXB e nao
+// posicionalmente. Recupera cAlias/nReg/nOpcx antes de calcular lAuto e os filtros.
+If nReg == Nil .And. Type("PARAMIXB") == "A"
+	cAlias := PARAMIXB[1]
+	nReg   := PARAMIXB[2]
+	nOpcx  := PARAMIXB[3]
+EndIf
+```
+
+Ajuste os índices ao contrato levantado no passo 2 — no MATA105, por exemplo,
+`PARAMIXB[1]` é a **emissão** e `PARAMIXB[2]` o **número**, e o shim teria de
+posicionar o registro a partir desses campos em vez de atribuir alias/recno.
+
+**Caso sem argumentos** (MATA415, LOJA010): não há `PARAMIXB` para recuperar. O
+shim é desnecessário, mas os parâmetros posicionais **continuam chegando `Nil`** —
+garanta um default sensato e lembre que o relatório depende do **registro
+posicionado** pela rotina chamadora.
+
+O shim é inócuo na execução avulsa pelo menu (sem `PARAMIXB` a condição é falsa e
+o comportamento por perguntas se mantém). Ao testar (passo 7), exercitar **os dois
+caminhos**: menu (`U_z<CODIGO>`) e a rotina padrão com o `MV_*` apontado para a
+cópia `z`.
+
 ### 8. Observação — traduções (`STRxxxx`)
 Se ao executar algum `STRxxxx` sair **em branco**, é porque o recurso `.tres`
 padrão não resolveu via `FWI18NLang`. Solução: aplicar a expedição do módulo, ou
@@ -265,3 +341,7 @@ parêntese (`│Sintaxe e │ FINR130(void)`) eram renomeadas e ganhavam 1 colun
 borda direita da caixa torta —, enquanto as 18 que traziam o nome sem parêntese
 (`│Funçào │ FINR130 │`) ficavam documentando uma função que não existia mais.
 Hoje as 29 saem renomeadas e com a largura original.
+
+Caso instrutivo (MATR110): chamado pelo MATA120 via `MV_PCOMPRA` → sem o shim
+`PARAMIXB` da seção 7.1 ele "funciona", mas imprime pela faixa de perguntas em vez
+do pedido selecionado no browse. Confirmado em produção em duas implantações.
