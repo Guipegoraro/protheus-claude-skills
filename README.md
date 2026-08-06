@@ -23,9 +23,12 @@ git clone https://github.com/Guipegoraro/protheus-claude-skills.git ~/.claude/sk
 
 2. As skills ficam disponiveis automaticamente no Claude Code (todas as sessoes, qualquer projeto). Para uso em um unico projeto, copie as pastas desejadas para `.claude/skills/` do repositorio do projeto.
 
-## Uso
+## Uso — dois modos de invocacao
 
-Invoque via slash command (`/<skill-name>`) ou mencione o tema na conversa — o Claude reconhece os trigger words da descricao e carrega a skill automaticamente.
+- **Model-invoked** (padrao): a description fica carregada em toda sessao e o Claude dispara a skill sozinho pelos trigger words — ou voce chama por `/<nome>`. Custo: alguns tokens de contexto por skill, sempre.
+- **User-invoked** (`disable-model-invocation: true`, marcadas com `/` nas tabelas abaixo): SO disparam quando voce digita `/<nome>` — custo zero de contexto, mas voce e o indice que precisa lembrar que existem.
+
+As **user-invoked** deste repositorio sao 7: `/wayfinder`, `/diagnosing-bugs`, `/wait-what`, `/to-questionnaire`, `/session-summary`, `/session-resume` e `/apontamento-gerar`. Todas as demais sao model-invoked (disparam por contexto).
 
 ## Skills
 
@@ -39,17 +42,15 @@ Invoque via slash command (`/<skill-name>`) ou mencione o tema na conversa — o
 
 ### Processo generico (adaptadas de mattpocock/skills)
 
-Quase todas sao **user-invoked** (`disable-model-invocation: true`): so carregam quando voce digita `/<nome>`, custo zero de contexto nas demais sessoes. Apenas `grilling`, `domain-modeling` e `writing-for-agents` sao model-invoked, com descriptions de uma linha.
-
 | Skill | Descricao |
 |-------|-----------|
-| `wayfinder` | Planeja trabalho grande demais para uma sessao como mapa de decision tickets em `.claude/plans/<slug>/` — fog of war, 1 decisao por sessao, mapa como indice |
+| `/wayfinder` | Planeja trabalho grande demais para uma sessao como mapa de decision tickets em `.claude/plans/<slug>/` — fog of war, 1 decisao por sessao, mapa como indice |
 | `grilling` | Primitiva de entrevista em rounds por fronteira: cada rodada pergunta todas as decisoes ja desbloqueadas, com recomendacao anexa; fatos vao para subagentes sem travar a rodada. `interrogatorio-advpl` = grilling + 10 dimensoes Protheus |
 | `domain-modeling` | Glossario vivo do dominio do cliente (CONTEXT.md) + ADRs de um paragrafo para decisoes dificeis de reverter |
-| `diagnosing-bugs` | Debug disciplinado: construir o feedback loop red-capable ANTES de formar teoria; multi-hipotese falsificavel; logs com prefixo unico para cleanup |
+| `/diagnosing-bugs` | Debug disciplinado: construir o feedback loop red-capable ANTES de formar teoria; multi-hipotese falsificavel; logs com prefixo unico para cleanup |
 | `writing-for-agents` | Escrita de qualquer documento que agente consome (skill, CLAUDE.md, AGENTS.md) — context pointers, information hierarchy, leading words, no-ops (+ SKILL-MECHANICS.md). Substitui a antiga writing-great-skills |
-| `wait-what` | "Nao entendi — re-explica": re-apresentacao em Linguagem Simples usando a linguagem ubiqua do CONTEXT.md/dominio.md |
-| `to-questionnaire` | Transforma decisao que depende de terceiro em questionario Markdown ("grill the send, not the subject") — ideal para rodadas de perguntas-cliente.md |
+| `/wait-what` | "Nao entendi — re-explica": re-apresentacao em Linguagem Simples usando a linguagem ubiqua do CONTEXT.md/dominio.md |
+| `/to-questionnaire` | Transforma decisao que depende de terceiro em questionario Markdown ("grill the send, not the subject") — ideal para rodadas de perguntas-cliente.md |
 
 ### PO-UI (frontend Angular + backend Protheus)
 
@@ -94,9 +95,9 @@ Quase todas sao **user-invoked** (`disable-model-invocation: true`): so carregam
 
 | Skill | Descricao |
 |-------|-----------|
-| `session-summary` | Gera resumo denso da sessao atual (decisoes, padroes, arquivos, pendencias) para reload apos `/clear`. Detecta `.claude/plans/<slug>/` e entra em modo referencial quando ha plano via `planejar-advpl` |
-| `session-resume` | Recarrega o resumo gerado por `session-summary`, restaurando contexto apos `/clear` |
-| `apontamento-gerar` | Gera apontamento de trabalho para o cliente |
+| `/session-summary` | Gera resumo denso da sessao atual (decisoes, padroes, arquivos, pendencias) para reload apos `/clear`. Detecta `.claude/plans/<slug>/` e entra em modo referencial quando ha plano via `planejar-advpl` |
+| `/session-resume` | Recarrega o resumo gerado por `session-summary`, restaurando contexto apos `/clear` |
+| `/apontamento-gerar` | Gera apontamento de trabalho para o cliente |
 
 ## MCPs recomendados
 
