@@ -8,7 +8,7 @@ Este repositorio e um espelho da minha pasta de skills e mistura **tres origens 
 
 1. **Autorais (Guilherme Pegoraro)** — criadas por mim para o meu fluxo de consultoria Protheus: `planejar-advpl`, `interrogatorio-advpl`, `prd-protheus`, `protheus-configurador-dicionario`, `protheus-consulta-padrao`, `refazer-relatorio-classico`, `apontamento-gerar`, `session-summary`, `session-resume`.
 2. **Comunidade TOTVS/engpro** — skills de terceiros (autoria Melkz Siqueira / Engenharia Protheus, MIT; `genericquery` de Johnni Moraes - TSC), adaptadas ao meu ambiente: `code-review`, `mvc-generator`, `entry-point-designer`, `tlpp-rest-endpoint-generator`, `fwrest-client-generator`, `fwmsprinter-pdf`, `data-dictionary-lookup`, `genericquery`. A antiga trinca SQL (query-builder / sql-code-review / sql-optimization, MIT) foi fundida e reescrita como `sql-protheus` a partir de pesquisa TDN/fontes-padrao (08/2026).
-3. **Adaptadas de [mattpocock/skills](https://github.com/mattpocock/skills)** (MIT, Matt Pocock) — skills de processo genericas, portadas quase-verbatim com adaptacoes minimas ao ecossistema Protheus (`.claude/plans/<slug>/` como tracker local): `grilling`, `domain-modeling`, `wayfinder`, `diagnosing-bugs`, `writing-great-skills`.
+3. **Adaptadas de [mattpocock/skills](https://github.com/mattpocock/skills)** (MIT, Matt Pocock) — skills de processo genericas, portadas quase-verbatim com adaptacoes minimas ao ecossistema Protheus (`.claude/plans/<slug>/` como tracker local): `grilling`, `domain-modeling`, `wayfinder`, `diagnosing-bugs`, `writing-for-agents`, `wait-what`, `to-questionnaire` (sincronizadas com o upstream v1.2, 08/2026).
 
 Credito e licenca de cada origem permanecem nos respectivos arquivos.
 
@@ -39,15 +39,17 @@ Invoque via slash command (`/<skill-name>`) ou mencione o tema na conversa — o
 
 ### Processo generico (adaptadas de mattpocock/skills)
 
-Quase todas sao **user-invoked** (`disable-model-invocation: true`): so carregam quando voce digita `/<nome>`, custo zero de contexto nas demais sessoes. Apenas `grilling` e `domain-modeling` sao model-invoked, com descriptions de uma linha.
+Quase todas sao **user-invoked** (`disable-model-invocation: true`): so carregam quando voce digita `/<nome>`, custo zero de contexto nas demais sessoes. Apenas `grilling`, `domain-modeling` e `writing-for-agents` sao model-invoked, com descriptions de uma linha.
 
 | Skill | Descricao |
 |-------|-----------|
 | `wayfinder` | Planeja trabalho grande demais para uma sessao como mapa de decision tickets em `.claude/plans/<slug>/` — fog of war, 1 decisao por sessao, mapa como indice |
-| `grilling` | Primitiva de entrevista: uma pergunta por vez, com recomendacao anexa, ate entendimento compartilhado. `interrogatorio-advpl` = grilling + 10 dimensoes Protheus |
+| `grilling` | Primitiva de entrevista em rounds por fronteira: cada rodada pergunta todas as decisoes ja desbloqueadas, com recomendacao anexa; fatos vao para subagentes sem travar a rodada. `interrogatorio-advpl` = grilling + 10 dimensoes Protheus |
 | `domain-modeling` | Glossario vivo do dominio do cliente (CONTEXT.md) + ADRs de um paragrafo para decisoes dificeis de reverter |
 | `diagnosing-bugs` | Debug disciplinado: construir o feedback loop red-capable ANTES de formar teoria; multi-hipotese falsificavel; logs com prefixo unico para cleanup |
-| `writing-great-skills` | Meta-skill para escrever/manter skills — invocacao, information hierarchy, leading words, catalogo de failure modes (+ GLOSSARY.md) |
+| `writing-for-agents` | Escrita de qualquer documento que agente consome (skill, CLAUDE.md, AGENTS.md) — context pointers, information hierarchy, leading words, no-ops (+ SKILL-MECHANICS.md). Substitui a antiga writing-great-skills |
+| `wait-what` | "Nao entendi — re-explica": re-apresentacao em Linguagem Simples usando a linguagem ubiqua do CONTEXT.md/dominio.md |
+| `to-questionnaire` | Transforma decisao que depende de terceiro em questionario Markdown ("grill the send, not the subject") — ideal para rodadas de perguntas-cliente.md |
 
 ### PO-UI (frontend Angular + backend Protheus)
 

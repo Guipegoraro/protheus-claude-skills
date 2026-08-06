@@ -19,6 +19,10 @@ Gera um resumo denso e especifico da sessao atual, otimizado para recarregar con
 - **Nao crie resumos genericos**: cada item deve ser exclusivo ao projeto sendo trabalhado. Se poderia aparecer em qualquer projeto, nao inclua.
 - **NAO duplique o que ja esta em `.claude/plans/<slug>/`** — quando ha plano via `planejar-advpl`, o resumo referencia os artefatos por path. Veja o **Passo 0** abaixo.
 
+## Antes de resumir: e o movimento certo?
+
+Se o usuario esta decidindo COMO encerrar/trocar de fase (continuar? /clear? resumir? subagente? /compact?), leia `references/fronteiras-de-fase.md` (nesta skill) — arvore de decisao em ordem de custo. Resumir e o movimento certo quando algo precisa VIAJAR entre sessoes; nao e o reflexo default.
+
 ## Onde salvar
 
 O resumo vai em `.claude/session-resume.md` no diretorio do projeto atual (working directory).

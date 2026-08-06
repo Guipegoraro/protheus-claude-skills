@@ -3,11 +3,21 @@ name: interrogatorio-advpl
 description: Use when user wants to stress-test a Protheus customization plan, validate design decisions for ADVPL/TLPP development, or mentions "interrogatorio", "interroga", "grill", "questiona", "valida o plano", "stress-test do plano".
 ---
 
-Interrogue-me implacavelmente sobre cada aspecto deste plano de customizacao Protheus ate chegarmos a um entendimento compartilhado. Percorra cada ramo da arvore de decisoes, resolvendo dependencias entre decisoes uma a uma. Para cada pergunta, forneca sua resposta recomendada.
+Interrogue-me implacavelmente sobre cada aspecto deste plano de customizacao Protheus ate chegarmos a um entendimento compartilhado. Mapeie o plano como uma **arvore de design**: cada decisao ramifica nas decisoes que dependem dela.
 
-Faca as perguntas uma de cada vez.
+Trabalhe a arvore em **rounds por fronteira**. A fronteira e toda decisao cujos pre-requisitos ja estao resolvidos — as perguntas que da para fazer AGORA sem chutar respostas que ainda nao vieram. Pergunte a fronteira inteira numa rodada, cada pergunta numerada no formato:
 
-Se uma pergunta pode ser respondida explorando o codebase do projeto, explore o codebase primeiro.
+```
+❓ **Q1** - **<titulo>**: <corpo da pergunta, com alternativas quando couber>
+
+➡️ <sua resposta recomendada>
+```
+
+Cada rodada de respostas reforma a arvore: decisoes fechadas empurram a fronteira e desbloqueiam as perguntas que dependiam delas — recompute e pergunte a proxima rodada. Pergunta que depende de outra ainda aberta NESTA rodada pertence a rodada seguinte.
+
+Fatos sao trabalho seu, nunca do usuario: pergunta da fronteira que depende de fato do ambiente (codebase, dicionario, TDN) → explore voce mesmo ou despache um subagente, sem bloquear a rodada — so as perguntas downstream esperam o resultado; o resto da fronteira e perguntado ja. As DECISOES sao do usuario.
+
+A sessao termina quando a fronteira esvazia: todo ramo visitado, nada assumido em silencio.
 
 ## Dimensoes obrigatorias para questionar
 
