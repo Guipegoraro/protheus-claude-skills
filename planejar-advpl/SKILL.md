@@ -14,7 +14,7 @@ Ao ser invocada, SEMPRE verifique primeiro se existe um plano em andamento:
 1. Liste `.claude/plans/` para ver planos existentes
 2. Se o usuario mencionar uma feature existente, leia o `plano.md` correspondente
 3. Retome da etapa atual indicada no `plano.md`
-4. Se existir `wayfinder-map.md` na pasta do slug: leia-o antes de tudo — "Decisions so far" sao decisoes JA tomadas (a Etapa 3 pergunta apenas o que estiver aberto; o PRD sintetiza delas), e as linhas de "Out of scope" do mapa vao para a secao `## Fora de escopo / rejeitado` do plano.md
+4. Se existir `wayfinder-map.md` na pasta do slug: leia-o antes de tudo — "Decisions so far" sao decisoes JA tomadas (a Etapa 3 pergunta apenas o que estiver aberto; o PRD sintetiza delas), as linhas de "Out of scope" do mapa vao para a secao `## Fora de escopo / rejeitado` do plano.md, e o "Destination" vira o `## Escopo declarado` (E-1..E-n com fonte)
 5. Se nao existir plano, inicie pela Etapa 1
 
 ## Auto-sizing: a complexidade determina a profundidade
@@ -29,6 +29,23 @@ O processo nao tem um peso unico. Dimensione pelas respostas da Etapa 1 (ou pelo
 
 **Valvula de seguranca (obrigatoria):** mesmo no porte pequeno, ANTES de implementar liste os passos atomicos. Se aparecerem **mais de 5 passos ou dependencias entre eles**, PARE e volte ao processo completo — o porte estava errado, nao o processo.
 
+## Escopo declarado: a largura do que sera construido
+
+Auto-sizing dimensiona a PROFUNDIDADE do processo. Esta secao dimensiona a LARGURA da entrega — quantas features entram. Vale em todos os portes, e morde mais forte nos grandes, onde pesquisa e interrogatorio produzem ideias mais rapido do que o cliente pediu.
+
+**Escopo declarado** = o que o cliente pediu, registrado na Etapa 1 como 1 a 5 linhas numeradas (E-1, E-2, ...), cada uma com a fonte (ticket, e-mail, reuniao). E o **teto** da entrega, nao o piso.
+
+**Origem obrigatoria.** Toda ideia que aparecer depois — na pesquisa, no interrogatorio, no PRD, no kanban — e uma de duas coisas:
+
+- **Derivada**: implica diretamente numa linha do escopo declarado (sem ela, E-n nao funciona). Entra, citando `E-n`.
+- **Extra**: tudo o mais, inclusive o que parece obviamente util. Vai para `## Fora de escopo / rejeitado` do plano.md com o motivo `sem pedido do cliente — propor depois`, e vira pergunta em `perguntas-cliente.md` se valer a pena oferecer. Extra so entra no escopo depois que o cliente pedir — dai ganha linha propria E-n com fonte.
+
+**Toda feature e conversada e aprovada.** Nenhuma feature entra no escopo declarado por decisao da sessao. Ao identificar uma candidata (derivada ou extra), PARE e apresente ao usuario, uma a uma: *o que e, de qual linha E-n deriva ou por que e extra, custo estimado (fontes/tasks), e o que acontece se ficar de fora*. Espere o **sim explicito** dessa feature — silencio, "pode seguir" generico e aprovacao de uma feature anterior nao valem para a proxima. Aprovada, ela ganha linha E-n com fonte `aprovado por <usuario/cliente> em <data>` e entra no plano.md; recusada, desce para `## Fora de escopo / rejeitado` no mesmo momento. Vale tambem para feature que o usuario aprovou e depois cresceu: a parte nova e uma feature nova, com sua propria conversa.
+
+**YAGNI nos suspeitos de sempre.** Estes nascem extras, nunca derivados: tela de manutencao/consulta que ninguem pediu, parametro MV para tornar configuravel algo com um unico valor conhecido, tabela de log/auditoria propria, tratamento generico para casos que o cliente nao descreveu, cadastro auxiliar "para facilitar depois", relatorio complementar. Implemente o caso que o cliente descreveu; o generico entra quando ele descrever o segundo caso.
+
+**Passada de corte.** Antes de fechar o PRD (Etapa 4) e antes de fechar o kanban (Etapa 5), liste CADA requisito / CADA card com sua origem (`E-n` ou fonte do cliente). Item sem origem sai do documento e desce para `## Fora de escopo / rejeitado`. Registre no plano.md quantos itens sairam — passada que nunca corta nada geralmente e passada que nao foi feita.
+
 ## Estrutura de arquivos
 
 ### Todos os artefatos da customizacao ficam em `.claude/plans/<slug>/`
@@ -41,7 +58,7 @@ O processo nao tem um peso unico. Dimensione pelas respostas da Etapa 1 (ou pelo
   research.md         # Pesquisa tecnica
   decisoes-cliente.md # Mapa de decisoes — versao para o cliente revisar
   prd.md              # Documento de requisitos (via /prd-protheus)
-  kanban.md           # Tarefas de implementacao
+  kanban.md           # Fallback do kanban — so quando nao ha kanban provider na maquina (ver ETAPA-5-KANBAN.md)
   qa.md               # Plano de testes para execucao humana
   pre-producao.md     # Campos/parametros/indices a criar no Configurador (criado sob demanda)
   perguntas-cliente.md # Duvidas em aberto aguardando resposta do cliente (criado sob demanda)
@@ -75,6 +92,8 @@ Pergunte ao usuario:
 - Qual modulo Protheus envolvido?
 - **Numero do ticket** (tspace/jira/e-mail) — se nao houver, registrar "sem ticket" e seguir
 - Existe alguma referencia ou solicitacao documentada?
+
+Com isso, escreva o **escopo declarado** (E-1..E-n, uma linha por coisa pedida, cada uma com fonte) na secao `## Escopo declarado` do plano.md e leia de volta ao usuario para ele confirmar linha a linha. O que voce achar que faz falta ali e proposta a conversar, nao linha a escrever.
 
 **Escopo grande ou nebuloso demais?** Se as respostas revelarem um esforco que nao cabe numa sessao de planejamento — muitas frentes, decisoes que dependem do cliente ainda sem forma, semanas de trabalho — sugira ao usuario rodar `/wayfinder` primeiro (mapa de decisoes em `.claude/plans/<slug>/`, uma decisao por sessao) e retomar esta skill quando o caminho estiver claro.
 
@@ -222,6 +241,8 @@ As decisoes tomadas durante o interrogatorio devem ser **registradas no `plano.m
 - ...
 ```
 
+O interrogatorio decide COMO construir o escopo declarado, nao QUANTO construir. Resposta que acrescenta feature nova (tela, tabela, parametro, rotina auxiliar) e candidata: conversar e aprovar antes de virar decisao, ou desce para `## Fora de escopo / rejeitado`.
+
 **Regras de negocio com fonte do cliente** ganham ID e canone proprio: crie `casos-e-regras.md` (leia `templates/casos-e-regras.md` nesta skill) — RN-xx/CB-xx citados em fonte, kanban e QA; os demais docs citam o ID, nunca reescrevem o texto.
 
 **Interrogatorio por artefato:** em portes medio/grande, artefatos duraveis que virarao gabarito (padroes de codigo, arquitetura, modelagem) merecem interrogatorio dedicado proprio, item a item com status de aprovacao — o artefato so vira gabarito citavel depois de sobreviver ao proprio interrogatorio.
@@ -272,9 +293,11 @@ Invoque a skill `/prd-protheus` passando:
 
 As decisoes ja estao em `plano.md`/`decisoes-cliente.md` — a `/prd-protheus` deve SINTETIZAR a partir delas, nao re-entrevistar o usuario. Salvar o resultado como `prd.md` na mesma pasta do plano.
 
+**Passada de corte no PRD** (antes de fechar): liste cada requisito com a origem (`E-n` ou fonte do cliente). Requisito sem origem sai do prd.md e desce para `## Fora de escopo / rejeitado` do plano.md. Apresente a lista de cortes ao usuario — corte revertido so por aprovacao explicita dele, que vira linha E-n nova.
+
 Atualize o `plano.md` e avance.
 
-**Concluida quando:** `prd.md` salvo na pasta do plano, sintetizado a partir das decisoes existentes, e `plano.md` atualizado.
+**Concluida quando:** `prd.md` salvo na pasta do plano, sintetizado a partir das decisoes existentes, **cada requisito citando sua origem (`E-n` ou fonte do cliente)**, passada de corte apresentada ao usuario e `plano.md` atualizado.
 
 ---
 
@@ -282,39 +305,11 @@ Atualize o `plano.md` e avance.
 
 **Objetivo:** Quebrar o PRD em tarefas atomicas e rastrear implementacao.
 
-### Criacao do kanban.md
-
-Com base no PRD, crie tarefas atomicas — cada uma implementavel em uma sessao de trabalho.
-
-Ao criar o `kanban.md`, leia `templates/kanban.md` (nesta skill) e use-o na integra (inclui o formato de task concluida em DONE).
-
-**Fatiamento tracer-bullet:** cada card deve atravessar o caminho completo (fonte → dicionario → tela/endpoint) e ser demonstravel/testavel sozinho — nada de cards "so backend" ou "so tela" que dependem um do outro para provar valor. Excecao: refactors largos usam o padrao expand–contract (expandir estrutura nova / migrar em lotes / contrair removendo a antiga), um card por fase.
-
-### Durante a implementacao
-
-Ao trabalhar em um item:
-1. Mova de TODO para DOING
-2. Ao concluir, mova para DONE usando o formato do template
-3. Atualize `**Ultima atualizacao**` no topo
-4. Necessidade nova de campo/parametro/indice/consulta F3 no meio de um card → skills `protheus-configurador-dicionario` / `protheus-consulta-padrao` (elas gravam o `pre-producao.md`)
-
-### Regras do Kanban
-- Maximo 2 itens em DOING simultaneamente
-- Se uma tarefa crescer demais, quebre em sub-tarefas
-- Se descobrir trabalho nao previsto, adicione como nova TASK em TODO
-- Bug descoberto apos o kanban montado: criar bug-spec em `fixes/` (leia `templates/bug-spec.md` nesta skill) — a spec dirige a correcao; causa raiz e achado de investigacao
-
-### Execucao delegada (opcional, portes medio/grande)
-
-Quando as tasks forem implementadas por agentes (subagente ou bridge externo), a sessao principal vira planner/reviewer e o par que disciplina a execucao e:
-
-- **Brief por task**: leia `templates/brief.md` (nesta skill) — auto-contido, fonte normativa, comandos literais, brief >1 pagina = task gorda.
-- **Agente executor do projeto**: leia `templates/agente-executor.md` (nesta skill) — instanciado UMA vez em `.claude/agents/` do projeto, versionado; as regras operacionais moram nele, nao repetidas em cada brief.
-- **Invariante**: nenhuma entrega de agente fecha sem analise da sessao principal (checklist objetivo) — o revisor valida FATOS em lote (campo por dicionario, assinatura por fonte real) antes de devolver rodada, e refaz a varredura em vez de confiar no relatorio do agente.
+Leia `ETAPA-5-KANBAN.md` (nesta skill) e siga-o na integra: descoberta do **kanban provider** instalado na maquina (fallback `kanban.md` na pasta do plano), contrato do card, camadas e gates, fatiamento tracer-bullet, passada de corte, movimentacao durante a implementacao e execucao delegada por agentes.
 
 Atualize o `plano.md` e avance.
 
-**Concluida quando (criacao):** `kanban.md` criado com tarefas atomicas cobrindo todo o PRD, cada uma com criterio de aceite. **Implementacao concluida quando:** todas as tasks em DONE.
+**Concluida quando (criacao):** kanban criado no provider (ou no `kanban.md` de fallback) com tarefas atomicas cobrindo todo o PRD — nada alem dele —, cada uma com criterio de aceite e campo **Origem** preenchido, e o provider/board registrado na linha **Kanban** do `plano.md`. **Implementacao concluida quando:** todas as tasks em DONE.
 
 ---
 
@@ -474,7 +469,7 @@ Marque a etapa como concluida e finalize o plano.
 /planejar-advpl → retomada (plano existente? wayfinder-map?) → auto-sizing
   1 Ideia (slug + plano.md)          → 2 Pesquisa (research.md)
   3 Duvidas (interrogatorio → decisoes + decisoes-cliente.md [+ casos-e-regras.md])
-  4 PRD (sintese → prd.md)           → 5 Kanban (camadas/gates → implementar)
+  4 PRD (sintese → prd.md)           → 5 Kanban (provider → camadas/gates → implementar)
   6 QA (qa.md + passada regra→codigo) → 7 Limpeza (grep zero residual)
   8 Producao (dicionario PROD → RPO → smoke test → notificar cliente)
 ```
@@ -483,6 +478,7 @@ Marque a etapa como concluida e finalize o plano.
 
 - **Uma etapa por vez** — nao pule etapas, cada uma alimenta a proxima (excecoes: pulo declarado pelo auto-sizing de porte pequeno, sempre registrado no plano.md, ou pedido do usuario)
 - **Sempre atualize o plano.md** ao concluir cada etapa
+- **Feature nova so entra conversada e aprovada** — em qualquer etapa, proponha e espere o sim; sem o sim, vai para `## Fora de escopo / rejeitado`
 - **Peca confirmacao** do usuario antes de avancar para a proxima etapa
 - **Se o usuario pedir para pular uma etapa**, registre no plano.md como "Pulada — motivo: [razao]"
 - **Ao retomar**, leia TODOS os arquivos existentes do plano para recuperar contexto completo
