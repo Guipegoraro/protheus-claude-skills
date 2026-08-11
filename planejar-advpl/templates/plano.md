@@ -9,6 +9,7 @@
 | **Slug** | [feature-slug-ticket — usado em .claude/plans/] |
 | **Criado** | [DATA] |
 | **Kanban** | [kanban provider + board/id/url — ou "kanban.md (sem provider)"; preenchido na Etapa 5] |
+| **Modo de aprovacao** | [livre / entrada / entrada + entrega — escolhido pelo usuario em [DATA]; re-perguntado a cada sessao] |
 | **Etapa atual** | 1 - Ideia |
 
 ## Descricao

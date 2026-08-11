@@ -13,6 +13,13 @@
 
 ---
 
+<!-- Nos modos com aprovacao, acrescente as secoes na ordem do fluxo:
+     entrada          -> ## AGUARDANDO APROVACAO / ## APROVADO / ## DOING / ## DONE
+     entrada+entrega  -> ... / ## DOING / ## EM REVISAO / ## DONE
+     Card em espera leva as linhas:
+     - **Comentarios**: [claude DATA] premissas/perguntas | [usuario DATA] resposta
+     - **Aprovacao**: Aprovado por <usuario> em <data>  |  NAO APROVADO — <motivo> -->
+
 ## TODO
 
 ### TASK-001: [Titulo descritivo]

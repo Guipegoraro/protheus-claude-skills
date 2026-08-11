@@ -15,7 +15,8 @@ Ao ser invocada, SEMPRE verifique primeiro se existe um plano em andamento:
 2. Se o usuario mencionar uma feature existente, leia o `plano.md` correspondente
 3. Retome da etapa atual indicada no `plano.md`
 4. Se existir `wayfinder-map.md` na pasta do slug: leia-o antes de tudo — "Decisions so far" sao decisoes JA tomadas (a Etapa 3 pergunta apenas o que estiver aberto; o PRD sintetiza delas), as linhas de "Out of scope" do mapa vao para a secao `## Fora de escopo / rejeitado` do plano.md, e o "Destination" vira o `## Escopo declarado` (E-1..E-n com fonte)
-5. Se nao existir plano, inicie pela Etapa 1
+5. Se o plano ja estiver na Etapa 5 ou depois: leia `ETAPA-5-KANBAN.md` antes de tocar em qualquer card — o **modo de aprovacao** e perguntado de novo a cada sessao, e os comentarios novos nos cards ativos sao lidos antes de decidir o que fazer
+6. Se nao existir plano, inicie pela Etapa 1
 
 ## Auto-sizing: a complexidade determina a profundidade
 
@@ -305,11 +306,11 @@ Atualize o `plano.md` e avance.
 
 **Objetivo:** Quebrar o PRD em tarefas atomicas e rastrear implementacao.
 
-Leia `ETAPA-5-KANBAN.md` (nesta skill) e siga-o na integra: descoberta do **kanban provider** instalado na maquina (fallback `kanban.md` na pasta do plano), contrato do card, camadas e gates, fatiamento tracer-bullet, passada de corte, movimentacao durante a implementacao e execucao delegada por agentes.
+Leia `ETAPA-5-KANBAN.md` (nesta skill) e siga-o na integra: descoberta do **kanban provider** instalado na maquina (fallback `kanban.md` na pasta do plano), **modo de aprovacao** (perguntado ao usuario a cada sessao) e conversa por comentarios no card, contrato do card, camadas e gates, fatiamento tracer-bullet, passada de corte, movimentacao durante a implementacao e execucao delegada por agentes.
 
 Atualize o `plano.md` e avance.
 
-**Concluida quando (criacao):** kanban criado no provider (ou no `kanban.md` de fallback) com tarefas atomicas cobrindo todo o PRD — nada alem dele —, cada uma com criterio de aceite e campo **Origem** preenchido, e o provider/board registrado na linha **Kanban** do `plano.md`. **Implementacao concluida quando:** todas as tasks em DONE.
+**Concluida quando (criacao):** modo de aprovacao perguntado ao usuario nesta sessao, kanban criado no provider (ou no `kanban.md` de fallback) com tarefas atomicas cobrindo todo o PRD — nada alem dele —, cada uma com criterio de aceite e campo **Origem** preenchido, e provider/board/modo registrados na linha **Kanban** do `plano.md`. **Implementacao concluida quando:** todas as tasks em DONE.
 
 ---
 
