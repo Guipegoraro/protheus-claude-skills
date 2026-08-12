@@ -126,7 +126,7 @@ As skills de AdvPL/TLPP tambem aproveitam, quando disponiveis, um MCP de documen
 ## Convencoes
 
 - Todo artefato de uma customizacao vive em `.claude/plans/<slug>/` (plano, PRD, kanban, QA, pre-producao, perguntas-cliente). Nada vai para `docs/` do projeto do cliente.
-- O kanban da Etapa 5 mora no **kanban provider** instalado na maquina (`ordna` aqui; MCP, plugin ou CLI em outra) e o board e registrado no `plano.md`; `kanban.md` na pasta do plano e fallback para maquina sem provider. Card sem **Origem** (`E-n` / requisito do PRD) nao entra.
+- O kanban da Etapa 5 mora no **kanban provider** instalado na maquina (`ordna` aqui; MCP, plugin ou CLI em outra) e o board e registrado no `plano.md`; `kanban.md` na pasta do plano e fallback para maquina sem provider. Card sem **Origem** (`E-n` / requisito do PRD) nao entra, e o que depende de voce ou de terceiro para em `TRABALHO HUMANO` / `AGUARDANDO TERCEIROS` com responsavel e data.
 - Slug: `<feature-slug>-<ticket>` quando houver ticket, apenas `<feature-slug>` caso contrario.
 - Dicionario sempre via Configurador, nunca via fonte. As skills `protheus-configurador-dicionario` e `protheus-consulta-padrao` documentam tudo em `pre-producao.md` para o consultor aplicar no deploy.
 - Outputs de desenvolvimento sempre em PT-BR (comentarios, commits, textos de UI); identificadores em ingles.

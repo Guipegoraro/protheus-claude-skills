@@ -16,9 +16,17 @@
 <!-- Nos modos com aprovacao, acrescente as secoes na ordem do fluxo:
      entrada          -> ## AGUARDANDO APROVACAO / ## APROVADO / ## DOING / ## DONE
      entrada+entrega  -> ... / ## DOING / ## EM REVISAO / ## DONE
-     Card em espera leva as linhas:
+
+     Estados transversais (qualquer modo), como secoes proprias:
+     ## TRABALHO HUMANO      (tarefa do usuario: Configurador, gate no TST, restart)
+     ## AGUARDANDO TERCEIROS (cliente, suporte TOTVS, fornecedor)
+
+     Linhas extras conforme o caso:
      - **Comentarios**: [claude DATA] premissas/perguntas | [usuario DATA] resposta
-     - **Aprovacao**: Aprovado por <usuario> em <data>  |  NAO APROVADO — <motivo> -->
+     - **Flags**: comentado | pergunta   (limpa quem responde, nao quem le)
+     - **Aprovacao**: Aprovado por <usuario> em <data>  |  NAO APROVADO — <motivo>
+     - **Responsavel**: <quem> — obrigatorio nos dois estados de espera
+     - **Perguntado em**: DD/MM via <e-mail/ticket/reuniao>  (AGUARDANDO TERCEIROS) -->
 
 ## TODO
 
