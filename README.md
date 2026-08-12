@@ -9,6 +9,7 @@ Este repositorio e um espelho da minha pasta de skills e mistura **tres origens 
 1. **Autorais (Guilherme Pegoraro)** — criadas por mim para o meu fluxo de consultoria Protheus: `planejar-advpl`, `interrogatorio-advpl`, `prd-protheus`, `protheus-configurador-dicionario`, `protheus-consulta-padrao`, `refazer-relatorio-classico`, `apontamento-gerar`, `session-summary`, `session-resume`.
 2. **Comunidade TOTVS/engpro** — skills de terceiros (autoria Melkz Siqueira / Engenharia Protheus, MIT; `genericquery` de Johnni Moraes - TSC), adaptadas ao meu ambiente: `code-review`, `mvc-generator`, `entry-point-designer`, `tlpp-rest-endpoint-generator`, `fwrest-client-generator`, `fwmsprinter-pdf`, `data-dictionary-lookup`, `genericquery`. A antiga trinca SQL (query-builder / sql-code-review / sql-optimization, MIT) foi fundida e reescrita como `sql-protheus` a partir de pesquisa TDN/fontes-padrao (08/2026).
 3. **Adaptadas de [mattpocock/skills](https://github.com/mattpocock/skills)** (MIT, Matt Pocock) — skills de processo genericas, portadas quase-verbatim com adaptacoes minimas ao ecossistema Protheus (`.claude/plans/<slug>/` como tracker local): `grilling`, `domain-modeling`, `wayfinder`, `diagnosing-bugs`, `writing-for-agents`, `wait-what`, `to-questionnaire` (sincronizadas com o upstream v1.2, 08/2026).
+4. **Wrapper de ferramenta externa** — `ordna`: o `SKILL.md` foi escrito aqui para dirigir o CLI [ordna](https://github.com/FreHilm/ordna) (`@frehilm/ordna-cli`, MIT, FreHilm); o `reference.md` da pasta e derivado do agent guide do proprio projeto.
 
 Credito e licenca de cada origem permanecem nos respectivos arquivos.
 
@@ -36,15 +37,16 @@ As **user-invoked** deste repositorio sao 7: `/wayfinder`, `/diagnosing-bugs`, `
 
 | Skill | Descricao |
 |-------|-----------|
-| `planejar-advpl` | Processo completo de planejamento de customizacao Protheus em 8 etapas — ideia, pesquisa, interrogatorio, PRD, kanban, QA, limpeza pre-producao e aplicacao |
+| `planejar-advpl` | Processo completo de planejamento de customizacao Protheus em 8 etapas — ideia, pesquisa, interrogatorio, PRD, kanban, QA, limpeza pre-producao e aplicacao. A Etapa 5 (`ETAPA-5-KANBAN.md`) descobre o **kanban provider** da maquina e pergunta o modo de aprovacao a cada sessao |
 | `prd-protheus` | Gera PRDs (Documentos de Requisitos) para customizacoes Protheus via entrevista conversacional |
 | `interrogatorio-advpl` | Stress-test de planos de customizacao — questiona cada aspecto ate validar todas as decisoes |
+| `ordna` | Board Kanban derivado de arquivos (`tasks/*.md` + `.ordna/`) via CLI `ordna` — granularidade de leitura, ciclo da task, colunas e dependencias. E o kanban provider usado pela Etapa 5 do `planejar-advpl` quando instalado |
 
 ### Processo generico (adaptadas de mattpocock/skills)
 
 | Skill | Descricao |
 |-------|-----------|
-| `/wayfinder` | Planeja trabalho grande demais para uma sessao como mapa de decision tickets em `.claude/plans/<slug>/` — fog of war, 1 decisao por sessao, mapa como indice |
+| `/wayfinder` | Planeja trabalho grande demais para uma sessao como mapa de decision tickets em `.claude/plans/<slug>/` — fog of war, 1 decisao por sessao, mapa como indice. Feature que ninguem pediu so entra no destino com sim explicito; o hand-off leva Destination → `## Escopo declarado` (E-1..E-n) do `planejar-advpl` |
 | `grilling` | Primitiva de entrevista em rounds por fronteira: cada rodada pergunta todas as decisoes ja desbloqueadas, com recomendacao anexa; fatos vao para subagentes sem travar a rodada. `interrogatorio-advpl` = grilling + 10 dimensoes Protheus |
 | `domain-modeling` | Glossario vivo do dominio do cliente (CONTEXT.md) + ADRs de um paragrafo para decisoes dificeis de reverter |
 | `/diagnosing-bugs` | Debug disciplinado: construir o feedback loop red-capable ANTES de formar teoria; multi-hipotese falsificavel; logs com prefixo unico para cleanup |
@@ -115,7 +117,7 @@ As skills de AdvPL/TLPP tambem aproveitam, quando disponiveis, um MCP de documen
 
 ## Fluxo recomendado
 
-1. **Planejamento** — para esforcos grandes demais para uma sessao, `/wayfinder` monta o mapa de decisoes primeiro; `/planejar-advpl` estrutura a customizacao (aciona `prd-protheus` e `interrogatorio-advpl` nas etapas certas) e produz o pacote em `.claude/plans/<slug>/`.
+1. **Planejamento** — para esforcos grandes demais para uma sessao, `/wayfinder` monta o mapa de decisoes primeiro; `/planejar-advpl` estrutura a customizacao (aciona `prd-protheus` e `interrogatorio-advpl` nas etapas certas) e produz o pacote em `.claude/plans/<slug>/`. Na Etapa 5 as tasks vao para o board do `ordna` (ou outro provider), no modo de aprovacao escolhido na hora.
 2. **Dicionario** — `/protheus-configurador-dicionario` desenha tabelas / campos / indices / parametros novos e gera o checklist em `pre-producao.md`. Para F3 / consultas padrao, `/protheus-consulta-padrao`.
 3. **Implementacao** — MVC (`/mvc-generator`), REST (`/tlpp-rest-endpoint-generator`, `/protheus-api-poui`), frontend (`/po-ui-app`), PDFs (`/fwmsprinter-pdf`), integracoes (`/fwrest-client-generator`) e consulta direta ao banco via `/genericquery` + `/sql-protheus`.
 4. **Qualidade** — `/code-review` e `/sql-protheus` (branch de review) antes de aplicar.
@@ -124,6 +126,7 @@ As skills de AdvPL/TLPP tambem aproveitam, quando disponiveis, um MCP de documen
 ## Convencoes
 
 - Todo artefato de uma customizacao vive em `.claude/plans/<slug>/` (plano, PRD, kanban, QA, pre-producao, perguntas-cliente). Nada vai para `docs/` do projeto do cliente.
+- O kanban da Etapa 5 mora no **kanban provider** instalado na maquina (`ordna` aqui; MCP, plugin ou CLI em outra) e o board e registrado no `plano.md`; `kanban.md` na pasta do plano e fallback para maquina sem provider. Card sem **Origem** (`E-n` / requisito do PRD) nao entra.
 - Slug: `<feature-slug>-<ticket>` quando houver ticket, apenas `<feature-slug>` caso contrario.
 - Dicionario sempre via Configurador, nunca via fonte. As skills `protheus-configurador-dicionario` e `protheus-consulta-padrao` documentam tudo em `pre-producao.md` para o consultor aplicar no deploy.
 - Outputs de desenvolvimento sempre em PT-BR (comentarios, commits, textos de UI); identificadores em ingles.

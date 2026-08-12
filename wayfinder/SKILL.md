@@ -108,6 +108,8 @@ Fog only ever gathers _toward_ the destination. The destination fixes the scope,
 
 Out-of-scope work never graduates — the frontier stops at the destination — so it returns only if the destination is redrawn, and then as a fresh effort, not a resumption.
 
+**A capability nobody asked for is out of scope until the human says otherwise.** Fog graduates into tickets that resolve decisions the destination already implies; a resolution that surfaces a *new feature* — an extra screen, table, parameter, report, "while we're here" convenience — is a scope act, not a route step. Put it to the human as a proposal (what it is, why it surfaced, what it costs, what happens without it) and wait for an explicit yes. With the yes, redraw the destination line that now covers it and ticket it; without one, it goes straight to **Out of scope**. Silence, a generic "go ahead", and an earlier yes for a different feature are not that yes.
+
 Ruling something out of scope is a scoping act, not a step on the route. When a ticket that already exists turns out to sit past the destination — mis-scoped in while charting, or exposed by a resolution — **close it** (a closed ticket is unambiguously off the frontier) and leave one line in the **Out of scope** section: the gist plus why it's out of scope, linking the closed ticket. It stays out of **Decisions so far**, which records the route actually walked — a scope boundary isn't a step on it.
 
 ## Invocation
@@ -139,6 +141,6 @@ The user may run unblocked tickets in parallel, so expect other sessions to be e
 
 ## Handing off — the way is clear
 
-The map is done when no open tickets remain and the fog is empty: nothing left to decide. For a Protheus customization, the hand-off is `/planejar-advpl` **in the same `<slug>`**: its stages then run in synthesis mode — the interrogatório only asks what is genuinely still open (the map's Decisions-so-far already answers the rest), and the PRD is synthesized from the recorded decisions rather than re-interviewed. Carry the map's **Out of scope** lines into `plano.md`'s `## Fora de escopo / rejeitado` section so they aren't re-litigated. (The reverse pointer also exists: `/planejar-advpl`'s Etapa 1 suggests this skill when the effort is too big to plan in one session.)
+The map is done when no open tickets remain and the fog is empty: nothing left to decide. For a Protheus customization, the hand-off is `/planejar-advpl` **in the same `<slug>`**: its stages then run in synthesis mode — the interrogatório only asks what is genuinely still open (the map's Decisions-so-far already answers the rest), and the PRD is synthesized from the recorded decisions rather than re-interviewed. Carry the map's **Out of scope** lines into `plano.md`'s `## Fora de escopo / rejeitado` section so they aren't re-litigated, and the Destination — split into what was actually asked for, each line with its source — into `plano.md`'s `## Escopo declarado` as E-1..E-n, the ceiling the later stages trace every requirement and card back to. (The reverse pointer also exists: `/planejar-advpl`'s Etapa 1 suggests this skill when the effort is too big to plan in one session.)
 
 <!-- Adaptada de https://github.com/mattpocock/skills (MIT, Matt Pocock) -->
