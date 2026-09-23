@@ -59,6 +59,8 @@ Auto-sizing dimensiona a PROFUNDIDADE do processo. Esta secao dimensiona a LARGU
   research.md         # Pesquisa tecnica
   decisoes-cliente.md # Mapa de decisoes — versao para o cliente revisar
   prd.md              # Documento de requisitos (via /prd-protheus)
+  .ordna/config.yaml  # Colunas e prefixo do board (Etapa 5 — provider padrao desta maquina)
+  tasks/TASK-001.md   # Um arquivo por card do kanban
   kanban.md           # Fallback do kanban — so quando nao ha kanban provider na maquina (ver ETAPA-5-KANBAN.md)
   qa.md               # Plano de testes para execucao humana
   pre-producao.md     # Campos/parametros/indices a criar no Configurador (criado sob demanda)

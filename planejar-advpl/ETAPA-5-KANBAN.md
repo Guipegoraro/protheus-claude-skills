@@ -10,12 +10,41 @@ Ramo da skill [`planejar-advpl`](SKILL.md) para a Etapa 5 — o resto do process
 
 ### Descoberta do provider (primeiro passo da etapa, sempre)
 
-1. Procure o provider entre as ferramentas desta sessao: tools MCP, plugins e skills cujo nome ou descricao fale de kanban, board, card, task ou issue; confira tambem o `.mcp.json` e o `settings.json` do projeto.
-2. **Um candidato** → use-o.
-3. **Mais de um** → pergunte ao usuario qual board recebe esta customizacao. Escolher sozinho espalha card de cliente em ferramenta errada.
-4. **Nenhum** → crie `kanban.md` na pasta do plano a partir de `templates/kanban.md` (nesta skill) e siga o resto deste arquivo tratando TODO/DOING/DONE como os estados do card.
-5. Nomeie o board/projeto do provider com o `<slug>` da customizacao, e registre no `plano.md` (linha **Kanban** do cabecalho): provider + identificacao do board (id, url ou nome), ou `kanban.md (sem provider)`. A sessao seguinte retoma por essa linha — provider nao registrado e board perdido.
-6. Confirme que o provider tem **comentarios por card** (ou equivalente). Nao tendo, os modos de aprovacao abaixo perdem o canal de conversa: avise o usuario e combine o substituto (secao de comentarios dentro do proprio card) antes de seguir.
+1. **O provider padrao desta maquina e o `ordna`** — skill `ordna` e CLI `ordna` no PATH, board em arquivos markdown versionaveis. Confirme com `ordna --version`; respondendo, use-o e monte o board como descrito em "Board ordna da customizacao" abaixo. Nao respondendo, siga para o passo 2.
+2. Procure outro provider entre as ferramentas desta sessao: tools MCP, plugins e skills cujo nome ou descricao fale de kanban, board, card, task ou issue; confira tambem o `.mcp.json` e o `settings.json` do projeto.
+3. **Um candidato** → use-o.
+4. **Mais de um** → pergunte ao usuario qual board recebe esta customizacao. Escolher sozinho espalha card de cliente em ferramenta errada.
+5. **Nenhum** → crie `kanban.md` na pasta do plano a partir de `templates/kanban.md` (nesta skill) e siga o resto deste arquivo tratando TODO/DOING/DONE como os estados do card.
+6. Nomeie o board/projeto do provider com o `<slug>` da customizacao, e registre no `plano.md` (linha **Kanban** do cabecalho): provider + identificacao do board (id, url ou nome), ou `kanban.md (sem provider)`. A sessao seguinte retoma por essa linha — provider nao registrado e board perdido.
+7. Confirme que o provider tem **comentarios por card** (ou equivalente). Nao tendo, os modos de aprovacao abaixo perdem o canal de conversa: avise o usuario e combine o substituto (secao de comentarios dentro do proprio card) antes de seguir.
+
+### Board ordna da customizacao
+
+O board mora **dentro da pasta do plano** — `.claude/plans/<slug>/` — pela mesma razao que todo o resto mora: uma pasta por customizacao. Rode `ordna init` la e escreva o `config.yaml`:
+
+```yaml
+tasksDir: tasks
+storage: file
+idPrefix: TASK          # o id do ordna JA e o TASK-nnn do contrato do card
+zeroPaddedIds: 3
+statuses: [aguardando-aprovacao, aprovado, doing, em-revisao, done]
+```
+
+Corte a lista de `statuses` no modo de aprovacao escolhido (Livre → `[todo, doing, done]`; Entrada → sem `em-revisao`). `done` fica sempre por ultimo: e o status terminal, e e nele que o ordna aplica o gate de `depends_on`.
+
+O contrato do card mapeia assim — leia a skill `ordna` para a mecanica do CLI:
+
+| Contrato do card | No ordna |
+|---|---|
+| Titulo `TASK-nnn` | id nativo, via `idPrefix: TASK` |
+| Estado | coluna (`ordna move`) |
+| Dependencias | `depends_on` — o CLI **recusa** fechar antes da dependencia |
+| Origem, criterio de aceite | secoes `## Goal` e `## Acceptance Criteria` do corpo |
+| Comentarios por card | secao `## Notes`, prefixando cada fala com quem falou |
+| Camada | tag (`-t camada-1`), que a barra lateral filtra |
+| TRABALHO HUMANO / AGUARDANDO TERCEIROS | tag — nunca coluna |
+
+Sendo o board arquivo versionado, a varredura de retomada do passo de flags usa `git diff` na pasta `tasks/` desde o ultimo commit da sessao anterior.
 
 ## Modo de aprovacao (perguntar SEMPRE)
 
