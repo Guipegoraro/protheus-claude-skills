@@ -2,14 +2,15 @@
 
 Skills customizadas para desenvolvimento TOTVS Protheus — ADVPL, TLPP, PO-UI e SQL — usadas com [Claude Code](https://claude.ai/claude-code).
 
-## Origem das skills (merge de tres fontes)
+## Origem das skills
 
-Este repositorio e um espelho da minha pasta de skills e mistura **tres origens distintas**:
+Este repositorio e um espelho da minha pasta de skills e mistura **cinco origens distintas**:
 
 1. **Autorais (Guilherme Pegoraro)** — criadas por mim para o meu fluxo de consultoria Protheus: `planejar-advpl`, `interrogatorio-advpl`, `prd-protheus`, `protheus-configurador-dicionario`, `protheus-consulta-padrao`, `refazer-relatorio-classico`, `apontamento-gerar`, `session-summary`, `session-resume`.
 2. **Comunidade TOTVS/engpro** — skills de terceiros (autoria Melkz Siqueira / Engenharia Protheus, MIT; `genericquery` de Johnni Moraes - TSC), adaptadas ao meu ambiente: `code-review`, `mvc-generator`, `entry-point-designer`, `tlpp-rest-endpoint-generator`, `fwrest-client-generator`, `fwmsprinter-pdf`, `data-dictionary-lookup`, `genericquery`. A antiga trinca SQL (query-builder / sql-code-review / sql-optimization, MIT) foi fundida e reescrita como `sql-protheus` a partir de pesquisa TDN/fontes-padrao (08/2026).
 3. **Adaptadas de [mattpocock/skills](https://github.com/mattpocock/skills)** (MIT, Matt Pocock) — skills de processo genericas, portadas quase-verbatim com adaptacoes minimas ao ecossistema Protheus (`.claude/plans/<slug>/` como tracker local): `grilling`, `domain-modeling`, `wayfinder`, `diagnosing-bugs`, `writing-for-agents`, `wait-what`, `to-questionnaire` (sincronizadas com o upstream v1.2, 08/2026).
 4. **Wrapper de ferramenta externa** — `ordna`: o `SKILL.md` foi escrito aqui para dirigir o CLI [ordna](https://github.com/FreHilm/ordna) (`@frehilm/ordna-cli`, MIT, FreHilm); o `reference.md` da pasta e derivado do agent guide do proprio projeto.
+5. **Derivada de [brunobrigidovilanova/protheus-claude-skills](https://github.com/brunobrigidovilanova/protheus-claude-skills)** (MIT, Bruno Brigido Vilanova) — `criar-mit044`: `scripts/`, `assets/` (modelo oficial da MIT044 + `prototipos.xml`) e o exemplo JSON vem da `mit044-especificacao` v1.1.0; o `SKILL.md` e os guias da pasta foram escritos aqui (`REDACAO.md` adapta o `guia-redacao.md` do upstream), e o gerador/validador ganharam itens `imagem` e `tabela` e a checagem de travessao. Licenca original em `criar-mit044/LICENSE`.
 
 Credito e licenca de cada origem permanecem nos respectivos arquivos.
 
@@ -29,7 +30,7 @@ git clone https://github.com/Guipegoraro/protheus-claude-skills.git ~/.claude/sk
 - **Model-invoked** (padrao): a description fica carregada em toda sessao e o Claude dispara a skill sozinho pelos trigger words — ou voce chama por `/<nome>`. Custo: alguns tokens de contexto por skill, sempre.
 - **User-invoked** (`disable-model-invocation: true`, marcadas com `/` nas tabelas abaixo): SO disparam quando voce digita `/<nome>` — custo zero de contexto, mas voce e o indice que precisa lembrar que existem.
 
-As **user-invoked** deste repositorio sao 7: `/wayfinder`, `/diagnosing-bugs`, `/wait-what`, `/to-questionnaire`, `/session-summary`, `/session-resume` e `/apontamento-gerar`. Todas as demais sao model-invoked (disparam por contexto).
+As **user-invoked** deste repositorio sao 8: `/wayfinder`, `/diagnosing-bugs`, `/wait-what`, `/to-questionnaire`, `/criar-mit044`, `/session-summary`, `/session-resume` e `/apontamento-gerar`. Todas as demais sao model-invoked (disparam por contexto).
 
 ## Skills
 
@@ -40,6 +41,7 @@ As **user-invoked** deste repositorio sao 7: `/wayfinder`, `/diagnosing-bugs`, `
 | `planejar-advpl` | Processo completo de planejamento de customizacao Protheus em 8 etapas — ideia, pesquisa, interrogatorio, PRD, kanban, QA, limpeza pre-producao e aplicacao. A Etapa 5 (`ETAPA-5-KANBAN.md`) descobre o **kanban provider** da maquina e pergunta o modo de aprovacao a cada sessao |
 | `prd-protheus` | Gera PRDs (Documentos de Requisitos) para customizacoes Protheus via entrevista conversacional |
 | `interrogatorio-advpl` | Stress-test de planos de customizacao — questiona cada aspecto ate validar todas as decisoes |
+| `/criar-mit044` | Redige a MIT044 (especificacao de customizacao que o cliente assina) a partir de um plano fechado: conteudo em `mit-conteudo.json` na pasta do plano, DOCX gerado no modelo oficial e conferido pelo validador |
 | `ordna` | Board Kanban derivado de arquivos (`tasks/*.md` + `.ordna/`) via CLI `ordna` — granularidade de leitura, ciclo da task, colunas e dependencias. E o kanban provider usado pela Etapa 5 do `planejar-advpl` quando instalado |
 
 ### Processo generico (adaptadas de mattpocock/skills)
