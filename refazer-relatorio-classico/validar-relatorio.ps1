@@ -138,6 +138,24 @@ if ([string]::IsNullOrWhiteSpace($IncludeDir)) {
     Chk "Includes presentes em $IncludeDir" ($missing.Count -eq 0) ("faltam: " + ($missing -join ', '))
 }
 
+# 8) FunName()/ProcName() comparados com o nome ANTIGO em literal.
+#    Nao quebra compilacao -- quebra em runtime, silenciosamente: FunName() passa a
+#    devolver o nome novo (o item de menu vira U_z<Nome>), a comparacao fica sempre
+#    .F. e o bloco guardado por ela nunca executa. Achado real no FINR340 do lote do
+#    ticket 00017641: 'AllTrim(FUNNAME()) == "FINR340"' guardava o Pergunte() do
+#    relatorio -- as perguntas de parametro sumiriam da tela.
+#    Correcao: comparar cobrindo as duas formas que FunName() pode devolver:
+#        AllTrim(Upper(FunName())) $ "U_Z<NOME>"
+#    As duas regex atravessam os wrappers (AllTrim/Upper/...) que quase sempre
+#    envolvem a chamada -- por isso o ')' extra em [\s\)]* e o [\s\w(]* do lado oposto.
+$fnRe  = [regex]('(?i)\b(FunName|ProcName)\s*\([^)]*\)[\s\)]*(==|<>|!=|\$|=)\s*"([^"]*)"')
+$fnRe2 = [regex]('(?i)"([^"]*)"\s*(==|<>|!=|\$|=)[\s\w(]*\b(FunName|ProcName)\s*\(')
+$fnBad = @()
+foreach ($m in $fnRe.Matches($codigo))  { $fnBad += $m.Groups[3].Value }
+foreach ($m in $fnRe2.Matches($codigo)) { $fnBad += $m.Groups[1].Value }
+$fnBad = @($fnBad | Where-Object { $_ -and ($_ -notmatch ('(?i)^(U_)?' + [regex]::Escape($Prefix))) } | Select-Object -Unique)
+Chk "FunName()/ProcName() nao comparado com o nome antigo" ($fnBad.Count -eq 0) ("literal(is) sem prefixo '$Prefix': " + ($fnBad -join ', '))
+
 ""
 if ($fail -eq 0) { "RESULTADO: PASS - checagens mecanicas ok. Falta so compilar/executar no AppServer."; exit 0 }
 else { "RESULTADO: FALHOU em $fail item(ns) - revisar acima antes de compilar."; exit 2 }

@@ -28,6 +28,7 @@ via macro-execução.
 | `refazer-relatorio.ps1` | Engine: transforma o fonte in-place (`-DryRun`, `-Prefix`, `-SkipComments`) |
 | `validar-relatorio.ps1` | Validação pós-engine, PASS/FAIL + exit 2 (`-IncludeDir`) |
 | `lib-segmentos.ps1` | Separa código × comentário e preserva a largura das caixas. Dot-source dos dois acima — **não rodar direto** |
+| `refazer-lote.ps1` | **Lote**: roda os passos 1–5 para N relatórios e emite 1 linha por relatório (ver seção *Lote*) |
 
 ## Pré-requisitos / entradas
 
@@ -103,7 +104,57 @@ via macro-execução.
   grupo de perguntas padrão (`Pergunte("MTR320",…)` etc.), que já existe no
   dicionário do cliente. (Ver regra `protheus-dicionario`.)
 
+## Lote (vários relatórios de uma vez)
+
+Quando forem **muitos relatórios**, não rode o processo abaixo um a um: os passos
+1–5 são mecânicos e a saída repetida por relatório só gasta contexto. Use o
+wrapper, que faz localizar → copiar → dry-run → engine → `.ch` → validar para
+todos e emite **uma linha por relatório**:
+
+```powershell
+# 1) reconhecimento: nada é gravado no destino
+& "<skill>\refazer-lote.ps1" -Codigos MATR320,FINR130,MATR110 -Dest "<repo>\<pasta relatorios>" -DryRun
+
+# 2) valendo (aceita -Lista arquivo.txt com 1 código por linha, # = comentário)
+& "<skill>\refazer-lote.ps1" -Lista .\lote.txt -Dest "<repo>\<pasta relatorios>" `
+      -IncludeDir "<pasta include do Protheus>"
+```
+
+O fonte é localizado pelo **código** (não precisa informar o módulo) nas raízes
+default `Desktop\padrao\Fontes Relatorios Central TOTVS` e `Desktop\padrao\Fontes`
+— override com `-Fontes`. Saída de exemplo:
+
+```
+CODIGO   FONTE       FUNCS TRAVA  STATICCALL ENGINE CH      VALIDADOR PARAMIXB?
+MATR320  MATERIAIS   6     -      -          ok     copiado PASS      -
+FINR130  FINANCEIRO  27    -      1          ok     copiado PASS      -
+MATR110  MATERIAIS   20    -      -          ok     copiado PASS      CHECAR
+```
+
+**Ler só a tabela.** O detalhe completo (dry-run, engine e validador de cada
+relatório) fica em `$LogDir` (`%TEMP%\refazer-lote-<stamp>`, com `resumo.csv`) —
+abrir apenas o do relatório que não deu `PASS`. Exit 2 se algum falhar.
+
+Comportamento nas exceções:
+
+- **Colisão de 10 chars** → marca `COLISAO-10CH` e **não** deixa fonte compilável
+  no destino (renomeia para `.FALHOU`); resolver manual (seção 3) e rodar de novo.
+- **Falha do engine** → mesmo tratamento `.FALHOU`. Isso importa: quando o engine
+  falha ele não grava, então o arquivo no destino ainda é o **fonte padrão** — se
+  ficasse como `z<cod>.prw` seria compilado por engano e daria `C2021`.
+- **`z<cod>.prw` já existe** → marca `JA-EXISTE` e pula (use `-Force`).
+- **`PARAMIXB? = CHECAR`** → heurística: a `User Function` declara parâmetros, logo
+  o relatório *pode* ser chamado por rotina padrão via `MV_*`. Não é veredito —
+  confirmar o contrato do `ExecBlock` na rotina chamadora antes de escrever o shim
+  (**seção 7.1**).
+
+O que o lote **não** faz: resolver colisão, escrever shim `PARAMIXB`, compilar e
+testar. Compilar/testar (seção 7) continua sendo a única prova de 100%.
+
 ## Processo
+
+> Referência do que o lote executa por relatório — e o caminho a seguir quando for
+> um relatório só, ou quando o lote marcar exceção.
 
 ### 1. Obter o fonte e o `.ch`
 1. Descobrir o **código clássico** do relatório (ver Pré-requisitos 1).
@@ -194,6 +245,25 @@ dispara checagem de código (e vice-versa). Checagens:
 10. Todos os `#include` referenciados existem na pasta include.
 11. **AVISO** (não reprova): comentário que ainda cita o nome antigo. Só afeta
     documentação, nunca compilação.
+12. **`FunName()`/`ProcName()` comparado com o nome ANTIGO em literal.** Compila
+    liso e quebra em runtime, calado — ver a armadilha abaixo.
+
+> **Armadilha `FunName()` — achada no FINR340 (ticket 00017641, 12/08/2026).**
+> `FunName()` devolve o **nome do programa como está no item de menu**, não a
+> função em execução. Como o item novo aponta para `U_z<Nome>`, toda comparação
+> com o literal antigo fica **sempre `.F.`** e o bloco que ela guarda nunca roda.
+> No FINR340 era `Local lFinr340 := AllTrim(FUNNAME()) == "FINR340"` guardando o
+> `Pergunte("FIN340",.F.)`: o relatório compilaria e abriria **sem a tela de
+> parâmetros**. Nenhuma checagem mecânica anterior via isso, e a compilação
+> também não veria. Correção que cobre as duas formas que `FunName()` pode
+> devolver (com e sem `U_`):
+>
+> ```advpl
+> Local lFinr340 := AllTrim(Upper(FunName())) $ "U_ZFINR340"
+> ```
+>
+> `ProcName(1)` usado só para montar texto de log (comum nos `FINRxxx` novos)
+> **não** é problema — o item 12 só reprova comparação com literal.
 
 > Só aceite avançar com **RESULTADO: PASS**. Qualquer FAIL: corrigir antes de
 > compilar (renomear função em colisão de 10 chars; reprefixar call site perdido;
