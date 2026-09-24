@@ -1,14 +1,14 @@
-# Column Reference — Protheus Data Dictionary
+# Column Reference: Protheus Data Dictionary
 
 Detailed description of all columns in the data dictionary tables. Use to interpret query results or understand the functional meaning of each field.
 
 ---
 
-## SX2 — System Tables
+## SX2: System Tables
 
 | Column | Type | Description |
 |--------|------|-------------|
-| `x2_chave` | C | Table alias (SA1, SE1, etc.) — primary key |
+| `x2_chave` | C | Table alias (SA1, SE1, etc.), primary key |
 | `x2_path` | C | Physical path (ISAM only, generally empty in SQL) |
 | `x2_arquivo` | C | Physical table name in the database (e.g.: SA1010) |
 | `x2_nome` | C | Table description in Portuguese |
@@ -36,7 +36,7 @@ Detailed description of all columns in the data dictionary tables. Use to interp
 
 ---
 
-## SX3 — Table Fields
+## SX3: Table Fields
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -76,7 +76,7 @@ Detailed description of all columns in the data dictionary tables. Use to interp
 | `x3_grpsxg` | C | Field group code (SXG) |
 | `x3_folder` | C | Folder/tab number where the field appears |
 | `x3_pyme` | C | Used by Protheus Series 3 |
-| `x3_agrup` | C | Grouper code (SXA) — used in MVC |
+| `x3_agrup` | C | Grouper code (SXA), used in MVC |
 | `x3_tela` | C | Numbers separated by `\|` for display control |
 | `x3_pos` | C | Export to POS |
 
@@ -89,7 +89,7 @@ Detailed description of all columns in the data dictionary tables. Use to interp
 
 ---
 
-## SIX — Table Indexes
+## SIX: Table Indexes
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -108,7 +108,7 @@ Detailed description of all columns in the data dictionary tables. Use to interp
 
 ---
 
-## SX6 — System Parameters
+## SX6: System Parameters
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -134,7 +134,7 @@ Detailed description of all columns in the data dictionary tables. Use to interp
 
 ---
 
-## SX5 — Generic Tables
+## SX5: Generic Tables
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -147,7 +147,7 @@ Detailed description of all columns in the data dictionary tables. Use to interp
 
 ---
 
-## SX7 — Triggers
+## SX7: Triggers
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -170,7 +170,7 @@ Detailed description of all columns in the data dictionary tables. Use to interp
 
 ---
 
-## SX1 — Parameterization Questions
+## SX1: Parameterization Questions
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -196,7 +196,7 @@ Detailed description of all columns in the data dictionary tables. Use to interp
 
 ---
 
-## SX9 — Table Relationships
+## SX9: Table Relationships
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -218,7 +218,7 @@ Detailed description of all columns in the data dictionary tables. Use to interp
 
 ---
 
-## SXB — Standard Lookups (F3)
+## SXB: Standard Lookups (F3)
 
 | Column | Type | Description |
 |--------|------|-------------|

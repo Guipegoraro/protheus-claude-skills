@@ -1,6 +1,6 @@
 ---
 name: session-summary
-description: Gera resumo consolidado da sessao atual — decisoes, padroes, arquivos trabalhados, bugs resolvidos, pendencias. Salva em arquivo para reload apos /clear. Quando o projeto ja tem plano em .claude/plans/<slug>/ (via planejar-advpl), referencia esses artefatos em vez de duplicar. Use ao final de sessoes produtivas ou quando o contexto ficar grande.
+description: "Gera resumo consolidado da sessao atual: decisoes, padroes, arquivos trabalhados, bugs resolvidos, pendencias. Salva em arquivo para reload apos /clear. Quando o projeto ja tem plano em .claude/plans/<slug>/ (via planejar-advpl), referencia esses artefatos em vez de duplicar. Use ao final de sessoes produtivas ou quando o contexto ficar grande."
 argument-hint: [nome-do-resumo]
 disable-model-invocation: true
 ---
@@ -17,11 +17,11 @@ Gera um resumo denso e especifico da sessao atual, otimizado para recarregar con
 - **Gotchas sao prioridade**: edge cases e gotchas devem ser registrados. Preserve-os explicitamente.
 - **Formato Markdown puro**: sem JSON, sem YAML no corpo. Markdown tem 16% menos tokens e LLMs parsam nativamente.
 - **Nao crie resumos genericos**: cada item deve ser exclusivo ao projeto sendo trabalhado. Se poderia aparecer em qualquer projeto, nao inclua.
-- **NAO duplique o que ja esta em `.claude/plans/<slug>/`** — quando ha plano via `planejar-advpl`, o resumo referencia os artefatos por path. Veja o **Passo 0** abaixo.
+- **NAO duplique o que ja esta em `.claude/plans/<slug>/`**: quando ha plano via `planejar-advpl`, o resumo referencia os artefatos por path. Veja o **Passo 0** abaixo.
 
 ## Antes de resumir: e o movimento certo?
 
-Se o usuario esta decidindo COMO encerrar/trocar de fase (continuar? /clear? resumir? subagente? /compact?), leia `references/fronteiras-de-fase.md` (nesta skill) — arvore de decisao em ordem de custo. Resumir e o movimento certo quando algo precisa VIAJAR entre sessoes; nao e o reflexo default.
+Se o usuario esta decidindo COMO encerrar/trocar de fase (continuar? /clear? resumir? subagente? /compact?), leia `references/fronteiras-de-fase.md` (nesta skill): arvore de decisao em ordem de custo. Resumir e o movimento certo quando algo precisa VIAJAR entre sessoes; nao e o reflexo default.
 
 ## Onde salvar
 
@@ -36,17 +36,17 @@ Se `$ARGUMENTS` foi fornecido, use como nome: `.claude/session-resume-$ARGUMENTS
 Antes de coletar qualquer coisa, verifique se existe um plano da skill `planejar-advpl` para esta customizacao:
 
 1. Liste `.claude/plans/` no diretorio do projeto.
-2. Se houver pasta(s), identifique o slug ativo — normalmente o que foi mencionado na conversa, ou o mais recentemente modificado.
+2. Se houver pasta(s), identifique o slug ativo: normalmente o que foi mencionado na conversa, ou o mais recentemente modificado.
 3. Liste os artefatos presentes em `.claude/plans/<slug>/`:
-   - `plano.md` — indice central e status de etapas
-   - `research.md` — pesquisa tecnica
-   - `prd.md` — requisitos do projeto
-   - `kanban.md` — tarefas de implementacao
-   - `qa.md` — plano de testes
-   - `decisoes-cliente.md` — decisoes que aguardam revisao do cliente
-   - `pre-producao.md` — campos/tabelas/parametros/consultas a aplicar no Configurador
-   - `perguntas-cliente.md` — duvidas abertas
-   - `wayfinder-map.md` + `wayfinder/` — mapa de decisoes (via /wayfinder); em modo referencial, decisoes resolvidas vivem nos tickets, nao no resumo
+   - `plano.md`: indice central e status de etapas
+   - `research.md`: pesquisa tecnica
+   - `prd.md`: requisitos do projeto
+   - `kanban.md`: tarefas de implementacao
+   - `qa.md`: plano de testes
+   - `decisoes-cliente.md`: decisoes que aguardam revisao do cliente
+   - `pre-producao.md`: campos/tabelas/parametros/consultas a aplicar no Configurador
+   - `perguntas-cliente.md`: duvidas abertas
+   - `wayfinder-map.md` + `wayfinder/`: mapa de decisoes (via /wayfinder); em modo referencial, decisoes resolvidas vivem nos tickets, nao no resumo
 
 **Se existe plano**, o resumo entra em **modo referencial**: cada secao numerada do template aponta para o artefato canonico em vez de copiar o conteudo. O resumo so detalha o que e:
 
@@ -54,7 +54,7 @@ Antes de coletar qualquer coisa, verifique se existe um plano da skill `planejar
 - **Divergente do plano**: pontos onde o plano mudou e o doc canonico ainda nao foi atualizado (marcar como pendencia para atualizar).
 - **Especifico da sessao**: codigo escrito, bugs reais encontrados, gotchas que emergiram da implementacao.
 
-**Se nao existe plano**, o resumo entra em **modo standalone** — funciona como antes, capturando tudo.
+**Se nao existe plano**, o resumo entra em **modo standalone**: funciona como antes, capturando tudo.
 
 Registre o modo escolhido no topo do resumo (ver template).
 
@@ -77,7 +77,7 @@ Data: [YYYY-MM-DD]
 Projeto: [nome do projeto/repo]
 Working Directory: [path]
 Modo: [referencial (plano em .claude/plans/<slug>/) | standalone]
-Plano: [.claude/plans/<slug>/ — apenas se modo referencial]
+Plano: [.claude/plans/<slug>/ (apenas se modo referencial)]
 
 ## 1. Objetivo
 
@@ -92,7 +92,7 @@ Plano: [.claude/plans/<slug>/ — apenas se modo referencial]
 
 | Decisao | Justificativa | Status |
 |---------|---------------|--------|
-| [o que foi escolhido nesta sessao] | [por que] | [nova / divergente do plano — referencia o item original] |
+| [o que foi escolhido nesta sessao] | [por que] | [nova / divergente do plano (referencia o item original)] |
 
 ## 3. Padroes Estabelecidos
 
@@ -102,7 +102,7 @@ Plano: [.claude/plans/<slug>/ — apenas se modo referencial]
 
 ## 4. Arquivos Trabalhados
 
-[Sempre detalhe — o codigo nao esta no plano.]
+[Sempre detalhe: o codigo nao esta no plano.]
 
 | Arquivo | Estado | O que faz / mudou |
 |---------|--------|-------------------|
@@ -118,7 +118,7 @@ Plano: [.claude/plans/<slug>/ — apenas se modo referencial]
 
 ## 6. Problemas Resolvidos
 
-[Sempre detalhe — bugs reais nao estao no plano.]
+[Sempre detalhe: bugs reais nao estao no plano.]
 
 - **[problema]**: Causa raiz: [causa]. Fix: [o que foi feito, com path:linha]
 
@@ -147,16 +147,16 @@ Plano: [.claude/plans/<slug>/ — apenas se modo referencial]
 
 Antes de salvar, verifique se ja existe `.claude/session-resume.md` (ou variante com nome).
 Se existir, leia-o e incorpore os pontos relevantes na secao "Contexto Historico" do novo resumo.
-NAO descarte resumos anteriores — acumule contexto.
+NAO descarte resumos anteriores; acumule contexto.
 
 ### Passo 4: Mostrar preview
 
 Mostre o resumo completo ao usuario e pergunte:
 
 > **Resumo gerado** (modo: [referencial / standalone]). Revise e me diga:
-> 1. **Aprovar** — salvo e voce roda `/clear` seguido de `/session-resume`
-> 2. **Editar** — me diga o que ajustar
-> 3. **Cancelar** — descarto o resumo
+> 1. **Aprovar**: salvo e voce roda `/clear` seguido de `/session-resume`
+> 2. **Editar**: me diga o que ajustar
+> 3. **Cancelar**: descarto o resumo
 
 ### Passo 5: Salvar (apos aprovacao)
 

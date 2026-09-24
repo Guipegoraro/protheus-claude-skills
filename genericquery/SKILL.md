@@ -37,7 +37,7 @@ e `tenantId`.
 
 - **`baseUrl`**: prefixo tal que `<baseUrl>/oauth2/v1/token` e
   `<baseUrl>/framework/v1/genericQuery` resolvam. Em muitos ambientes o caminho tem
-  `/api` duplicado (ex.: `http://HOST:PORTA/api/api`) — confirmar por teste.
+  `/api` duplicado (ex.: `http://HOST:PORTA/api/api`); confirmar por teste.
 - **`tenantId`**: `"empresa,filial"` (ex.: `"01,01"`). Define a filial usada pelo
   `FilialFilter`.
 - **Seguranca**: o arquivo tem credenciais em texto. **Nunca versionar.** Garantir o
@@ -99,7 +99,7 @@ a seguranca do REST esta desligada.
 
 ## Erros comuns
 
-- **Connection reset no token**: enviar corpo vazio (`-d ""`) — o runner ja faz. Se
+- **Connection reset no token**: enviar corpo vazio (`-d ""`); o runner ja faz. Se
   persistir, revisar o `/api` duplicado no `baseUrl`.
 - **`access_token` vazio**: usuario/senha invalidos ou grant errado.
 - **401/403 na consulta**: token expirado (rodar de novo) ou usuario sem acesso a

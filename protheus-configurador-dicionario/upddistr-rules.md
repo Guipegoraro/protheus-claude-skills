@@ -14,9 +14,9 @@ There are three regimes:
 
 | Regime | Used by | Behaviour |
 | --- | --- | --- |
-| **Regra padrão** | Plain UPDDISTR releases | Conservative — preserves any column the customer can edit. |
+| **Regra padrão** | Plain UPDDISTR releases | Conservative: preserves any column the customer can edit. |
 | **Regra com dicionário de referência** | UPDDISTR when a reference dictionary was previously processed (LIB ≥ 2017-08-07) | Per-column diff: if the customer's value matches the previous TOTVS default, the upgrade applies the new TOTVS value. If the customer changed it, the customer's value is kept. Tracking via the reference dictionary. |
-| **Regra do Gestão de Ambientes** | Pacotes built through Gestão de Ambientes (customer projects) | More aggressive — typically overwrites everything to ensure the project is fully applied. Used when the customer explicitly built a delta package. |
+| **Regra do Gestão de Ambientes** | Pacotes built through Gestão de Ambientes (customer projects) | More aggressive: typically overwrites everything to ensure the project is fully applied. Used when the customer explicitly built a delta package. |
 
 ## SX2 (tables)
 
@@ -57,7 +57,7 @@ Highlights (full matrix in TDN):
 | `X3_VLDUSER` | Overwrites only if destination is empty. |
 | `X3_VALID` | Always overwrites (system validation). |
 | `X3_WHEN`, `X3_PICTVAR`, `X3_INIBRW`, `X3_F3` | Overwrites if the new value is not empty (i.e. doesn't blank existing customer config). |
-| `X3_CBOX*` | Same — fills blanks, overwrites non-blanks if new value non-empty. |
+| `X3_CBOX*` | Same: fills blanks, overwrites non-blanks if new value non-empty. |
 | `X3_TRIGGER` | Overwrites only if new value is `S`. Doesn't disable an existing trigger. |
 | `X3_USADO` | Overwrites if customer cannot change use, OR if all modules are in-use (adds the new modules). |
 | `X3_RESERV` | Always (except `B1_DESC`). |
@@ -66,7 +66,7 @@ Highlights (full matrix in TDN):
 | `X3_GRPSXG` | Always overwrites. |
 | `X3_CONTEXT` | Always overwrites; a R→V or V→R flip cascades to override most other columns. |
 
-**Implication for customisation**: customising `X3_TITULO`, `X3_DESCRIC`, `X3_VISUAL`, `X3_BROWSE`, `X3_OBRIGAT`, `X3_VLDUSER`, `X3_NIVEL` on a TOTVS-owned field is safe — the upgrade preserves your value. Customising `X3_TIPO`, `X3_TAMANHO` (without SXG), `X3_VALID`, `X3_RESERV` is not safe — the upgrade will overwrite.
+**Implication for customisation**: customising `X3_TITULO`, `X3_DESCRIC`, `X3_VISUAL`, `X3_BROWSE`, `X3_OBRIGAT`, `X3_VLDUSER`, `X3_NIVEL` on a TOTVS-owned field is safe; the upgrade preserves your value. Customising `X3_TIPO`, `X3_TAMANHO` (without SXG), `X3_VALID`, `X3_RESERV` is not safe; the upgrade will overwrite.
 
 ## SIX (indexes)
 
@@ -83,7 +83,7 @@ Existing parameters only. New parameters are inserted intact.
 | Column | Standard rule |
 | --- | --- |
 | `X6_FIL`, `X6_VAR`, `X6_TIPO` | Never (key / type) |
-| `X6_CONTEUD`, `X6_CONTSPA`, `X6_CONTENG` | **Never overwrites** — customer's runtime value is sacred |
+| `X6_CONTEUD`, `X6_CONTSPA`, `X6_CONTENG` | **Never overwrites**: customer's runtime value is sacred |
 | `X6_DESCRIC`, `X6_DESC1`, `X6_DESC2` (and ES/EN siblings) | Always overwrites |
 | `X6_PROPRI`, `X6_PYME` | Never |
 | `X6_DEFPOR`, `X6_DEFSPA`, `X6_DEFENG` | Never (default reference) |
@@ -129,12 +129,12 @@ Inserted/updated, follows the same model as SX9.
 1. Check the column-by-column rule above.
 2. If you need to change a column the rule overwrites, you have two options:
    - Use a different mechanism (`X3_VLDUSER` instead of `X3_VALID`, `X3_RELACAO` instead of trying to repurpose a TOTVS expression).
-   - Document the override in `.claude/plans/<slug>/pre-producao.md` and re-apply manually after every UPDDISTR. Painful — try to avoid.
+   - Document the override in `.claude/plans/<slug>/pre-producao.md` and re-apply manually after every UPDDISTR. Painful; try to avoid.
 
 **When auditing post-upgrade damage**:
 
-Compare `X6_CONTEUD` against `X6_DEFPOR` to see which parameters drifted from defaults — that is your "customer-intentional configuration" surface.
+Compare `X6_CONTEUD` against `X6_DEFPOR` to see which parameters drifted from defaults: that is your "customer-intentional configuration" surface.
 
 For SX3, compare `X3_PROPRI` to know what is customer-owned (`U`) vs TOTVS (`S`/blank). Customer-owned rows are insulated from UPDDISTR.
 
-**Dictionary audit is non-disableable from recent LIBs.** Direct DB changes via APSDU / external scripts / SQL are logged and flagged. This is a feature, not a bug — embrace it.
+**Dictionary audit is non-disableable from recent LIBs.** Direct DB changes via APSDU / external scripts / SQL are logged and flagged. This is a feature, not a bug; embrace it.

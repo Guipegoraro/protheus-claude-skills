@@ -45,16 +45,16 @@ User Function GetProd()
 
 Key facts:
 - Verbs: `@Get, @Post, @Put, @Patch, @Delete` (TLPP HAS PATCH; WSRESTFUL does not). Named form: `@Get(endpoint="/api/...")`. Works on Function, User Function and class methods.
-- **There are NO `@QueryParam`/`@BodyParam`/`@PathParam` annotations** — everything is read at runtime from the global `oRest`:
+- **There are NO `@QueryParam`/`@BodyParam`/`@PathParam` annotations**; everything is read at runtime from the global `oRest`:
   - `getQueryRequest()` / `getPathParamsRequest()` → JsonObject; `getBodyRequest()` → string (parse with `JsonObject():fromJson()`)
   - `getHeaderRequest()`, `getHeaderResponse()`, thread-pool data getters
   - `setResponse(cJson)`, `setStatusCode(n)`, `setFault(cJson)`
-- **WARNING (TDN):** JsonObjects returned by `oRest:get*Request()` are REFERENCES to the internal REST object — never mutate them (state leaks across requests).
+- **WARNING (TDN):** JsonObjects returned by `oRest:get*Request()` are REFERENCES to the internal REST object; never mutate them (state leaks across requests).
 - Path-param name collision: `/x/:id` vs `/x/:codigo` on the same base → the FIRST registered route's name wins.
 - Extras: native OpenAPI generation, onAuth hook, thread lifecycle hooks, trace logs. Dynamic routes possible via a JSON-returning registrar function.
 - Official examples incl. side-by-side FWREST→TLPP migration: https://github.com/totvs/tlpp-sample-rest (`server/migrate-FWrest-2-tlpp`).
 
-## WSRESTFUL (legacy — maintenance only)
+## WSRESTFUL (legacy, maintenance only)
 
 ```advpl
 #INCLUDE "TOTVS.CH"
@@ -85,22 +85,22 @@ Return .T.
 
 - Verbs: GET/POST/PUT/DELETE only. `cId` (ALL/ID/...) allows several methods per verb. `SECURITY "MATA030"` ties privilege check to a routine; `NOTENANT` skips TenantId validation.
 - Query params: declare `WSDATA` + receive with `WSRECEIVE` (→ `::param`). Path params: `::aURLParms` (positional) or `PATHPARAM p1,p2` (named → `::p1`). Headers: `HEADERPARAM`.
-- Errors: `SetRestFault(nCode, cMessage, [lJson], [nStatus], [cDetailMsg], [cHelpUrl], [aDetails])` — the last 3 only serialize when the WSMETHOD carries `TTALK "v1"` (which switches errors from legacy `{errorCode, errorMessage}` to the TOTVS standard `{code, message, detailedMessage, helpUrl, details}`). **Always use `TTALK "v1"` — PO-UI expects the standard format.**
+- Errors: `SetRestFault(nCode, cMessage, [lJson], [nStatus], [cDetailMsg], [cHelpUrl], [aDetails])`; the last 3 only serialize when the WSMETHOD carries `TTALK "v1"` (which switches errors from legacy `{errorCode, errorMessage}` to the TOTVS standard `{code, message, detailedMessage, helpUrl, details}`). **Always use `TTALK "v1"`: PO-UI expects the standard format.**
 - Return .T./.F. from methods. New/changed REST classes require an **AppServer restart** to register.
 - Working threads are reused: never leave open queries, dirty filters or positioned areas behind.
 
-## FWAdapterBaseV2 — standard-contract adapter over SQL (ADVPL)
+## FWAdapterBaseV2: standard-contract adapter over SQL (ADVPL)
 
 Official adapter implementing pagination, OData `filter`, `order` and `fields` from the TOTVS guide over a query. Supports `?pagesize&page`, `?filter=code eq '000001'` (lib 20220322+ has toupper()), `?order=`, `?fields=`; response includes `remainingRecords` (lib 20220502+) and `total` (lib 20250519+). Use it when the endpoint is essentially "query a table with the standard contract". TDN: "09. FWAdapterBaseV2".
 
-## FWRestModel — zero-code REST over MVC models
+## FWRestModel: zero-code REST over MVC models
 
 ```advpl
 PUBLISH MODEL REST NAME products SOURCE MyMVCSource            // ModelDef exposed
 PUBLISH USER MODEL REST NAME myUserModel ...                   // user models
 ```
-Exposes the model at `http://server:port/fwmodel/<name>[/<PK-base64>]`. Customize by inheriting `FwRestModel` (`RESOURCE OBJECT <class>`): GetData/SaveData/DelData, SetFilter, Seek/Skip/Total, SetFields, DecodePK, Get/SetStatusResponse... Good for quick admin CRUD over existing MVC models; the fwmodel JSON shape is the MVC model structure, NOT the PO-UI `{items, hasNext}` contract — for po-page-dynamic-* prefer a TLPP/adapter endpoint.
+Exposes the model at `http://server:port/fwmodel/<name>[/<PK-base64>]`. Customize by inheriting `FwRestModel` (`RESOURCE OBJECT <class>`): GetData/SaveData/DelData, SetFilter, Seek/Skip/Total, SetFields, DecodePK, Get/SetStatusResponse... Good for quick admin CRUD over existing MVC models; the fwmodel JSON shape is the MVC model structure, NOT the PO-UI `{items, hasNext}` contract. For po-page-dynamic-* prefer a TLPP/adapter endpoint.
 
 ## Framework generic services (reuse before building)
-- `BasicProtheusServices` / `fwformstructview` — SX3 structure via REST (feeds dynamic metadata)
-- `GenericLookupService` — standard F3 lookup via REST (pairs with po-lookup)
+- `BasicProtheusServices` / `fwformstructview`: SX3 structure via REST (feeds dynamic metadata)
+- `GenericLookupService`: standard F3 lookup via REST (pairs with po-lookup)

@@ -33,11 +33,11 @@ Structured querying of the TOTVS Protheus ERP data dictionary. Allows searching 
 
 ## Bundled Reference Files
 
-This skill uses progressive disclosure. The SKILL.md covers dictionary structure, query flow, and response format. SQL queries and detailed column reference are in the `references/` directory — read on demand as needed:
+This skill uses progressive disclosure. The SKILL.md covers dictionary structure, query flow, and response format. SQL queries and detailed column reference are in the `references/` directory. Read on demand as needed:
 
 | Reference File | When to Read | Content |
 | --- | --- | --- |
-| [references/sql-queries.md](references/sql-queries.md) | Executing **dictionary queries** — listing fields, indexes, parameters, triggers, questions, relationships, standard lookups, or combining SX* tables | Complete SQL queries for all 9 dictionary tables (SX2, SX3, SIX, SX6, SX5, SX7, SX1, SX9, SXB), combined queries (full view, fields with triggers, mandatory fields), and mandatory `execute-sql` rules (TRIM, d_e_l_e_t_, lowercase) |
+| [references/sql-queries.md](references/sql-queries.md) | Executing **dictionary queries**: listing fields, indexes, parameters, triggers, questions, relationships, standard lookups, or combining SX* tables | Complete SQL queries for all 9 dictionary tables (SX2, SX3, SIX, SX6, SX5, SX7, SX1, SX9, SXB), combined queries (full view, fields with triggers, mandatory fields), and mandatory `execute-sql` rules (TRIM, d_e_l_e_t_, lowercase) |
 | [references/column-reference.md](references/column-reference.md) | Interpreting **results** or needing to understand the **meaning of specific columns** from SX* tables | Detailed tables with all columns from SX2, SX3, SIX, SX6, SX5, SX7, SX1, SX9, and SXB, including type, possible values, and functional description |
 
 ---
@@ -65,9 +65,9 @@ Protheus organizes its metadata in SX* tables:
 ## Mandatory Rules for execute-sql Queries
 
 1. **Always** include `d_e_l_e_t_ = ' '` (soft-delete filter)
-2. Columns are **lowercase** — never use `X3_CAMPO`, always `x3_campo`
+2. Columns are **lowercase**: never use `X3_CAMPO`, always `x3_campo`
 3. Use `TRIM()` in `character` field comparisons (trailing spaces)
-4. Use **base** table without suffix: `sx3`, `sx2`, `six` — **never** `sx3t10`, `sx2t10`
+4. Use **base** table without suffix: `sx3`, `sx2`, `six`, **never** `sx3t10`, `sx2t10`
 
 ---
 
@@ -98,7 +98,7 @@ Execute **3 queries in parallel** (see queries in [references/sql-queries.md](re
 When presenting results to the user, always:
 
 1. **Title**: Table name and description (from SX2)
-2. **Sharing mode**: E (Exclusive) or C (Shared) — indicate the meaning
+2. **Sharing mode**: E (Exclusive) or C (Shared); indicate the meaning
 3. **Formatted table**: Fields in markdown table with relevant columns
 4. **Indexes**: List with composition and description
 5. **Notes**: Virtual fields, triggers, special validations
@@ -106,7 +106,7 @@ When presenting results to the user, always:
 ### Response Example
 
 ```markdown
-## SA1 — Customer Registry
+## SA1: Customer Registry
 
 **Mode**: Shared (C/C/C)
 **Unique key**: A1_FILIAL+A1_COD+A1_LOJA

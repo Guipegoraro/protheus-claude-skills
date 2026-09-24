@@ -27,7 +27,7 @@ Copie a pasta `genericquery/` para o diretorio de skills do Claude Code:
 
 `baseUrl` = prefixo tal que `<baseUrl>/oauth2/v1/token` e
 `<baseUrl>/framework/v1/genericQuery` resolvam. Em muitos ambientes o caminho tem
-`/api` duplicado (ex.: `http://host:8070/api/api`) — confirme por teste.
+`/api` duplicado (ex.: `http://host:8070/api/api`); confirme por teste.
 `tenantId` = `"empresa,filial"` (ex.: `"01,01"`).
 
 ## Usar
@@ -41,7 +41,7 @@ bash ~/.claude/skills/genericquery/scripts/gq.sh ./.genericquery.json dev \
   "SE4" "E4_CODIGO,E4_DESCRI,E4_TIPO" "E4_TIPO='1'"
 ```
 
-`FilialFilter`/`DeletedFilter` da API ja sao `true` — nao precisa por `D_E_L_E_T_`
+`FilialFilter`/`DeletedFilter` da API ja sao `true`; nao precisa por `D_E_L_E_T_`
 nem `[ALIAS]_FILIAL` no `where`.
 
 Documentacao completa e parametros: veja `SKILL.md`.

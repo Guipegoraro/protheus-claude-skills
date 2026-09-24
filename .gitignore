@@ -1,14 +1,14 @@
-# Skills pessoais — nao publicar
+# Skills pessoais - nao publicar
 apontamento-gerar/
 
-# Skills instaladas (TOTVS / marketplace) — nao redistribuir
+# Skills instaladas (TOTVS / marketplace) - nao redistribuir
 entry-point-designer/
 mvc-generator/
 tlpp-rest-endpoint-generator/
 
-# Skills da Anthropic sincronizadas pelo claude.ai (licenca propria) — nao redistribuir
+# Skills da Anthropic sincronizadas pelo claude.ai (licenca propria) - nao redistribuir
 synced/
 
-# Config local do genericquery (contem senha) — nunca versionar
+# Config local do genericquery (contem senha) - nunca versionar
 .genericquery.json
 **/.genericquery.json

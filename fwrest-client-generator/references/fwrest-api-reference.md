@@ -1,8 +1,8 @@
-# FWRest — Complete Method Reference
+# FWRest: Complete Method Reference
 
 Authoritative reference for the framework `FWRest` HTTP client class. Source: <https://tdn.totvs.com/display/framework/FWRest>.
 
-`FWRest` supports **GET, POST, PUT, DELETE** only. There is **no PATCH** verb — use `HTTPQuote()` when PATCH is required.
+`FWRest` supports **GET, POST, PUT, DELETE** only. There is **no PATCH** verb; use `HTTPQuote()` when PATCH is required.
 
 ---
 
@@ -40,7 +40,7 @@ oClient:SetPath("/rest/sample?startIndex=2&count=10")
 
 ### `SetPostParams(cParams) → Nil`
 
-Sets the request body for the next `:Post()` call. Required for POST with a payload. Has **no effect** on PUT/DELETE — those take the body as a positional argument.
+Sets the request body for the next `:Post()` call. Required for POST with a payload. Has **no effect** on PUT/DELETE: those take the body as a positional argument.
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
@@ -70,8 +70,8 @@ Sets the request timeout in seconds. Default is 120s.
 
 Enables/disables internal HTTP code validation.
 
-- `.T.` (default) — verb returns `.T.` only when HTTP code is in the success range.
-- `.F.` — verb returns `.T.` as long as the connection succeeded. The caller MUST inspect `GetHTTPCode()` and `GetResult()` to determine outcome. **Required to read the body of 4xx/5xx responses.**
+- `.T.` (default): verb returns `.T.` only when HTTP code is in the success range.
+- `.F.`: verb returns `.T.` as long as the connection succeeded. The caller MUST inspect `GetHTTPCode()` and `GetResult()` to determine outcome. **Required to read the body of 4xx/5xx responses.**
 
 ### `GetChkStatus() → Logical` *(Release 23+)*
 
@@ -149,7 +149,7 @@ Returns the HTTP status code of the last response (as character, e.g. `"200"`, `
 
 ## Header Array Format
 
-Headers are always an `Array` of strings in the form `"Key: Value"` (note the **literal space** after the colon — required by the underlying parser).
+Headers are always an `Array` of strings in the form `"Key: Value"` (note the **literal space** after the colon; required by the underlying parser).
 
 ```tlpp
 Local aHeader := {}
@@ -190,12 +190,12 @@ Enable verbose trace logs by setting `FWTraceLog=1` in the environment section o
 | `SetGetParams(cQuery)` | 20201009 | Nil | Alternative to `Get()` 2nd arg |
 | `SetTimeOut(nSec)` | 20231009 | Nil | Default 120s |
 | `SetChkStatus(lChk)` | Release 23 | Nil | `.F.` to read 4xx bodies |
-| `GetChkStatus()` | Release 23 | Logical | — |
+| `GetChkStatus()` | Release 23 | Logical | - |
 | `SetLegacySuccess(lActive)` | 20240812 | Logical | `.F.` enables 200–299 |
-| `Get(aHead, cQuery)` | All | Logical | — |
+| `Get(aHead, cQuery)` | All | Logical | - |
 | `Post(aHead)` | All | Logical | Body via `SetPostParams` |
-| `Put(aHead, cBody, cQuery)` | `cQuery` since 20230403 | Logical | — |
-| `Delete(aHead, cBody, cQuery)` | `cQuery` since 20230403 | Logical | — |
-| `GetResult()` | All | Character | — |
-| `GetLastError()` | All | Character | — |
-| `GetHTTPCode()` | Release 23 | Character | — |
+| `Put(aHead, cBody, cQuery)` | `cQuery` since 20230403 | Logical | - |
+| `Delete(aHead, cBody, cQuery)` | `cQuery` since 20230403 | Logical | - |
+| `GetResult()` | All | Character | - |
+| `GetLastError()` | All | Character | - |
+| `GetHTTPCode()` | Release 23 | Character | - |

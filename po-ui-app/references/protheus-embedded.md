@@ -1,12 +1,12 @@
 # Running a PO-UI App Inside Protheus (FwCallApp + protheus-lib-core)
 
-How to embed an Angular/PO-UI app in the Protheus menu (webapp/smartclient) — the mode that consumes NO extra licenses.
+How to embed an Angular/PO-UI app in the Protheus menu (webapp/smartclient): the mode that consumes NO extra licenses.
 
-## Licensing (decides the architecture — literal TDN quote)
+## Licensing (decides the architecture; literal TDN quote)
 1. App executed inside Protheus via `FwCallApp` + Multi-Protocol Port (MPP) + protheus-lib-core → **no additional license consumed**.
 2. App executed via browser against the standard REST → consumes standard REST licenses.
 
-Also: the MPP's own REST instance is EXCLUSIVE to embedded apps — external requests get a CORS error ON PURPOSE (documented). Standalone apps must use the regular `[HTTPREST]` server instead.
+Also: the MPP's own REST instance is EXCLUSIVE to embedded apps; external requests get a CORS error ON PURPOSE (documented). Standalone apps must use the regular `[HTTPREST]` server instead.
 
 ## Server prerequisites (appserver.ini)
 
@@ -29,7 +29,7 @@ Common errors: ERR_CERT_AUTHORITY_INVALID / ERR_SSL_VERSION_OR_CIPHER_MISMATCH (
 ## Packaging rules for the .app (MANDATORY checklist)
 
 1. Angular build output with `index.html` at root; `<base href="/">` in head.
-2. ZERO external resources — no CDN; everything bundled.
+2. ZERO external resources: no CDN; everything bundled.
 3. All files inside a folder named after the app, ALL LOWERCASE.
 4. Zip the folder → rename `.zip` to `.app`.
 5. Compile the `.app` as a RESOURCE in the RPO (deployed/updated via patch like any source).
@@ -37,7 +37,7 @@ Common errors: ERR_CERT_AUTHORITY_INVALID / ERR_SSL_VERSION_OR_CIPHER_MISMATCH (
    ```json
    { "name": "My App", "version": "1.0.0", "api_baseUrl": "/" }
    ```
-   With `api_baseUrl: "/"`, FwCallApp rewrites it at extraction time to the real REST address — the SAME build works on any environment, no rebuild. (Old keys serverBackend/restEntryPoint are replaced by api_baseUrl.) Do NOT hardcode the server in environment.ts.
+   With `api_baseUrl: "/"`, FwCallApp rewrites it at extraction time to the real REST address; the SAME build works on any environment, no rebuild. (Old keys serverBackend/restEntryPoint are replaced by api_baseUrl.) Do NOT hardcode the server in environment.ts.
 7. Angular routes: add a route for `index.html` → main component.
 
 Runtime: extracted to `protheus_data/http-root/app-root/<app>/`; base href adjusted; preload stores in sessionStorage: `ERPTOKEN` (Bearer of the logged Protheus user), company group + branch (LIB 20210405+), dDataBase (LIB 20240115+). Empty file `noredirect` at app root skips preload.
@@ -52,14 +52,14 @@ Return
 
 ## @totvs/protheus-lib-core (Angular side)
 
-Install. Published majors are ONLY 14/15/17/19/21 (matching Angular/PO-UI majors) — there is no lib-core 16/18/20; on those Angular majors, embedded apps stay on the previous published major. v19 needs `--force` due to a PO-UI dep inconsistency:
+Install. Published majors are ONLY 14/15/17/19/21 (matching Angular/PO-UI majors). There is no lib-core 16/18/20; on those Angular majors, embedded apps stay on the previous published major. v19 needs `--force` due to a PO-UI dep inconsistency:
 ```bash
 ng add @po-ui/ng-components@latest
 ng add @po-ui/ng-templates@latest
 npm i subsink
 npm i @totvs/protheus-lib-core@latest
 ```
-Peer deps also require `@totvs/po-theme` (TOTVS theme — embedded apps use it, not the plain PO theme) and `@totvs/common-assets`. Not open source; docs: https://tdn.totvs.com.br/display/framework/Protheus-lib-core · registry: https://npm.totvs.io
+Peer deps also require `@totvs/po-theme` (TOTVS theme; embedded apps use it, not the plain PO theme) and `@totvs/common-assets`. Not open source; docs: https://tdn.totvs.com.br/display/framework/Protheus-lib-core · registry: https://npm.totvs.io
 
 Standalone bootstrap:
 ```typescript
@@ -70,14 +70,14 @@ providers: [
 ]
 ```
 
-Importing `ProtheusLibCoreModule` auto-enables 4 interceptors: auth (attaches ERPTOKEN Bearer to every request), URL (completes relative URLs to the MPP REST — just call relative endpoints), context (company group/branch header), language (`Content-Language`, LIB 20221128+).
+Importing `ProtheusLibCoreModule` auto-enables 4 interceptors: auth (attaches ERPTOKEN Bearer to every request), URL (completes relative URLs to the MPP REST; just call relative endpoints), context (company group/branch header), language (`Content-Language`, LIB 20221128+).
 
 ### Services (all confirmed in real code)
-- `ProAppConfigService` — `insideProtheus(): boolean` (detect embedded vs standalone), `callAppClose()` (close the hosting dialog)
-- `ProSessionInfoService` — getAppName(), getBranch(), getCompany(), getDataBase(), getModule()
+- `ProAppConfigService`: `insideProtheus(): boolean` (detect embedded vs standalone), `callAppClose()` (close the hosting dialog)
+- `ProSessionInfoService`: getAppName(), getBranch(), getCompany(), getDataBase(), getModule()
 - `ProBranchService.getUserBranches()` / `ProCompanyService.getUserCompanies()`
-- `ProUserAccessService` — `aliasHasAccess(alias)`, `userHasAccess(routine, action)` → `{access, message}`
-- `ProGenericAdapterService` — generic dictionary CRUD: `list({alias: 'SA1'})` → `{items}` (no custom backend needed)
+- `ProUserAccessService`: `aliasHasAccess(alias)`, `userHasAccess(routine, action)` → `{access, message}`
+- `ProGenericAdapterService` (generic dictionary CRUD): `list({alias: 'SA1'})` → `{items}` (no custom backend needed)
 - `ProDateService.getDateFormat(language)`, `ProJsToAdvplService` (JS↔ADVPL bridge), `ProThemeService`, `ProUserInfoService`, `ProThreadInfoService`, `ProUserProfileService`
 
 ### Hybrid pattern (same app inside AND outside Protheus)
@@ -87,7 +87,7 @@ ngOnInit(): void {
   if (this.proAppConfig.insideProtheus()) {
     // session inherited: interceptors handle token/URL/context
   } else {
-    // standalone dev/browser: own auth (OAuth2 — see authentication.md);
+    // standalone dev/browser: own auth (OAuth2 - see authentication.md);
     // common dev fallback: interceptor injecting Basic auth when no ERPTOKEN in sessionStorage
   }
 }
@@ -96,7 +96,7 @@ ngOnInit(): void {
 ## JS ↔ ADVPL bidirectional channel
 
 - App side: create `advpltojs.js` under `assets/preload` (receives ADVPL instructions); send with `ProJsToAdvplService` / `twebchannel.jsToAdvpl('type', 'content')`.
-- ADVPL side — the source that called FwCallApp must contain (CANNOT be TLPP — needs a Static Function):
+- ADVPL side. The source that called FwCallApp must contain (CANNOT be TLPP; needs a Static Function):
 ```advpl
 Static Function JsToAdvpl(oWebChannel, cType, cContent)
     If cType == 'getParam'
@@ -113,5 +113,5 @@ Return
 Params `MV_GCTPURL` (`http://host:http-port`) + `MV_BACKEND` (`http://host:rest-port/rest`) + `[HTTP] Path=<rootpath>\http-root`. Modern environments only need `App_Environment`.
 
 ## Reference example (best current one)
-https://github.com/danilosalve/sample-protheus-lib-core — Angular 21 + PO-UI 21 + lib-core 21, standalone components + signals, plus `server/` with a complete TLPP REST backend and the packaged `.app`.
+https://github.com/danilosalve/sample-protheus-lib-core: Angular 21 + PO-UI 21 + lib-core 21, standalone components + signals, plus `server/` with a complete TLPP REST backend and the packaged `.app`.
 Docs: FwCallApp TDN page · "Apps no Protheus" (medium.com/totvsdevelopers/apps-no-protheus-10db4f47f9fc).

@@ -1,15 +1,15 @@
-# Code Quality Patterns — Performance, Legacy, Metadata, Compilation
+# Code Quality Patterns: Performance, Legacy, Metadata, Compilation
 
 Detailed code examples and tables for performance (G2), legacy/deprecated (G3), metadata access (G4), and compilation (G5) review findings.
 
 ---
 
-## G2 — Performance and Loops
+## G2: Performance and Loops
 
-### Prohibited APIs Inside Loops (CA1003) — MAJOR
+### Prohibited APIs Inside Loops (CA1003): MAJOR
 
 ```advpl
-// BAD: GetMV called inside loop — repeated dictionary lookup
+// BAD: GetMV called inside loop - repeated dictionary lookup
 While !Eof()
   cParam := GetMV("MV_ESTADO")
   // ... process record ...
@@ -26,14 +26,14 @@ EndDo
 
 **Prohibited inside loops:** `GetMV()`, `SuperGetMV()`, `ExistBlock()`, `AllUsers()`, `Type()`, `Pergunte()`
 
-### UI APIs Inside Transactions (CA1002) — MAJOR
+### UI APIs Inside Transactions (CA1002): MAJOR
 
 ```advpl
 // BAD: MsgAlert inside transaction blocks the database lock
 Begin Transaction
   // ... database operations ...
   If lError
-    MsgAlert("Error!")  // Prohibited — holds transaction lock
+    MsgAlert("Error!")  // Prohibited - holds transaction lock
   EndIf
 End Transaction
 
@@ -54,15 +54,15 @@ EndIf
 
 **Prohibited inside transactions:** `MsgAlert()`, `MsgYesNo()`, `MsgInfo()`, `Aviso()`, `Help()`, `Pergunte()`, `ParamBox()`
 
-### Direct SQL Without Evaluation (CS1000) — MAJOR
+### Direct SQL Without Evaluation (CS1000): MAJOR
 
 Raw SQL queries should be evaluated for Cloud compatibility. Prefer framework APIs where available. When SQL is necessary, use `ChangeQuery()` or `BeginSQL/EndSQL` for dialect portability.
 
 ---
 
-## G3 — Legacy and Deprecated Code
+## G3: Legacy and Deprecated Code
 
-### ISAM Driver Access (CA1000) — MAJOR
+### ISAM Driver Access (CA1000): MAJOR
 
 ```advpl
 // BAD: Legacy ISAM temporary table creation
@@ -76,7 +76,7 @@ oTempTable:Create()
 oTempTable:Delete()
 ```
 
-### Console Output (CA1004) — MINOR
+### Console Output (CA1004): MINOR
 
 ```advpl
 // BAD: Console output functions
@@ -86,10 +86,10 @@ ConOut("Processing order: " + cOrder)
 FWLogMsg("INFO", , "MYMODULE", "ProcOrder", , , "Processing order: " + cOrder, , , )
 ```
 
-### IIF/IF Inline (CA4000) — INFO
+### IIF/IF Inline (CA4000): INFO
 
 ```advpl
-// BAD: Inline ternary — harder to debug and test
+// BAD: Inline ternary - harder to debug and test
 cStatus := IIF(lActive, "Active", "Inactive")
 
 // GOOD: Explicit conditional block
@@ -123,12 +123,12 @@ Legacy include files must be replaced with `totvs.ch`:
 | `FileIO.ch` | `totvs.ch` | `FWFileWriter()` / `FWFileReader()` |
 | `Font.ch` | `totvs.ch` | `TFont()` |
 | `ParmType.ch` | `totvs.ch` | `Default` prefix |
-| `protheus.ch` | `totvs.ch` | — |
-| `RWMake.ch` | `totvs.ch` | — |
+| `protheus.ch` | `totvs.ch` | - |
+| `RWMake.ch` | `totvs.ch` | - |
 
 ---
 
-## G4 — Metadata Access
+## G4: Metadata Access
 
 Direct `DbSelectArea` on Protheus system tables (SX\*) is **prohibited**. Always use framework APIs.
 
@@ -163,7 +163,7 @@ cTitle := FWSX3Util():GetFieldTitle("SA1", "A1_COD")
 
 ---
 
-## G5 — Compilation and Encoding
+## G5: Compilation and Encoding
 
 | Check               | Rule   | Severity | Description                         |
 | ------------------- | ------ | -------- | ----------------------------------- |

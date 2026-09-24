@@ -49,7 +49,7 @@ def detecta_prototipos(doc):
     body   = primeiro parágrafo narrativo longo (não bullet, não negrito)
     label  = primeiro rótulo em negrito terminado em ':'
     bullet = primeiro parágrafo iniciado pelo caractere de bullet
-    A varredura começa depois do heading 'Processo Atual' — antes dele só existe capa.
+    A varredura começa depois do heading 'Processo Atual'; antes dele só existe capa.
     """
     achados = {}
     dentro = False

@@ -35,10 +35,10 @@
 | Funcao/Metodo | Parametros | Retorno | Status TDN |
 |---------------|------------|---------|------------|
 | MsExecAuto | ... | Logico | Documentado |
-| FWFormModel | ... | Objeto | Sem doc TDN — ref: skill mvc-generator |
+| FWFormModel | ... | Objeto | Sem doc TDN; ref: skill mvc-generator |
 
 ## Dicionario de Dados
-### SA1 — Clientes
+### SA1: Clientes
 | Campo | Tipo | Tam | Descricao |
 |-------|------|-----|-----------|
 | A1_COD | C | 6 | Codigo do cliente |

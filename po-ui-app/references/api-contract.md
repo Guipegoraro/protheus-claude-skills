@@ -14,8 +14,8 @@ Sources: https://po-ui.io/guides/api (frontend contract) + Guia de implementaç�
 }
 ```
 
-- `hasNext` (boolean) — REQUIRED on every paginated response. TOTVS validator enforces `items` + `hasNext` together.
-- `items` (array) — the page records.
+- `hasNext` (boolean): REQUIRED on every paginated response. TOTVS validator enforces `items` + `hasNext` together.
+- `items` (array): the page records.
 - Optional extras allowed by TOTVS guide: `total`, `remainingRecords` (FWAdapterBaseV2 lib 20220502+ returns `remainingRecords`, lib 20250519+ returns `total`).
 
 ## 2. Single-entity responses (GET one, POST, PUT)
@@ -26,7 +26,7 @@ Return the entity directly, no wrapper:
 { "id": 10, "name": "John", "surname": "Doe" }
 ```
 
-Optional `_messages` array (each item in the error format below, with `type`: `success | warning | error | information`) — the PO-UI `po-http-interceptor` shows them as notifications automatically.
+Optional `_messages` array (each item in the error format below, with `type`: `success | warning | error | information`). The PO-UI `po-http-interceptor` shows them as notifications automatically.
 
 Optional `_expandables: ["communities", ...]` listing expandable sub-entities (TOTVS guide).
 
@@ -65,7 +65,7 @@ HTTP status usage (TOTVS): 4xx = business/request error (401 unauthenticated, 40
 
 Pagination multiplier semantics: `page=2&pageSize=20` → records 21–40.
 
-Optional complex filters (TOTVS guide): OData v4 subset — `filter=code eq '000001'`, operators eq/ne/gt/ge/lt/le/and/or/not, grouping. FWAdapterBaseV2 implements this on the Protheus side.
+Optional complex filters (TOTVS guide): OData v4 subset (`filter=code eq '000001'`, operators eq/ne/gt/ge/lt/le/and/or/not, grouping). FWAdapterBaseV2 implements this on the Protheus side.
 
 ## 5. Endpoint map consumed by PO-UI components
 
@@ -81,24 +81,24 @@ Optional complex filters (TOTVS guide): OData v4 subset — `filter=code eq '000
 | Page customization | `POST {serviceLoadApi}` → PoPageDynamicTableOptions/... |
 | Lookup by value | `GET {api}/{value}` (or `GET {api}?{fieldValue}=1,2` for multiple) |
 | Job scheduler | `GET {api}/processes[?search=]`, `GET {api}/processes/{id}/parameters`, `POST {api}`, `GET/PUT {api}/{id}`, availability probe `HEAD {api}/processes` |
-| Login (po-page-login) | `POST {authUrl}` — Basic: header `Authorization: Basic b64(login:password)` + body `{rememberUser}`; Bearer: body `{login, password: b64, rememberUser}`. 200 → `{user}` saved to sessionStorage; 400/401 → error object + optional `maxAttemptsRemaining`, `loginWarnings`, `passwordWarnings` |
+| Login (po-page-login) | `POST {authUrl}`; Basic: header `Authorization: Basic b64(login:password)` + body `{rememberUser}`; Bearer: body `{login, password: b64, rememberUser}`. 200 → `{user}` saved to sessionStorage; 400/401 → error object + optional `maxAttemptsRemaining`, `loginWarnings`, `passwordWarnings` |
 
 Metadata response shape: `{ version, title, fields: [{property, key, label, disabled, ...}], keepFilters, ... }`. On metadata fetch error, PO-UI falls back to the browser-cached version.
 
 ## 6. X-PO-* control headers
 
-Sent by the frontend and STRIPPED by PO-UI interceptors before the request leaves — the backend never sees them. They control PO-UI behavior only:
+Sent by the frontend and STRIPPED by PO-UI interceptors before the request leaves; the backend never sees them. They control PO-UI behavior only:
 
-- `X-PO-No-Message: true` — suppress success/error notifications
-- `X-PO-No-Error: true` — suppress 4xx/5xx notifications
-- `X-PO-Screen-Lock: true` — lock screen with loading overlay (dynamic pages and job-scheduler services send it by default)
-- `X-PO-No-Count-Pending-Requests: true` — skip the pending-request counter
+- `X-PO-No-Message: true`: suppress success/error notifications
+- `X-PO-No-Error: true`: suppress 4xx/5xx notifications
+- `X-PO-Screen-Lock: true`: lock screen with loading overlay (dynamic pages and job-scheduler services send it by default)
+- `X-PO-No-Count-Pending-Requests: true`: skip the pending-request counter
 
 Requires `PoHttpInterceptorService` / `PoHttpRequestInterceptorService` registered (via `provideHttpClient(withInterceptorsFromDi())` + PoHttpRequestModule).
 
 ## 7. TOTVS URL and versioning standard
 
-- URL: `{host}/api/{grouper}/{domain}/{version}/{resource}` — e.g. `/api/framework/v1/users`. Resources plural, no verbs in URL, ≤ ~3 path levels, camelCase or kebab-case.
+- URL: `{host}/api/{grouper}/{domain}/{version}/{resource}`, e.g. `/api/framework/v1/users`. Resources plural, no verbs in URL, ≤ ~3 path levels, camelCase or kebab-case.
 - Version `v{major}[.{minor}]` (v1, v1.5). New MAJOR required when: removing/renaming URI, removing response field, removing verb, new mandatory param. NOT required for: new optional params, new response properties.
 - Dates: ISO-8601 (`yyyy-mm-ddThh:mm:ss±hh:mm`).
 - Content-Type: `application/json` (XML only when legally required).

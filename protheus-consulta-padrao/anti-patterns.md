@@ -5,7 +5,7 @@ Mistakes encountered in real Protheus customisations. Flag any of these in code 
 ## Dictionary mutation in source files
 
 ```advpl
-// WRONG — never do this in production source
+// WRONG - never do this in production source
 DbSelectArea("SXB")
 RecLock("SXB", .T.)
     XB_ALIAS  := "ZCONS1"
@@ -33,9 +33,9 @@ WRONG: @BE_LOCAL = '"+M->CP_ZARDEST+"'
 
 **Why it's wrong:**
 
-The `@` prefix tells Protheus to push the rest of the string as a literal SQL WHERE clause to the database. There is **no runtime variable expansion** inside the `@` block — the string `'"+M->CP_ZARDEST+"'` is sent verbatim as text to the database, producing `WHERE BE_LOCAL = '"+M->CP_ZARDEST+"'`, which matches zero rows. The filter silently returns an empty result — operator presses F3 and sees nothing, with no error message.
+The `@` prefix tells Protheus to push the rest of the string as a literal SQL WHERE clause to the database. There is **no runtime variable expansion** inside the `@` block: the string `'"+M->CP_ZARDEST+"'` is sent verbatim as text to the database, producing `WHERE BE_LOCAL = '"+M->CP_ZARDEST+"'`, which matches zero rows. The filter silently returns an empty result; operator presses F3 and sees nothing, with no error message.
 
-Verified against the real TOTVS SXB: every type-6 filter using `@` in the standard dictionary uses **constants** (`@G3B_TIPO = '1'`, `@ADK_CORP = 'T'`, `@A1_COD IN ('000001','000002')`) — never runtime variables.
+Verified against the real TOTVS SXB: every type-6 filter using `@` in the standard dictionary uses **constants** (`@G3B_TIPO = '1'`, `@ADK_CORP = 'T'`, `@A1_COD IN ('000001','000002')`), never runtime variables.
 
 **Right approach (two options):**
 
@@ -56,12 +56,12 @@ Verified against the real TOTVS SXB: every type-6 filter using `@` in the standa
   ```
   The `#` triggers macro substitution **once**, runs the function, then the returned `@...` string is treated as static SQL and pushed down.
 
-**⚠️ Important:** if the variable feeding the filter is a **grid field** (lives in `aCols`, not in the Enchoice), `M->FIELD` is unreliable inside the filter — see *Reading `M->FIELD` from a grid context* below. Replace `M->FIELD` with `GDFieldGet("FIELD")` in the User Function.
+**⚠️ Important:** if the variable feeding the filter is a **grid field** (lives in `aCols`, not in the Enchoice), `M->FIELD` is unreliable inside the filter; see *Reading `M->FIELD` from a grid context* below. Replace `M->FIELD` with `GDFieldGet("FIELD")` in the User Function.
 
 ## Reading `M->FIELD` from a grid context
 
 ```advpl
-// WRONG — when CAMPO is a grid field (aHeader/aCols)
+// WRONG - when CAMPO is a grid field (aHeader/aCols)
 User Function MyFilter()
     Local cFiltro := "@1=2"
     If Type("M->CAMPO") == "C"
@@ -72,20 +72,20 @@ Return cFiltro
 
 **Why it's wrong:**
 
-`M->FIELD` is the memory-variable proxy that Protheus binds to **Enchoice fields** (form-level cabeçalho). For **grid fields** (rows in `oGetDados`, backed by `aHeader`/`aCols`), `M->FIELD` is created and populated only at very specific moments of the row-edit lifecycle — and it is **not reliable** during evaluation of:
+`M->FIELD` is the memory-variable proxy that Protheus binds to **Enchoice fields** (form-level cabeçalho). For **grid fields** (rows in `oGetDados`, backed by `aHeader`/`aCols`), `M->FIELD` is created and populated only at very specific moments of the row-edit lifecycle, and it is **not reliable** during evaluation of:
 
 - Type-6 SXB filters (pressing F3 on a grid field)
 - `X3_VALID` of a grid field referencing **other** grid fields on the same row
 - Triggers and CPO callbacks that read sibling grid fields
 
-In many cases the variable doesn't even exist in scope (`Type("M->CAMPO") <> "C"`), so any defensive `If Type(...) == "C"` simply falls through and the function returns its empty/default branch — operator sees "filter matches everything" or "validation always accepts", with no error.
+In many cases the variable doesn't even exist in scope (`Type("M->CAMPO") <> "C"`), so any defensive `If Type(...) == "C"` simply falls through and the function returns its empty/default branch; operator sees "filter matches everything" or "validation always accepts", with no error.
 
 **Symptom recipe:** customisation works "by feel" if the operator tabs through fields in a specific order, fails otherwise. Or: filter returns all rows ignoring the dependency. Or: F3 modal is empty when it should be filtered. No exception, no log entry.
 
-**Right approach — use the framework's grid accessors:**
+**Right approach. Use the framework's grid accessors:**
 
 ```advpl
-// CORRECT — reads the grid row's current value
+// CORRECT - reads the grid row's current value
 cArmDest := AllTrim(GDFieldGet("CP_ZARDEST"))
 
 // Optional fallback: M-> for the (rare) case the function is called
@@ -97,11 +97,11 @@ EndIf
 
 Three TOTVS-blessed alternatives, in order of preference:
 
-1. **`GDFieldGet("FIELD")`** — the generic helper. Reads the current row of the active getDados, no extra parameters. Used by TOTVS in `DEL` (`DEL->DEL_CODMOT == GDFieldGet('DUP_CODMOT',n)`), `JAR001`/`JAR002`, `CLN2`.
+1. **`GDFieldGet("FIELD")`**: the generic helper. Reads the current row of the active getDados, no extra parameters. Used by TOTVS in `DEL` (`DEL->DEL_CODMOT == GDFieldGet('DUP_CODMOT',n)`), `JAR001`/`JAR002`, `CLN2`.
 
-2. **`aCols[n][nPosX]`** — direct array access when you control the surrounding code. Used by TOTVS in `SB8` (`SB8->B8_PRODUTO == aCols[n,nPosCProd]`), `QEL`, `QPL`, `XP1`, `W13` (the last uses `aScan(aHeader, ...)` to resolve the index dynamically).
+2. **`aCols[n][nPosX]`**: direct array access when you control the surrounding code. Used by TOTVS in `SB8` (`SB8->B8_PRODUTO == aCols[n,nPosCProd]`), `QEL`, `QPL`, `XP1`, `W13` (the last uses `aScan(aHeader, ...)` to resolve the index dynamically).
 
-3. **`oGetDados:aCols[oGetDados:nAt][nPos]`** — when you have an explicit reference to the object. Used by TOTVS in `AA3_02` (`AA3->AA3_CODPRO == oGetDados:aCols[oGetDados:nAt,nPosiProd]`), `MHICHG`, `ST9FPA`.
+3. **`oGetDados:aCols[oGetDados:nAt][nPos]`**: when you have an explicit reference to the object. Used by TOTVS in `AA3_02` (`AA3->AA3_CODPRO == oGetDados:aCols[oGetDados:nAt,nPosiProd]`), `MHICHG`, `ST9FPA`.
 
 **Quick test in the field:** if you wrote a type-6 filter that depends on a grid field and the F3 either returns nothing or returns everything regardless of what the operator typed, the first hypothesis is `M->FIELD` being read from a grid context. Replace with `GDFieldGet` and retry.
 
@@ -146,7 +146,7 @@ XB_ALIAS = 'SA1'   -- same code as TOTVS standard
 XB_CONTEM = 'SA1FA093SB1();...'   -- added a custom button
 ```
 
-**Symptom:** the next LIB update or UPDDISTR run overwrites the entire `SA1` consulta. The customisation vanishes silently. `UPDDISTR` deletes all rows of the consulta and reinserts the standard ones — there is no partial merge.
+**Symptom:** the next LIB update or UPDDISTR run overwrites the entire `SA1` consulta. The customisation vanishes silently. `UPDDISTR` deletes all rows of the consulta and reinserts the standard ones; there is no partial merge.
 
 **Fix:** create a new `XB_ALIAS` (`ZSA1`, `SA1FX`, etc.) and wire it via `SX3.X3_F3` on the affected fields. Customisations live under custom aliases, never under TOTVS standard ones.
 
@@ -202,7 +202,7 @@ The consulta exists, but its type-1 `XB_CONTEM` references a table missing from 
 
 ## Two consultas with the same `XB_ALIAS`
 
-`XB_ALIAS` is the consulta key. Two different consultas with the same alias produce undefined behaviour — the engine picks one and ignores the other. This usually happens when a custom consulta is created without prefixing its alias.
+`XB_ALIAS` is the consulta key. Two different consultas with the same alias produce undefined behaviour: the engine picks one and ignores the other. This usually happens when a custom consulta is created without prefixing its alias.
 
 **Detection:** `SELECT XB_ALIAS, COUNT(DISTINCT XB_DESCRI) FROM SXB WHERE XB_TIPO='1' GROUP BY XB_ALIAS HAVING COUNT(DISTINCT XB_DESCRI) > 1;`
 

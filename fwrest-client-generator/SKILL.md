@@ -14,7 +14,7 @@ metadata:
 
 ## Overview
 
-Generate production-ready AdvPL/TLPP code that **consumes** external REST APIs using the framework `FWRest` class. `FWRest` is the **HTTP client** class — it is the counterpart to the `@Get/@Post` annotation-based REST server (see `tlpp-rest-endpoint-generator` for *exposing* endpoints, not consuming them).
+Generate production-ready AdvPL/TLPP code that **consumes** external REST APIs using the framework `FWRest` class. `FWRest` is the **HTTP client** class; it is the counterpart to the `@Get/@Post` annotation-based REST server (see `tlpp-rest-endpoint-generator` for *exposing* endpoints, not consuming them).
 
 `FWRest` wraps low-level HTTP socket calls and supports the four standard verbs **GET, POST, PUT, DELETE** (no native PATCH support). It handles SSL automatically through `appserver.ini` socket configuration.
 
@@ -42,11 +42,11 @@ Use this skill when generating code that:
 
 A typical FWRest call follows this five-step lifecycle:
 
-1. **Instantiate** — `oClient := FWRest():New(cHost)` where `cHost` is the **base URL only** (scheme + host + optional port), e.g. `"https://api.example.com"`.
-2. **Configure** — `SetPath()`, `SetPostParams()`, `SetGetParams()`, `SetTimeOut()`, `SetChkStatus()`, `SetLegacySuccess()`.
-3. **Build headers** — Plain `Array` of `"Key: Value"` strings, e.g. `{"Content-Type: application/json", "Authorization: Bearer xyz"}`.
-4. **Invoke verb** — `:Get(aHead)`, `:Post(aHead)`, `:Put(aHead, cBody)`, `:Delete(aHead, cBody)`. All return `.T.` on success.
-5. **Read result** — `GetResult()` on success (response body as character), `GetLastError()` on failure, `GetHTTPCode()` for the numeric status.
+1. **Instantiate**: `oClient := FWRest():New(cHost)` where `cHost` is the **base URL only** (scheme + host + optional port), e.g. `"https://api.example.com"`.
+2. **Configure**: `SetPath()`, `SetPostParams()`, `SetGetParams()`, `SetTimeOut()`, `SetChkStatus()`, `SetLegacySuccess()`.
+3. **Build headers**: Plain `Array` of `"Key: Value"` strings, e.g. `{"Content-Type: application/json", "Authorization: Bearer xyz"}`.
+4. **Invoke verb**: `:Get(aHead)`, `:Post(aHead)`, `:Put(aHead, cBody)`, `:Delete(aHead, cBody)`. All return `.T.` on success.
+5. **Read result**: `GetResult()` on success (response body as character), `GetLastError()` on failure, `GetHTTPCode()` for the numeric status.
 
 ### Path vs Query Parameters
 
@@ -57,7 +57,7 @@ A typical FWRest call follows this five-step lifecycle:
 | Query string (separate) | `SetGetParams("page=1&size=20")` | Appended after path |
 | GET param via verb | `:Get(aHead, "page=1")` | Appended after path |
 
-> **Special characters in query values must be URI-encoded** via the `Escape()` function — otherwise the request will fail or be misinterpreted.
+> **Special characters in query values must be URI-encoded** via the `Escape()` function; otherwise the request will fail or be misinterpreted.
 
 ### Status Code Semantics
 
@@ -66,7 +66,7 @@ A typical FWRest call follows this five-step lifecycle:
 | `Get()` | Returns `.T.` only for HTTP **200** (legacy) or **200–299** (with `SetLegacySuccess(.F.)`) |
 | `Post()` | Returns `.T.` for **200** or **201** (legacy) or **200–299** (with `SetLegacySuccess(.F.)`) |
 | `Put()` / `Delete()` | Returns `.T.` for **200** or **201** (legacy) or **200–299** (with `SetLegacySuccess(.F.)`) |
-| `SetChkStatus(.F.)` | Disables internal HTTP code validation — verb returns `.T.` if **the connection succeeded**, regardless of HTTP code. You then call `GetHTTPCode()` to decide. **Use this for APIs that return 204, 207, 3xx, or 4xx as part of the contract.** |
+| `SetChkStatus(.F.)` | Disables internal HTTP code validation: verb returns `.T.` if **the connection succeeded**, regardless of HTTP code. You then call `GetHTTPCode()` to decide. **Use this for APIs that return 204, 207, 3xx, or 4xx as part of the contract.** |
 
 ### No PATCH Support
 
@@ -76,12 +76,12 @@ A typical FWRest call follows this five-step lifecycle:
 
 ## Bundled Reference Files
 
-This skill uses progressive disclosure. The SKILL.md body covers the architecture, decision logic, and the generation checklist. Detailed method reference, code templates, and authentication patterns are in the `references/` directory — read them on demand based on the scenario:
+This skill uses progressive disclosure. The SKILL.md body covers the architecture, decision logic, and the generation checklist. Detailed method reference, code templates, and authentication patterns are in the `references/` directory; read them on demand based on the scenario:
 
 | Reference File | When to Read | Content |
 | --- | --- | --- |
 | [references/fwrest-api-reference.md](references/fwrest-api-reference.md) | Looking up **exact method signatures**, **parameter types**, **minimum LIB version** per method, or behavior of `SetChkStatus`/`SetLegacySuccess`/`SetTimeOut`/`GetHTTPCode` | Complete `FWRest` method reference table with syntax, parameters, returns, LIB version requirements |
-| [references/fwrest-client-templates.md](references/fwrest-client-templates.md) | Generating **any FWRest call** — GET, POST, PUT, DELETE, JSON parsing, error handling, file upload (.gz), header construction | Full code templates for all 4 HTTP verbs, JSON body construction, response parsing, generic error-handling wrapper |
+| [references/fwrest-client-templates.md](references/fwrest-client-templates.md) | Generating **any FWRest call**: GET, POST, PUT, DELETE, JSON parsing, error handling, file upload (.gz), header construction | Full code templates for all 4 HTTP verbs, JSON body construction, response parsing, generic error-handling wrapper |
 | [references/fwrest-authentication-patterns.md](references/fwrest-authentication-patterns.md) | Implementing **HTTP Basic**, **Bearer Token / JWT**, **API Key**, or **OAuth 2.0 (client credentials / authorization code)** authentication | Header templates for each auth scheme, token-refresh pattern, secret storage guidance |
 
 ---
@@ -92,12 +92,12 @@ This skill uses progressive disclosure. The SKILL.md body covers the architectur
 
 Identify from the user's request:
 
-- **Target API** — base URL, path, and HTTP verb(s)
-- **Authentication scheme** — None, Basic, Bearer/JWT, API Key, or OAuth 2.0
-- **Payload format** — JSON (default), XML, form-encoded, binary/gzip
-- **Expected response codes** — only 2xx, or also 204/3xx/4xx as part of contract
-- **Timeout requirement** — default 120s vs custom (e.g. webhook endpoints with 5s SLA)
-- **Whether the call is part of a transaction** — affects error handling strategy
+- **Target API**: base URL, path, and HTTP verb(s)
+- **Authentication scheme**: None, Basic, Bearer/JWT, API Key, or OAuth 2.0
+- **Payload format**: JSON (default), XML, form-encoded, binary/gzip
+- **Expected response codes**: only 2xx, or also 204/3xx/4xx as part of contract
+- **Timeout requirement**: default 120s vs custom (e.g. webhook endpoints with 5s SLA)
+- **Whether the call is part of a transaction**: affects error handling strategy
 
 ### Step 2: Load Templates
 
@@ -125,7 +125,7 @@ Use the checklist below to verify the generated code covers all requirements.
 
 - [ ] `#include "totvs.ch"` (AdvPL) or `#include "tlpp-core.th"` (TLPP) present, in lowercase
 - [ ] Function declares `oClient`, `aHeader`, `cBody`, `cResponse`, `nHttpCode` as locals with explicit types (TLPP `as Object`, `as Array`, etc.)
-- [ ] `FWRest():New(cHost)` receives ONLY the base URL — path is set via `SetPath()`
+- [ ] `FWRest():New(cHost)` receives ONLY the base URL; path is set via `SetPath()`
 
 ### Request Construction
 
@@ -133,7 +133,7 @@ Use the checklist below to verify the generated code covers all requirements.
 - [ ] Query parameter values passed through `Escape()` when they may contain spaces or special chars
 - [ ] Headers built as an `Array` of `"Key: Value"` strings (note the literal space after the colon)
 - [ ] `Content-Type` header included for POST/PUT bodies (`application/json`, `application/xml`, etc.)
-- [ ] Body serialized via `oJson:toJson()` — never built by string concatenation when the data is dynamic
+- [ ] Body serialized via `oJson:toJson()`; never built by string concatenation when the data is dynamic
 - [ ] `SetPostParams(cBody)` called **before** `:Post()` (Post body is NOT a parameter of `:Post()`)
 - [ ] PUT/DELETE bodies passed as the **second positional argument** of `:Put(aHead, cBody)` / `:Delete(aHead, cBody)`
 
@@ -171,11 +171,11 @@ Use the checklist below to verify the generated code covers all requirements.
 ### SonarQube Compliance
 
 - [ ] No hardcoded passwords, tokens, or API keys in source code
-- [ ] No `IIF()` — use `If/Else/EndIf` blocks
+- [ ] No `IIF()`; use `If/Else/EndIf` blocks
 - [ ] `GetMV()` calls outside of loops
 - [ ] No UI functions (`MsgAlert`, `MsgYesNo`, `Aviso`, `Help`) inside the call path of a transaction or scheduled job
 - [ ] Includes in lowercase (e.g., `#include "totvs.ch"`)
-- [ ] No use of `RpcSetEnv` inside REST endpoint handlers that themselves invoke FWRest — environment must already be prepared
+- [ ] No use of `RpcSetEnv` inside REST endpoint handlers that themselves invoke FWRest; environment must already be prepared
 
 ---
 
@@ -190,4 +190,4 @@ Use the checklist below to verify the generated code covers all requirements.
 | Query string not escaped | Garbled parameters | Wrap values with `Escape()` |
 | 4xx body unreadable | `GetResult()` returns empty | Call `SetChkStatus(.F.)` first; then read `GetResult()` even on failure |
 | Hardcoded credentials | SonarQube blocker | Read from `GetMV("MV_XYZTOK",,"")` parameter |
-| PATCH attempted | Compile error / no such method | FWRest does not support PATCH — use `HTTPQuote()` |
+| PATCH attempted | Compile error / no such method | FWRest does not support PATCH; use `HTTPQuote()` |

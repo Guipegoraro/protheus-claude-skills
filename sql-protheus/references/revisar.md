@@ -1,4 +1,4 @@
-# Revisar SQL existente — workflow, checklists e relatorio
+# Revisar SQL existente: workflow, checklists e relatorio
 
 ## Conteudo
 - Workflow de review
@@ -17,7 +17,7 @@
 
 Regras do ecossistema (herdadas do code-review categoria 9): mutacao de dicionario em fonte (`PutSX3/PutSX6/PutMV`, RecLock em SX*) = CRITICAL; bloqueio de regra de negocio sem `// Ref:` do cliente = MAJOR.
 
-## Checklist — Embedded SQL / statement
+## Checklist: Embedded SQL / statement
 
 - [ ] `RetSqlName()` para nome fisico (nunca `SA1010` hardcoded)
 - [ ] `D_E_L_E_T_ = ' '` (espaco) em TODAS as tabelas, inclusive JOINs
@@ -31,7 +31,7 @@ Regras do ecossistema (herdadas do code-review categoria 9): mutacao de dicionar
 - [ ] Campos listados; sem `IIF()`; sem funcao especifica de um SGBD sem branch `TCGetDB()`
 - [ ] `TCSqlExec`: retorno `< 0` checado com `TCSQLError()`
 
-## Checklist — Workarea
+## Checklist: Workarea
 
 - [ ] `DbSelectArea()` + `DbSetOrder(n)` no indice SIX correto (ordem errada = full scan)
 - [ ] `DbSeek()` com prefixo de filial (`xFilial("XXX") + chave`)
@@ -40,7 +40,7 @@ Regras do ecossistema (herdadas do code-review categoria 9): mutacao de dicionar
 - [ ] `GetArea()`/`RestArea()` quando a rotina nao e dona do posicionamento
 - [ ] Volume grande? Entao deveria ser SQL, nao ISAM
 
-## Checklist — seguranca
+## Checklist: seguranca
 
 - [ ] Nenhum input de requisicao HTTP/tela/arquivo concatenado em query
 - [ ] Nenhum `SetUnsafe`/`&(macro)`/`%exp:%` recebendo fragmento SQL montado com input externo

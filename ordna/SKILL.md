@@ -1,15 +1,15 @@
 ---
 name: ordna
-description: Use when a directory holds .ordna/ or tasks/*.md, when the user names ordna, a kanban, a board or a card, or when work needs a board that does not exist yet — ordna is this machine's kanban provider: it creates the board, reads it, edits tasks and moves cards between columns.
+description: "Use when a directory holds .ordna/ or tasks/*.md, when the user names ordna, a kanban, a board or a card, or when work needs a board that does not exist yet. Ordna is this machine's kanban provider: it creates the board, reads it, edits tasks and moves cards between columns."
 ---
 
 # Ordna
 
-Board derivado de arquivos: cada task é um markdown em `tasks/`, cada coluna é um valor de `status`. Não existe estado de board em lugar nenhum — o arquivo é a fonte de verdade e o Kanban é **projeção**. O CLI `ordna` valida status e dependência por cima desses mesmos arquivos.
+Board derivado de arquivos: cada task é um markdown em `tasks/`, cada coluna é um valor de `status`. Não existe estado de board em lugar nenhum: o arquivo é a fonte de verdade e o Kanban é **projeção**. O CLI `ordna` valida status e dependência por cima desses mesmos arquivos.
 
 ## Granularidade
 
-Leia na menor granularidade que responde à pergunta — no mesmo board, abrir os arquivos custa mais de uma ordem de grandeza a mais que listar.
+Leia na menor granularidade que responde à pergunta: no mesmo board, abrir os arquivos custa mais de uma ordem de grandeza a mais que listar.
 
 | Pergunta | Como responder |
 |---|---|
@@ -17,15 +17,15 @@ Leia na menor granularidade que responde à pergunta — no mesmo board, abrir o
 | O que essa task diz | `ordna show <id>` |
 | Vou **editar** o corpo | Read + Edit em `tasks/<id>.md` |
 
-`ordna ls` e `ordna show` respondem no terminal. A TUI (`ordna`, `ordna board`) é interativa — quem abre é o usuário.
+`ordna ls` e `ordna show` respondem no terminal. A TUI (`ordna`, `ordna board`) é interativa: quem abre é o usuário.
 
 ## Storage
 
-`.ordna/config.yaml` pode trazer `storage: file` (padrão) | `hybrid` | `namespace`. Nos dois primeiros as tasks são arquivos em `tasks/`. Em **`namespace` não existe arquivo** — as tasks vivem em `refs/ordna/tasks/<id>` e tudo passa pelo CLI. Confirme o modo antes de abrir arquivo.
+`.ordna/config.yaml` pode trazer `storage: file` (padrão) | `hybrid` | `namespace`. Nos dois primeiros as tasks são arquivos em `tasks/`. Em **`namespace` não existe arquivo**: as tasks vivem em `refs/ordna/tasks/<id>` e tudo passa pelo CLI. Confirme o modo antes de abrir arquivo.
 
 ## Ciclo de uma task
 
-1. `ordna create "<título>"` cria com o esqueleto (`## Goal`, `## Acceptance Criteria`, `## Notes`, `## Progress`). Flags: `-p high|medium|low`, `-t <tag...>`, `-d <dependência...>`, `-s <status>`, `-a <nome>`. O comando aceita só o título — o corpo detalhado você escreve editando `tasks/<id>.md`.
+1. `ordna create "<título>"` cria com o esqueleto (`## Goal`, `## Acceptance Criteria`, `## Notes`, `## Progress`). Flags: `-p high|medium|low`, `-t <tag...>`, `-d <dependência...>`, `-s <status>`, `-a <nome>`. O comando aceita só o título; o corpo detalhado você escreve editando `tasks/<id>.md`.
 2. Executa.
 3. Registra em `## Progress` o que foi feito, marca os checkboxes de `## Acceptance Criteria` que passaram, e põe `updated_at` na data de hoje.
 4. `ordna move <id> <status>`.
@@ -38,7 +38,7 @@ O resto do CLI (`assign`, `web`, `attach`, filtros de `ls`) sai de `ordna --help
 
 ## Comentários
 
-O ordna não tem comentário como recurso — a conversa de um card vive na seção `## Notes` do corpo, append-only, cada fala prefixada com quem falou e a data (`> @gui 13/08: ...`).
+O ordna não tem comentário como recurso; a conversa de um card vive na seção `## Notes` do corpo, append-only, cada fala prefixada com quem falou e a data (`> @gui 13/08: ...`).
 
 Leia `## Notes` **antes** de executar um card: é onde o usuário corrige rumo, e a correção costuma chegar depois do card já estar escrito. Ao responder, acrescente sua fala no fim da seção em vez de reescrever a dele.
 
@@ -47,15 +47,15 @@ Leia `## Notes` **antes** de executar um card: é onde o usuário corrige rumo, 
 Padrão `todo → doing → done`. `statuses:` no config redefine as colunas na ordem, e a primeira é o default de tasks novas.
 
 - O **último status da lista é o terminal**. Mover pra ele com `depends_on` em aberto é rejeitado pelo CLI.
-- `archived` é reservado — sempre aceito, e filtrado das demais visões.
+- `archived` é reservado: sempre aceito, e filtrado das demais visões.
 
 ## Qual board
 
-Um board por diretório: o `ordna` lê `<cwd>/.ordna/config.yaml`, e não existe flag `--cwd`. Boards são independentes entre si — IDs, colunas e contadores próprios. Quando o cwd não for o board que o usuário quer, pergunte antes de criar.
+Um board por diretório: o `ordna` lê `<cwd>/.ordna/config.yaml`, e não existe flag `--cwd`. Boards são independentes entre si: IDs, colunas e contadores próprios. Quando o cwd não for o board que o usuário quer, pergunte antes de criar.
 
 ## Criar um board
 
-`ordna init` na pasta que vai receber o board — cria `.ordna/config.yaml` e `tasks/`. Depois escreva o `config.yaml` com as colunas e o prefixo daquele trabalho:
+`ordna init` na pasta que vai receber o board: cria `.ordna/config.yaml` e `tasks/`. Depois escreva o `config.yaml` com as colunas e o prefixo daquele trabalho:
 
 ```yaml
 tasksDir: tasks
@@ -65,7 +65,7 @@ zeroPaddedIds: 3
 statuses: [todo, doing, done]
 ```
 
-Boards de contexto diferente merecem `idPrefix` diferente — é o que deixa o ID citável fora do board (em commit, documento, conversa) sem ambiguidade.
+Boards de contexto diferente merecem `idPrefix` diferente: é o que deixa o ID citável fora do board (em commit, documento, conversa) sem ambiguidade.
 
 Uma pasta pode apontar pro board de outra: `tasksDir: ../outra/tasks`. Serve pra rodar `ordna` de um lugar conveniente sem mover os arquivos.
 

@@ -1,4 +1,4 @@
-# Documentation and Conventions — ProtheusDOC, Clean Code, TLPP
+# Documentation and Conventions: ProtheusDOC, Clean Code, TLPP
 
 Detailed patterns for ProtheusDOC documentation, clean code conventions, and TLPP-specific review checks.
 
@@ -109,12 +109,12 @@ Function CalcTotal(cCustCode, nDiscount)
 | `a`    | Array           | `aItems`, `aFields`, `aResult`            |
 | `o`    | Object          | `oModel`, `oStatement`, `oTempTable`      |
 | `b`    | Code Block      | `bCondition`, `bAction`                   |
-| `x`    | Variant/Unknown | `xValue` (avoid — prefer typed variables) |
+| `x`    | Variant/Unknown | `xValue` (avoid; prefer typed variables) |
 
 ### Variable Scope
 
 ```advpl
-// BAD: Using Private when Local suffices — leaks into call stack
+// BAD: Using Private when Local suffices - leaks into call stack
 Private cOrder := ""
 Private nTotal := 0
 
@@ -162,7 +162,7 @@ EndIf
 
 ### Dead Code
 
-Remove commented-out code blocks, unused variables, and unreachable code. Version control preserves history — dead code in source reduces readability.
+Remove commented-out code blocks, unused variables, and unreachable code. Version control preserves history; dead code in source reduces readability.
 
 ---
 

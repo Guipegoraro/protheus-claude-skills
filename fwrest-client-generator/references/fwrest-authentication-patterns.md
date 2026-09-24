@@ -65,11 +65,11 @@ aAdd(aHeader, "Content-Type: application/json")
 aAdd(aHeader, "X-API-Key: " + cApiKey)
 ```
 
-Confirm the exact header name with the target API documentation — common alternatives: `Api-Key`, `apikey`, `X-Auth-Token`.
+Confirm the exact header name with the target API documentation. Common alternatives: `Api-Key`, `apikey`, `X-Auth-Token`.
 
 ---
 
-## 5. OAuth 2.0 — Client Credentials Grant
+## 5. OAuth 2.0: Client Credentials Grant
 
 Two-step pattern: (1) request a token from the auth server, (2) use the token in subsequent calls. Cache the token in a static variable until near expiry.
 
@@ -152,7 +152,7 @@ aAdd(aHeader, "Authorization: Bearer " + cToken)
 
 ---
 
-## 6. OAuth 2.0 — Authorization Code Grant
+## 6. OAuth 2.0: Authorization Code Grant
 
 The authorization-code grant requires a browser-based user consent step that **cannot** happen inside a server-side Protheus routine. Implementation pattern:
 
@@ -160,7 +160,7 @@ The authorization-code grant requires a browser-based user consent step that **c
 2. Persist the refresh token securely (encrypted Protheus parameter or external vault).
 3. The Protheus integration uses the **refresh token grant** (similar to client-credentials above but with `grant_type=refresh_token&refresh_token=...`) to obtain access tokens for API calls.
 
-Code follows the same shape as Template 5 — only `cBody` differs.
+Code follows the same shape as Template 5; only `cBody` differs.
 
 ---
 
@@ -194,8 +194,8 @@ aAdd(aHeader, "Authorization: Bearer " + cToken)
 | Anti-pattern | Why it fails |
 | --- | --- |
 | Hardcoded `cToken := "eyJhbGc..."` | SonarQube blocker + leaks via source repo |
-| Calling auth endpoint on every request | Rate-limit / latency / cost — always cache the token |
+| Calling auth endpoint on every request | Rate-limit / latency / cost; always cache the token |
 | Logging the full `Authorization` header | Token theft on log exposure |
 | Sharing one OAuth token across tenants | Cross-tenant data leakage |
-| Storing secrets in `cEmpAnt`/`__cUserID` | These are protected variables — SonarQube blocker |
+| Storing secrets in `cEmpAnt`/`__cUserID` | These are protected variables; SonarQube blocker |
 | Using HTTP Basic over plain HTTP | Credentials sent in plaintext |

@@ -32,7 +32,7 @@
 
 ## Testes de Regressao
 
-> O que NAO pode quebrar — funcionalidades existentes que a customizacao toca.
+> O que NAO pode quebrar: funcionalidades existentes que a customizacao toca.
 
 ### RT-001: [Funcionalidade existente]
 - **Rotina**: [Nome da rotina padrao]

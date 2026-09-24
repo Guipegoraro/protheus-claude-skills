@@ -67,40 +67,40 @@ Use como ponto de partida, ajuste ao caso:
 
 ## Regras de linguagem (load-bearing)
 
-- **Participio passado impessoal** — mesma voz dos apontamentos:
+- **Participio passado impessoal** (mesma voz dos apontamentos):
   "Considerados apenas titulos baixados", "Excluidos titulos do
   tipo INV". Evitar primeira pessoa ("decidimos", "fizemos").
 - **Citar nomes de cliente/processo** quando ja sao conhecidos do
   cliente: "clientes 42671051 e 52085074", "processo 59533".
 - **Citar parametros** com codigo exato do SX6 (`ASC_ASC06A001`,
-  `MV_PAR01`) — o cliente confere no Configurador.
-- **Citar tabelas e campos custom** com prefixo Z** (SZN, ZN_VLRNUM)
-  — sao reais e podem aparecer em telas/relatorios/queries.
+  `MV_PAR01`); o cliente confere no Configurador.
+- **Citar tabelas e campos custom** com prefixo Z** (SZN, ZN_VLRNUM):
+  sao reais e podem aparecer em telas/relatorios/queries.
 - **NAO citar** nomes de funcoes ADVPL/TLPP, classes, namespaces,
   variaveis internas, design patterns ou decisoes de implementacao
   (lock-by-name, idempotencia, begin transaction, FWPreparedStatement,
   alias temporario, etc). Se nao agrega ao entendimento do cliente,
   fica de fora.
-- **Acentuacao correta** — o documento e lido por humano, nao por
+- **Acentuacao correta**: o documento e lido por humano, nao por
   AppServer. `cálculo`, `parâmetro`, `função`, `decisões`, etc.
 - **Pendencias para o cliente** ficam no bloco final "PERGUNTAS EM
   ABERTO". Sempre inclua: pergunta, contexto curto, qual
   comportamento esta em vigor enquanto nao responde.
 
-## Changelog — formato e regras
+## Changelog: formato e regras
 
 O bloco CHANGELOG fica no fim do arquivo. Cada entrada:
 
 1. **Data ISO** (`YYYY-MM-DD`)
 2. **Descricao em uma frase** do que mudou.
-3. **Fonte** (em linha indentada): de onde veio a mudanca —
-   e-mail, ticket, ata de reuniao, nome da pessoa. **Nunca
-   omitir** — sem fonte a mudanca nao tem rastreabilidade.
+3. **Fonte** (em linha indentada): de onde veio a mudanca
+   (e-mail, ticket, ata de reuniao, nome da pessoa). **Nunca
+   omitir**: sem fonte a mudanca nao tem rastreabilidade.
 4. **Item afetado**: numero da secao + tema (ex: "secao 6.5
    cobertura de POs sem SW6").
 
 Ordem cronologica: mais antigo no topo, mais novo no fim. **Nunca
-reescreva entrada antiga** — se uma decisao foi reposta, registre
+reescreva entrada antiga**: se uma decisao foi reposta, registre
 uma nova linha "decisao X revertida apos resposta do Fulano".
 
 Quando uma pergunta em aberto for respondida pelo cliente:

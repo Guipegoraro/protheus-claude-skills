@@ -2,7 +2,7 @@
 
 Concrete walk-throughs. Each one is the recipe you'd hand to a Protheus admin to apply via Configurador. Always document the same rows in `.claude/plans/<slug>/pre-producao.md`.
 
-## 1. Create a custom table ZA0 — credit-limit history
+## 1. Create a custom table ZA0: credit-limit history
 
 **Purpose**: track historical credit-limit changes per customer.
 
@@ -26,16 +26,16 @@ Concrete walk-throughs. Each one is the recipe you'd hand to a Protheus admin to
 
 | Campo | Tipo | Tamanho | Decimal | Título | Picture | Contexto | Obrigat | Used | X3_F3 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| ZA0_FILIAL | C | 2 | 0 | Filial | `@!` | R | N | key | — |
+| ZA0_FILIAL | C | 2 | 0 | Filial | `@!` | R | N | key | - |
 | ZA0_CLIENT | C | 6 | 0 | Cliente | `@!` | R | S | yes | `SA1` |
-| ZA0_LOJA | C | 2 | 0 | Loja | `@!` | R | S | yes | — |
-| ZA0_DTALT | D | 8 | 0 | Data Alteração | — | R | S | yes | — |
-| ZA0_VLANT | N | 14 | 2 | Valor Anterior | `@E 99,999,999.99` | R | N | yes | — |
-| ZA0_VLNOV | N | 14 | 2 | Valor Novo | `@E 99,999,999.99` | R | S | yes | — |
-| ZA0_USER | C | 6 | 0 | Usuário | `@!` | R | S | yes | — |
-| ZA0_OBSERV | M | 0 | 0 | Observação | — | R | N | yes | — |
+| ZA0_LOJA | C | 2 | 0 | Loja | `@!` | R | S | yes | - |
+| ZA0_DTALT | D | 8 | 0 | Data Alteração | - | R | S | yes | - |
+| ZA0_VLANT | N | 14 | 2 | Valor Anterior | `@E 99,999,999.99` | R | N | yes | - |
+| ZA0_VLNOV | N | 14 | 2 | Valor Novo | `@E 99,999,999.99` | R | S | yes | - |
+| ZA0_USER | C | 6 | 0 | Usuário | `@!` | R | S | yes | - |
+| ZA0_OBSERV | M | 0 | 0 | Observação | - | R | N | yes | - |
 
-**Helps de campo** (F1 — required, one per field, self-contained end-user text):
+**Helps de campo** (F1, required, one per field, self-contained end-user text):
 
 | Campo | Help |
 | --- | --- |
@@ -51,7 +51,7 @@ Notes:
 
 - `ZA0_CLIENT` and `ZA0_LOJA` should carry `X3_GRPSXG` linking to the standard customer-code group (`031` or whatever SXG group SA1 uses on this environment). Verify via `FWSX3Util():GetAllGroupFields(cGrp)` before fixing the group code.
 - `ZA0_CLIENT` gets `X3_F3 = "SA1"` for the F3 lookup.
-- The help texts explain the field on their own — no ticket/PRD reference, no bare internal names.
+- The help texts explain the field on their own: no ticket/PRD reference, no bare internal names.
 
 **SIX rows**:
 
@@ -62,7 +62,7 @@ Notes:
 
 Both indexes get nicknames so the code that uses them is independent of TOTVS reordering.
 
-## 2. Add a field to a TOTVS table — A1_CREDLIM credit override
+## 2. Add a field to a TOTVS table: A1_CREDLIM credit override
 
 **Purpose**: a customer-level cap that overrides the operational rule.
 
@@ -92,13 +92,13 @@ Both indexes get nicknames so the code that uses them is independent of TOTVS re
 Limite de crédito específico deste cliente, em reais. Quando preenchido com valor maior que zero, sobrepõe o limite de crédito padrão da empresa na análise de crédito dos pedidos de venda. Quando zero, o sistema usa o limite padrão configurado pelo administrador.
 ```
 
-Note the help stands on its own — it explains the override behaviour in words instead of citing `MV_ESCRDLM` or the project documentation.
+Note the help stands on its own: it explains the override behaviour in words instead of citing `MV_ESCRDLM` or the project documentation.
 
 No SIX needed (existing SA1 indexes cover most queries; if the customer wants a "filter by credit limit" report, a new index can be added later).
 
 The field survives UPDDISTR (it's customer-owned, `X3_PROPRI = U`).
 
-## 3. Create a parameter — credit-limit default
+## 3. Create a parameter: credit-limit default
 
 **Purpose**: configurable default when `A1_CREDLIM` is zero.
 
@@ -106,7 +106,7 @@ The field survives UPDDISTR (it's customer-owned, `X3_PROPRI = U`).
 
 | Field | Value |
 | --- | --- |
-| X6_FIL | (blank — applies to all branches) |
+| X6_FIL | (blank: applies to all branches) |
 | X6_VAR | `MV_ESCRDLM` |
 | X6_TIPO | `N` |
 | X6_DESCRIC | `Limite de crédito default` |
@@ -146,7 +146,7 @@ SA1->(DBSeek(xFilial("SA1") + cCNPJ))
 
 If the nickname isn't yet present on the standard index, **add it via Configurador** (Edit → Índices → select the index → set Nickname). Standard indexes can get nicknames without breaking anything.
 
-## 6. Custom virtual field — display the group description
+## 6. Custom virtual field: display the group description
 
 Show the product's group description as a column in browses without storing it.
 
@@ -166,7 +166,7 @@ Show the product's group description as a column in browses without storing it.
 
 `B1_DESCGR` will appear in every SB1 browse with the group's description, computed live. Use `GetSx3Cache` in the validator/relacao if performance becomes an issue on large browses.
 
-## 7. Trigger — auto-fill on field change
+## 7. Trigger: auto-fill on field change
 
 When `A1_EST` (state) changes, populate `A1_INSCR` (state-tax) with the correct mask.
 
@@ -212,29 +212,29 @@ Changing `Z01.XG_SIZE` to `14` updates the size on all three tables atomically.
 
 Every example above should land as a row in `.claude/plans/<slug>/pre-producao.md`.
 
-**Everything in this file is copy-pasteable.** The operator applies it by copying values straight into Configurador screens, so every value is the literal content to be typed — complete, exactly as it goes into the screen. No placeholders (`<...>`, `a definir`), no ellipses (`…`), no prose mixed into value cells ("yes, financeiro module" is prose; the cell carries the literal choice). Short values go in table cells; multi-line/long values (help de campo, X3_RELACAO expressions, combo lists) each get their own fenced code block so one selection copies the whole value.
+**Everything in this file is copy-pasteable.** The operator applies it by copying values straight into Configurador screens, so every value is the literal content to be typed: complete, exactly as it goes into the screen. No placeholders (`<...>`, `a definir`), no ellipses (`…`), no prose mixed into value cells ("yes, financeiro module" is prose; the cell carries the literal choice). Short values go in table cells; multi-line/long values (help de campo, X3_RELACAO expressions, combo lists) each get their own fenced code block so one selection copies the whole value.
 
 Template:
 
 ```markdown
-# Pre-produção — <slug>
+# Pre-produção: <slug>
 
-## SX2 — tabelas novas
+## SX2: tabelas novas
 
 | X2_CHAVE | X2_NOME | X2_MODO | X2_AUTREC | X2_STAMP | X2_INSDT |
 | --- | --- | --- | --- | --- | --- |
 | ZA0 | Histórico de Limite | E | 1 | 1 | 1 |
 
-## SX3 — campos novos
+## SX3: campos novos
 
 | Tabela | Campo | Tipo | Tamanho | Decimal | Título | Descrição | Picture | Context | Obrigat | Used | X3_F3 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| SA1 | A1_CREDLIM | N | 14 | 2 | Limite crédito | Limite de crédito por cliente | @E 99,999,999.99 | R | N | financeiro | — |
-| ZA0 | ZA0_FILIAL | C | 2 | 0 | Filial | Filial do sistema | @! | R | N | key | — |
+| SA1 | A1_CREDLIM | N | 14 | 2 | Limite crédito | Limite de crédito por cliente | @E 99,999,999.99 | R | N | financeiro | - |
+| ZA0 | ZA0_FILIAL | C | 2 | 0 | Filial | Filial do sistema | @! | R | N | key | - |
 
 ## Helps de campo (F1)
 
-Um bloco por campo — copiar o texto inteiro para o help do campo no Configurador.
+Um bloco por campo: copiar o texto inteiro para o help do campo no Configurador.
 
 ### SA1 → A1_CREDLIM
 
@@ -248,13 +248,13 @@ Limite de crédito específico deste cliente, em reais. Quando preenchido com va
 Filial do sistema à qual este registro pertence. Preenchida automaticamente.
 ```
 
-## SIX — índices novos
+## SIX: índices novos
 
 | Tabela | Ordem | Chave | Descrição | Nickname | ShowPesq |
 | --- | --- | --- | --- | --- | --- |
 | ZA0 | 1 | ZA0_FILIAL+ZA0_CLIENT+ZA0_LOJA+DTOS(ZA0_DTALT) | Por cliente + data | ZA0CDT | S |
 
-## SX6 — parâmetros novos
+## SX6: parâmetros novos
 
 | X6_VAR | X6_TIPO | X6_CONTEUD | X6_DESCRIC |
 | --- | --- | --- | --- |

@@ -194,7 +194,7 @@ def main():
         print('\n%d de %d verificações falharam: %s'
               % (len(falhas), total[0], '; '.join(falhas)))
     else:
-        print('\nTUDO OK — %d verificações' % total[0])
+        print('\nTUDO OK - %d verificações' % total[0])
     return 1 if falhas else 0
 
 

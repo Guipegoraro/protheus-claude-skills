@@ -31,11 +31,11 @@ This skill reviews AdvPL and TLPP source files against TOTVS engineering standar
 
 ## Bundled Reference Files
 
-This skill uses progressive disclosure. The SKILL.md body covers the review workflow, category definitions, checklist, and output format. Detailed code examples, anti-patterns, and rule-specific fixes are in the `references/` directory — read them on demand based on the review scenario:
+This skill uses progressive disclosure. The SKILL.md body covers the review workflow, category definitions, checklist, and output format. Detailed code examples, anti-patterns, and rule-specific fixes are in the `references/` directory; read them on demand based on the review scenario:
 
 | Reference File | When to Read | Content |
 | --- | --- | --- |
-| [references/security-review-patterns.md](references/security-review-patterns.md) | Reviewing **security concerns** — SQL injection, hardcoded credentials, restricted APIs, environment context | SQL injection examples, `FWExecStatement` patterns, restricted functions table, REST/SOAP environment rules |
+| [references/security-review-patterns.md](references/security-review-patterns.md) | Reviewing **security concerns**: SQL injection, hardcoded credentials, restricted APIs, environment context | SQL injection examples, `FWExecStatement` patterns, restricted functions table, REST/SOAP environment rules |
 | [references/code-quality-patterns.md](references/code-quality-patterns.md) | Reviewing **performance, legacy code, metadata access, or compilation** issues | Loop/transaction anti-patterns, ISAM migration, deprecated API replacements, SX* metadata access table, encoding rules |
 | [references/documentation-and-conventions.md](references/documentation-and-conventions.md) | Reviewing **ProtheusDOC, naming conventions, clean code**, or **TLPP-specific** patterns | ProtheusDOC tag reference, common documentation mistakes, variable naming/scope conventions, TLPP type annotations, namespace, Try-Catch |
 
@@ -43,16 +43,16 @@ This skill uses progressive disclosure. The SKILL.md body covers the review work
 
 ## Review Process
 
-### Step 1 — Understand the Code
+### Step 1: Understand the Code
 
 Before reviewing:
 
 1. Read the **entire file** to understand purpose, scope, and dependencies
 2. Identify the **element types** (Functions, Static Functions, Classes, Methods)
-3. Note the **file extension** — `.prw` (AdvPL), `.tlpp` (TLPP), `.prx` (legacy)
-4. Check the **includes** — `totvs.ch`, `tlpp-core.th`, custom `.ch`/`.th` files
+3. Note the **file extension**: `.prw` (AdvPL), `.tlpp` (TLPP), `.prx` (legacy)
+4. Check the **includes**: `totvs.ch`, `tlpp-core.th`, custom `.ch`/`.th` files
 
-### Step 2 — Load Relevant References
+### Step 2: Load Relevant References
 
 Based on the code under review, read the appropriate reference files:
 
@@ -61,7 +61,7 @@ Based on the code under review, read the appropriate reference files:
 - **Documentation / clean code / TLPP findings** → read [references/documentation-and-conventions.md](references/documentation-and-conventions.md)
 - **Full review** → read all three reference files
 
-### Step 3 — Run Review Categories
+### Step 3: Run Review Categories
 
 Apply each review category below in order. For every finding, record:
 
@@ -72,7 +72,7 @@ Apply each review category below in order. For every finding, record:
 - **Finding** (what is wrong)
 - **Fix** (how to correct it, with code example when helpful)
 
-### Step 4 — Produce the Report
+### Step 4: Produce the Report
 
 Output findings as a structured report grouped by category, ordered by severity (CRITICAL first). End with a summary and overall assessment.
 
@@ -84,31 +84,31 @@ Output findings as a structured report grouped by category, ordered by severity 
 
 Check for vulnerabilities that expose the application to attacks or data leaks. Key rules:
 
-- **CA2050 / CA2051** — SQL Injection: concatenating user input in SQL strings → use `FWExecStatement` (CRITICAL)
-- **CA2052** — Hardcoded credentials in source → use environment configuration (CRITICAL)
-- **BG1000** — `RpcSetEnv`/`RpcSetType` in REST/SOAP services → configure `PrepareIn` (MAJOR)
-- **CA2022–CA2025, CA2053** — Restricted/prohibited functions and assignments (CRITICAL)
-- **BG1200** — `ErrorBlock` override → migrate to `Try-Catch` in TLPP (INFO)
+- **CA2050 / CA2051** (SQL Injection): concatenating user input in SQL strings → use `FWExecStatement` (CRITICAL)
+- **CA2052**: Hardcoded credentials in source → use environment configuration (CRITICAL)
+- **BG1000**: `RpcSetEnv`/`RpcSetType` in REST/SOAP services → configure `PrepareIn` (MAJOR)
+- **CA2022–CA2025, CA2053**: Restricted/prohibited functions and assignments (CRITICAL)
+- **BG1200**: `ErrorBlock` override → migrate to `Try-Catch` in TLPP (INFO)
 
 ### 2. Performance and Loops (SonarQube G2)
 
 Detect patterns that degrade runtime performance:
 
-- **CA1003** — Prohibited APIs inside loops (`GetMV`, `SuperGetMV`, `ExistBlock`, `AllUsers`, `Type`, `Pergunte`) → cache before loop (MAJOR)
-- **CA1002** — UI APIs inside transactions (`MsgAlert`, `MsgYesNo`, etc.) → move UI after transaction (MAJOR)
-- **CS1000** — Direct SQL without evaluation → prefer framework APIs or `ChangeQuery()`/`BeginSQL` (MAJOR)
+- **CA1003**: Prohibited APIs inside loops (`GetMV`, `SuperGetMV`, `ExistBlock`, `AllUsers`, `Type`, `Pergunte`) → cache before loop (MAJOR)
+- **CA1002**: UI APIs inside transactions (`MsgAlert`, `MsgYesNo`, etc.) → move UI after transaction (MAJOR)
+- **CS1000**: Direct SQL without evaluation → prefer framework APIs or `ChangeQuery()`/`BeginSQL` (MAJOR)
 
 ### 3. Legacy and Deprecated Code (SonarQube G3)
 
 Identify deprecated APIs and legacy patterns:
 
-- **CA1000** — ISAM driver access (`MSCREATE`, `DBCREATE`) → `FWTemporaryTable` (MAJOR)
-- **CA1001** — File-based semaphores → `LockByName()` (MAJOR)
-- **CA1004** — Console output (`ConOut`) → `FWLogMsg()` (MINOR)
-- **CA4000** — `IIF` inline → explicit `If/Else/EndIf` (INFO)
-- **CA3001** — Uppercase `#INCLUDE` → lowercase `#include` (MINOR)
+- **CA1000**: ISAM driver access (`MSCREATE`, `DBCREATE`) → `FWTemporaryTable` (MAJOR)
+- **CA1001**: File-based semaphores → `LockByName()` (MAJOR)
+- **CA1004**: Console output (`ConOut`) → `FWLogMsg()` (MINOR)
+- **CA4000**: `IIF` inline → explicit `If/Else/EndIf` (INFO)
+- **CA3001**: Uppercase `#INCLUDE` → lowercase `#include` (MINOR)
 
-**Obsolete Include Directives** — Flag any of these legacy includes and recommend replacement:
+**Obsolete Include Directives**. Flag any of these legacy includes and recommend replacement:
 
 | Obsolete Include | Replacement Include | Modern Class/API |
 |---|---|---|
@@ -117,8 +117,8 @@ Identify deprecated APIs and legacy patterns:
 | `FileIO.ch` | `totvs.ch` | `FWFileWriter()` / `FWFileReader()` |
 | `Font.ch` | `totvs.ch` | `TFont()` |
 | `ParmType.ch` | `totvs.ch` | `Default` prefix for parameter handling |
-| `protheus.ch` | `totvs.ch` | — |
-| `RWMake.ch` | `totvs.ch` | — |
+| `protheus.ch` | `totvs.ch` | - |
+| `RWMake.ch` | `totvs.ch` | - |
 
 ### 4. Metadata Access (SonarQube G4)
 
@@ -142,8 +142,8 @@ Check syntax errors (**CA0000**), file encoding (Windows-1252), INI references (
 
 ### 9. Ecosystem Rules (override the references above)
 
-- Dictionary mutation in customisation source (`PutSX3`, `PutSX6`, `PutMV`, `PutSX1`, `RecLock` on SX*/SXB) = **CRITICAL** — dictionary changes go through the Configurador only (skill `protheus-configurador-dicionario`).
-- Business-rule block (`Return ""`, error status) without a client source comment (`// Ref: <e-mail/ticket/data>`) and leftover `TODO Pergunta` markers = **MAJOR** — open questions belong in `.claude/plans/<slug>/perguntas-cliente.md`, interim behavior stays permissive (log/aviso).
+- Dictionary mutation in customisation source (`PutSX3`, `PutSX6`, `PutMV`, `PutSX1`, `RecLock` on SX*/SXB) = **CRITICAL**: dictionary changes go through the Configurador only (skill `protheus-configurador-dicionario`).
+- Business-rule block (`Return ""`, error status) without a client source comment (`// Ref: <e-mail/ticket/data>`) and leftover `TODO Pergunta` markers = **MAJOR**; open questions belong in `.claude/plans/<slug>/perguntas-cliente.md`, interim behavior stays permissive (log/aviso).
 
 ---
 
@@ -223,9 +223,9 @@ Output the review as follows:
 
 | Group | Rules | Focus |
 |-------|-------|-------|
-| G1 — Security | BG1000, CA2022–CA2053, BG1200 | Injection, credentials, restricted APIs |
-| G2 — Performance | CA1002, CA1003, CS1000 | Loops, transactions, queries |
-| G3 — Legacy | CA1000–CA1006, CA2014–CA2020, CA3001–CA3002, CA4000, BG1100 | Deprecated APIs, ISAM, console |
-| G4 — Metadata | CA2000–CA2013, CA2021 | Direct SX* table access |
-| G5 — Compilation | CA0000, CA1005, CA2016 | Syntax, encoding, I18N |
+| G1: Security | BG1000, CA2022–CA2053, BG1200 | Injection, credentials, restricted APIs |
+| G2: Performance | CA1002, CA1003, CS1000 | Loops, transactions, queries |
+| G3: Legacy | CA1000–CA1006, CA2014–CA2020, CA3001–CA3002, CA4000, BG1100 | Deprecated APIs, ISAM, console |
+| G4: Metadata | CA2000–CA2013, CA2021 | Direct SX* table access |
+| G5: Compilation | CA0000, CA1005, CA2016 | Syntax, encoding, I18N |
 

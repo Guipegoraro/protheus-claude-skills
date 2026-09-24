@@ -179,7 +179,7 @@ def limpa_quebras(heads):
     """Tira dos títulos as quebras de linha de uma geração anterior.
 
     Quando o template é extraído de uma MIT044 já gerada, os `<w:br>` do respiro vêm
-    junto nos títulos preservados — sem esta limpeza cada nova geração acrescentaria
+    junto nos títulos preservados; sem esta limpeza cada nova geração acrescentaria
     mais uma quebra.
     """
     n = 0
@@ -217,7 +217,7 @@ def limpa_miolo(doc, heads):
 def corrige_sumario(doc):
     """Faz o campo TOC do template montar o sumário em qualquer idioma do Word.
 
-    O template traz `TOC \\t "Heading 1,1,Heading 2,2,..."` — seleção por NOME de
+    O template traz `TOC \\t "Heading 1,1,Heading 2,2,..."`: seleção por NOME de
     estilo em inglês. No Word em português os estilos se chamam "Título 1"/"Título 2",
     nada casa e o F9 devolve "Nenhuma entrada de sumário foi encontrada". Trocando
     para `\\o "1-2"` a seleção passa a ser pelo nível de estrutura de tópicos; nos
@@ -248,7 +248,7 @@ def uniformiza_numeracao(doc, heads):
     """Poe os 5 Heading 2 na MESMA lista numerada.
 
     Nos documentos de origem, 'Processo Atual' e 'Processo Proposto' costumam usar
-    numId=1/ilvl=1 e os tres seguintes numId=5/ilvl=0 — a numeracao sai quebrada
+    numId=1/ilvl=1 e os tres seguintes numId=5/ilvl=0; com isso a numeracao sai quebrada
     (a., b., 01., 02., 03.). Só é aplicado com --numeracao-uniforme.
     """
     ref = heads['Parametrizações'].find(qn('w:pPr')).find(qn('w:numPr'))
@@ -275,7 +275,7 @@ def acha_tabela(doc, texto, indice_padrao=None):
     """Localiza uma tabela pelo texto de qualquer célula da 1a linha.
 
     Localizar por conteúdo (e não por índice) mantém o gerador funcionando quando
-    o template ganha ou perde tabelas — foi o que aconteceu quando o "Histórico de
+    o template ganha ou perde tabelas. Foi o que aconteceu quando o "Histórico de
     Versões" entrou entre a capa e os "Dados da Customização".
     """
     for t in doc.tables:
@@ -333,7 +333,7 @@ def escreve_valor(cell, rotulo, valor):
     """Reescreve a célula como "rótulo: valor", preservando o run do rótulo (negrito).
 
     No template oficial o rótulo às vezes vem grudado ao placeholder ({{cliente}}) no
-    mesmo run — por isso o rótulo é reescrito por inteiro em vez de ter só o valor
+    mesmo run, por isso o rótulo é reescrito por inteiro em vez de ter só o valor
     trocado. O valor vai num run próprio, sem negrito.
     """
     valor = '' if valor is None else str(valor).strip()
@@ -394,7 +394,7 @@ def acha_historico(doc):
     """Tabela do "Histórico de Versões", pelo cabeçalho completo.
 
     Exige as duas primeiras colunas ("Data" e "Versão") porque a tabela do Aceite
-    também tem uma coluna "Data" — casar só por ela sobrescreve o quadro de assinatura.
+    também tem uma coluna "Data"; casar só por ela sobrescreve o quadro de assinatura.
     """
     for t in doc.tables:
         if not t.rows or len(t.rows[0].cells) < len(HISTORICO):
@@ -408,7 +408,7 @@ def acha_historico(doc):
 def preenche_historico(doc, historico):
     """Preenche a tabela "Histórico de Versões" (cabeçalho + uma linha por versão).
 
-    As linhas em branco que sobram são mantidas — é onde as revisões seguintes do
+    As linhas em branco que sobram são mantidas: é onde as revisões seguintes do
     documento vão ser anotadas à mão.
     """
     tab = acha_historico(doc)
@@ -501,7 +501,7 @@ def quebra_pagina_antes(tabela):
 def respiro_entre_secoes(blocos):
     """Uma linha de respiro antes de cada título de seção.
 
-    A quebra vai no fim do último elemento da seção anterior — o mesmo lugar em que
+    A quebra vai no fim do último elemento da seção anterior, o mesmo lugar em que
     ela é feita à mão no Word. Quando a seção termina em tabela não há onde inserir
     o <w:br>, e o bloco é pulado.
     """

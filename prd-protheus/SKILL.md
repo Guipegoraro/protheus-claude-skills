@@ -35,7 +35,7 @@ Glob: **/*.prw
 Glob: **/*.tlpp
 ```
 
-Leia tambem o CLAUDE.md e/ou README.md do projeto se existirem — eles contem convencoes, prefixos, tabelas custom e arquitetura.
+Leia tambem o CLAUDE.md e/ou README.md do projeto se existirem: eles contem convencoes, prefixos, tabelas custom e arquitetura.
 
 Se encontrar arquivos de codigo, pergunte ao usuario:
 
@@ -45,12 +45,12 @@ Se o usuario concordar, va para o Passo 2.
 Se nao, pule para o Passo 3.
 Se NAO encontrar fontes, informe e va direto para o Passo 3.
 
-### Passo 2: Explorar codigo — BUSCA DIRECIONADA
+### Passo 2: Explorar codigo (BUSCA DIRECIONADA)
 
 A exploracao NAO e um inventario do projeto. Busque APENAS o que e relevante ao tema que o usuario descreveu.
 
 #### Etapa 1: Contexto rapido
-- Read CLAUDE.md e/ou README.md — convencoes, prefixos, tabelas custom existentes
+- Read CLAUDE.md e/ou README.md: convencoes, prefixos, tabelas custom existentes
 - Isso e SEMPRE feito (e rapido e informa o resto)
 
 #### Etapa 2: Busca direcionada ao tema
@@ -72,12 +72,12 @@ NAO busque coisas sem relacao com o que esta sendo planejado.
 
 Ao encontrar funcoes padrao Protheus no codigo (ex: MATA410, FWFormModel, MsExecAuto), use os plugins de documentacao para entender o contexto:
 
-- **claude-tdn:tdn-docs** — buscar documentacao no TDN para funcoes/rotinas padrao encontradas, entender PEs disponiveis e parametros
-- **protheus-toolkit:docs** ou **advpl-specialist:docs** — buscar funcoes nativas, tabelas SX, parametros MV referenciados no codigo
+- **claude-tdn:tdn-docs**: buscar documentacao no TDN para funcoes/rotinas padrao encontradas, entender PEs disponiveis e parametros
+- **protheus-toolkit:docs** ou **advpl-specialist:docs**: buscar funcoes nativas, tabelas SX, parametros MV referenciados no codigo
 
 Se algum plugin nao estiver disponivel, siga sem ele usando o MCP `advpl-tlpp-mcp-docs` (docs, code-search, dicionario) e a exploracao do codigo.
 
-Estas consultas sao automaticas e rapidas — enriquecem o resumo sem interferir no fluxo.
+Estas consultas sao automaticas e rapidas: enriquecem o resumo sem interferir no fluxo.
 
 #### Etapa 4: Mini-review do codigo existente (perguntar ao usuario)
 
@@ -99,12 +99,12 @@ Apresente ao usuario APENAS o que e relevante para o PRD. Exemplo:
 ```
 Encontrei codigo relacionado ao que voce descreveu:
 
-- [Arquivo1.prw] — PE da MATA410 que ja valida campo X_CUSTOM
+- [Arquivo1.prw]: PE da MATA410 que ja valida campo X_CUSTOM
   -> Pode ser estendido para incluir a nova validacao
   -> Doc TDN: MATA410 aceita PE "MT410LOK" para validacao de linha
-- [Arquivo2.tlpp] — API REST que ja faz POST para sistema externo
+- [Arquivo2.tlpp]: API REST que ja faz POST para sistema externo
   -> Padrao de integracao que podemos seguir
-- Tabela ZB0 (documentada no CLAUDE.md) — fila de pedidos
+- Tabela ZB0 (documentada no CLAUDE.md): fila de pedidos
   -> Pode precisar de novos campos para esta feature
 
 Convencoes do projeto: prefixo TEC, namespace custom.tecnoperfil.*
@@ -130,7 +130,7 @@ Faca NO MAXIMO 2-3 perguntas por vez. Aguarde a resposta antes de continuar.
 
 #### Enriquecimento automatico durante a entrevista
 
-Quando o usuario mencionar um **modulo Protheus** (ex: "Compras", "Faturamento", SIGACOM, SIGAFAT), use automaticamente **protheus-toolkit:business-modules** para carregar a referencia do modulo — tabelas, rotinas, PEs disponiveis, integracoes. Se o plugin nao estiver disponivel, siga sem ele usando o MCP `advpl-tlpp-mcp-docs` (product-docs-search, dicionario). Isso permite fazer perguntas mais especificas e informadas.
+Quando o usuario mencionar um **modulo Protheus** (ex: "Compras", "Faturamento", SIGACOM, SIGAFAT), use automaticamente **protheus-toolkit:business-modules** para carregar a referencia do modulo (tabelas, rotinas, PEs disponiveis, integracoes). Se o plugin nao estiver disponivel, siga sem ele usando o MCP `advpl-tlpp-mcp-docs` (product-docs-search, dicionario). Isso permite fazer perguntas mais especificas e informadas.
 
 Quando o usuario descrever um **fluxo de negocio** (ex: "pedido vira nota fiscal que gera financeiro"), pergunte:
 
@@ -140,7 +140,7 @@ Se aceitar, use **protheus-toolkit:process** ou **advpl-specialist:process** par
 
 ### Passo 4: Aprofundamento adaptativo
 
-Ao longo da entrevista, garanta que as 3 dimensoes abaixo foram abordadas. Nao pergunte em ordem rigida — encaixe naturalmente na conversa. Se o usuario ja respondeu algo espontaneamente, NAO repita.
+Ao longo da entrevista, garanta que as 3 dimensoes abaixo foram abordadas. Nao pergunte em ordem rigida; encaixe naturalmente na conversa. Se o usuario ja respondeu algo espontaneamente, NAO repita.
 
 #### Dimensao 1: Modulo e Tabelas
 
@@ -191,7 +191,7 @@ Para a secao "Decisoes de Implementacao", consulte o plugin especializado confor
 | Relatorio | **protheus-toolkit:protheus-reports** | TReport vs FWMSPrinter vs FwPrinterXlsx |
 | Tela com browse/grid | **protheus-toolkit:protheus-screens** | Tipo de browse/grid adequado |
 
-Consulte APENAS o plugin pertinente ao tipo da customizacao — nao carregue todos.
+Consulte APENAS o plugin pertinente ao tipo da customizacao; nao carregue todos.
 
 Se qualquer plugin desta etapa nao estiver disponivel, siga sem ele usando o MCP `advpl-tlpp-mcp-docs` e a exploracao do codigo existente.
 
@@ -297,7 +297,7 @@ Se qualquer plugin desta etapa nao estiver disponivel, siga sem ele usando o MCP
 
 ## 8. Regras de Filial e Seguranca
 
-- **Filiais**: [Todas / Especificas — quais]
+- **Filiais**: [Todas / Especificas (quais)]
 - **Compartilhamento de tabelas**: [xFilial padrao / Compartilhada]
 - **Controle de acesso**: [Grupos / Permissoes necessarias]
 - **Auditoria**: [Campos ou operacoes que precisam de log]
@@ -330,7 +330,7 @@ Apos exibir o PRD completo na conversa, pergunte:
 > Gostaria de gravar isso em um arquivo?
 
 Se o usuario responder sim:
-1. Sugira `.claude/plans/<slug>/prd.md` — se nao houver plano, pergunte ticket + descricao curta para montar o slug (convencao: `<feature-slug>[-<ticket>]`)
+1. Sugira `.claude/plans/<slug>/prd.md`; se nao houver plano, pergunte ticket + descricao curta para montar o slug (convencao: `<feature-slug>[-<ticket>]`)
 2. Pergunte se quer usar esse caminho ou outro
 3. Use a ferramenta Write para criar o arquivo
 
@@ -348,11 +348,11 @@ Se o usuario recusar, encerre normalmente.
 
 ## Regras
 
-1. **NUNCA crie GitHub Issues** — output e sempre texto na conversa + arquivo opcional
-2. **Sempre exiba o PRD completo na conversa primeiro** — so depois ofereca gravar
-3. **Respeite o estilo do cliente** — se CLAUDE.md ou fontes indicam Hungarian notation, prefixos, Protheus.doc headers, namespaces TLPP, mencione nas Decisoes de Implementacao
-4. **Entrevista adaptativa** — nao despeje todas as perguntas de uma vez. Conversa natural.
-5. **Maximo 2-3 perguntas por mensagem** — aguarde resposta antes de continuar
-6. **Se informacoes suficientes**, gere o PRD sem forcar perguntas — sinalize lacunas como "A definir"
-7. **Exploracao direcionada** — busque APENAS codigo relevante ao tema, nao inventarie o projeto
+1. **NUNCA crie GitHub Issues**: output e sempre texto na conversa + arquivo opcional
+2. **Sempre exiba o PRD completo na conversa primeiro**: so depois ofereca gravar
+3. **Respeite o estilo do cliente**: se CLAUDE.md ou fontes indicam Hungarian notation, prefixos, Protheus.doc headers, namespaces TLPP, mencione nas Decisoes de Implementacao
+4. **Entrevista adaptativa**: nao despeje todas as perguntas de uma vez. Conversa natural.
+5. **Maximo 2-3 perguntas por mensagem**: aguarde resposta antes de continuar
+6. **Se informacoes suficientes**, gere o PRD sem forcar perguntas; sinalize lacunas como "A definir"
+7. **Exploracao direcionada**: busque APENAS codigo relevante ao tema, nao inventarie o projeto
 8. **Secoes nao aplicaveis** = "Nao se aplica" (nao omitir a secao)

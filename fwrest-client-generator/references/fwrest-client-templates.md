@@ -5,7 +5,7 @@ For exact method signatures see [fwrest-api-reference.md](./fwrest-api-reference
 
 ---
 
-## Template 0 — Shared Helpers
+## Template 0: Shared Helpers
 
 Place these in a common include file so all integrations reuse them.
 
@@ -41,7 +41,7 @@ Return Nil
 
 ---
 
-## Template 1 — GET with Query Parameters
+## Template 1: GET with Query Parameters
 
 ```tlpp
 #include "tlpp-core.th"
@@ -101,7 +101,7 @@ Return jResult
 
 ---
 
-## Template 2 — GET by ID (Path Parameter)
+## Template 2: GET by ID (Path Parameter)
 
 ```tlpp
 Function CrmGetCustomer(cId as Character) as Json
@@ -147,7 +147,7 @@ Return jResult
 
 ---
 
-## Template 3 — POST JSON Body
+## Template 3: POST JSON Body
 
 ```tlpp
 Function CrmCreateCustomer(jPayload as Json) as Json
@@ -193,7 +193,7 @@ Return jResult
 
 ---
 
-## Template 4 — PUT (Full Update)
+## Template 4: PUT (Full Update)
 
 ```tlpp
 Function CrmUpdateCustomer(cId as Character, jPayload as Json) as Logical
@@ -215,7 +215,7 @@ Function CrmUpdateCustomer(cId as Character, jPayload as Json) as Logical
     oClient:SetTimeOut(30)
     oClient:SetLegacySuccess(.F.)
 
-    // PUT body is the 2nd parameter of :Put() — not via SetPostParams
+    // PUT body is the 2nd parameter of :Put() - not via SetPostParams
     lOk := oClient:Put(aHeader, cBody)
     cHttpCode := oClient:GetHTTPCode()
 
@@ -233,7 +233,7 @@ Return lOk
 
 ---
 
-## Template 5 — DELETE
+## Template 5: DELETE
 
 ```tlpp
 Function CrmDeleteCustomer(cId as Character) as Logical
@@ -270,7 +270,7 @@ Return lOk
 
 ---
 
-## Template 6 — Reading 4xx / 5xx Response Body
+## Template 6: Reading 4xx / 5xx Response Body
 
 When the API encodes error details in the response body of a 400/422/etc, you MUST disable internal status checking, otherwise `GetResult()` may be empty.
 
@@ -296,7 +296,7 @@ EndIf
 
 ---
 
-## Template 7 — Sending Binary / GZipped File
+## Template 7: Sending Binary / GZipped File
 
 ```tlpp
 Function UploadBatchFile(cFilePath as Character) as Logical
@@ -336,7 +336,7 @@ Return lOk
 
 ---
 
-## Template 8 — Escaping Query Values
+## Template 8: Escaping Query Values
 
 When query values may contain spaces, `&`, `=`, or non-ASCII characters, encode them with `Escape()`.
 

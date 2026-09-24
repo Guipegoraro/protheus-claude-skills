@@ -2,7 +2,7 @@
 
 Concrete consultas you can adapt. Each example shows the full set of rows that must exist in SXB; in real life they are created through the **Configurador**, not via source.
 
-## 1. Standard table lookup — SA1 (Clientes)
+## 1. Standard table lookup: SA1 (Clientes)
 
 The most common case: a lookup over a regular table with two search indexes (code+store, name) and three columns visible.
 
@@ -22,7 +22,7 @@ The most common case: a lookup over a regular table with two search indexes (cod
 
 Wired to a field via `SX3.X3_F3 = 'SA1'`. The receiving form must have the code field immediately followed by the store field.
 
-## 2. Filtered lookup — SA1 by sales group
+## 2. Filtered lookup: SA1 by sales group
 
 Same shape as example 1 but restricted to one sales group. The filter uses `#` so the variable is re-evaluated on every row.
 
@@ -78,7 +78,7 @@ XB_TIPO=3, XB_CONTEM = '01#ZCLI001(,,3)#ZCLI001(,,2)'
 
 Prefer tipo 9 for new code.
 
-## 5. Specific lookup — wizard-style picker
+## 5. Specific lookup: wizard-style picker
 
 Use Específica when there is no table behind the lookup: a tree, a file selector, a multi-source picker.
 
@@ -113,7 +113,7 @@ Key points:
 - `VAR_IXB` carries the value the engine writes back via the type-5 expression. Setting it inside the function is the standard contract.
 - A `Public` variable (`__cResult`) is used because the type-5 expression must reference something visible at evaluation time.
 
-## 6. Cross-table lookup — return via `Posicione`
+## 6. Cross-table lookup: return via `Posicione`
 
 When the lookup is over table A but the receiving field needs a value from a related table B:
 
@@ -137,6 +137,6 @@ Field `Z1_CLIENTE` should F3 to SA1 with code+store as return:
 2. Set `Z1_CLIENTE.X3_F3 = 'SA1'`.
 3. Place the next field (e.g. `Z1_LOJA`) immediately after `Z1_CLIENTE` in the form's tab order.
 
-The consulta `SA1` already returns code + store, so two fields are populated on selection. No SXB change needed — reuse the standard one.
+The consulta `SA1` already returns code + store, so two fields are populated on selection. No SXB change needed; reuse the standard one.
 
 If you need an alternative behaviour (e.g. only customers in a specific group), do **not** alter the standard `SA1` consulta. Create a new `XB_ALIAS` (`ZSA1G1`, `SA1VIP`) and wire that to `X3_F3` instead.

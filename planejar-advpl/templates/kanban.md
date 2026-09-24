@@ -24,21 +24,21 @@
      Linhas extras conforme o caso:
      - **Comentarios**: [claude DATA] premissas/perguntas | [usuario DATA] resposta
      - **Flags**: comentado | pergunta   (limpa quem responde, nao quem le)
-     - **Aprovacao**: Aprovado por <usuario> em <data>  |  NAO APROVADO — <motivo>
-     - **Responsavel**: <quem> — obrigatorio nos dois estados de espera
+     - **Aprovacao**: Aprovado por <usuario> em <data>  |  NAO APROVADO - <motivo>
+     - **Responsavel**: <quem> (obrigatorio nos dois estados de espera)
      - **Perguntado em**: DD/MM via <e-mail/ticket/reuniao>  (AGUARDANDO TERCEIROS) -->
 
 ## TODO
 
 ### TASK-001: [Titulo descritivo]
 - **Descricao**: O que fazer
-- **Origem**: [requisito do PRD] / [E-n do escopo declarado] — card sem origem nao entra no kanban
+- **Origem**: [requisito do PRD] / [E-n do escopo declarado]; card sem origem nao entra no kanban
 - **Arquivos**: `path/to/file.prw`, `path/to/file2.tlpp`
 - **Complexidade**: Baixa | Media | Alta
 - **Dependencias**: Nenhuma | TASK-XXX
 - **Camada**: N
 - **Regras**: RN-xx, CB-xx (casos-e-regras.md)
-- **Criterio de aceite**: O que define "pronto" — SEMPRE inclui o teste correspondente (task sem teste nao fecha; kanban sem esse contrato vira lista de intencoes)
+- **Criterio de aceite**: O que define "pronto"; SEMPRE inclui o teste correspondente (task sem teste nao fecha; kanban sem esse contrato vira lista de intencoes)
 
 ### TASK-002: [Titulo descritivo]
 ...

@@ -1,6 +1,6 @@
-# SX6 — Parameters (MV_*)
+# SX6: Parameters (MV_*)
 
-SX6 is the dictionary of named runtime parameters — the `MV_*` family. Almost every configurable behaviour in Protheus reads from SX6: tax codes, default series, currency rounding, integration endpoints. SX6 is read constantly; the platform aggressively caches it.
+SX6 is the dictionary of named runtime parameters: the `MV_*` family. Almost every configurable behaviour in Protheus reads from SX6: tax codes, default series, currency rounding, integration endpoints. SX6 is read constantly; the platform aggressively caches it.
 
 ## SX6 attributes
 
@@ -21,12 +21,12 @@ SX6 is the dictionary of named runtime parameters — the `MV_*` family. Almost 
 | `X6_VALID` | Char(160) | Validation expression evaluated at parameter edit time in the Configurador. |
 | `X6_DEFPOR`, `X6_DEFSPA`, `X6_DEFENG` | Char(250) | The **default** TOTVS-shipped value. Populated only for TOTVS-owned parameters. Used by migrators to detect whether the customer changed the value. |
 | `X6_EXPDEST` | Char | Copy-content flag (from release 12.1.025). |
-| `X6_ACTIVE` | Char | `1` / `2` — whether the parameter is currently used by standard product routines. |
-| `X6_INIT` | — | Not used. |
+| `X6_ACTIVE` | Char | `1` / `2`: whether the parameter is currently used by standard product routines. |
+| `X6_INIT` | - | Not used. |
 
 The description is split into three 50-char columns so the Configurador can render it on three lines without truncating.
 
-## Naming — `MV_YYZZZZZ`
+## Naming: `MV_YYZZZZZ`
 
 The TOTVS convention is:
 
@@ -77,7 +77,7 @@ X6_FIL  X6_VAR        X6_CONTEUD
 | --- | --- |
 | `GetMV(cParam, lUseDef, uDefault)` | Reads SX6. If the row doesn't exist and `lUseDef = .F.`, returns the default in the third arg without writing anything. |
 | `SuperGetMV(cParam, lUseDef, uDefault, cBranch)` | Same as GetMV but cached in memory after the first read. **Preferred**. Honours `cBranch` if passed. |
-| `PutMV(cParam, uValue)` | Writes a value to SX6. Use only in migrators. Never use in production fontes — it mutates the dictionary. |
+| `PutMV(cParam, uValue)` | Writes a value to SX6. Use only in migrators. Never use in production fontes: it mutates the dictionary. |
 
 **Always pass a default** to `SuperGetMV`. The parameter may not exist yet on the customer's environment when your fonte runs the first time after deploy. A missing default causes a runtime error.
 
@@ -85,7 +85,7 @@ X6_FIL  X6_VAR        X6_CONTEUD
 // Right
 Local cBlqCR := SuperGetMV("MV_ESBLQCR", .F., "N")
 
-// Wrong — crashes if the parameter doesn't exist
+// Wrong - crashes if the parameter doesn't exist
 Local cBlqCR := SuperGetMV("MV_ESBLQCR")
 ```
 
@@ -116,24 +116,24 @@ For `MV_ESCRDLIM` (numeric credit limit default):
 
 The parameter is now readable via `SuperGetMV("MV_ESCRDLIM", .F., 1000.00)`.
 
-**Document the parameter** in `.claude/plans/<slug>/pre-producao.md` — the deploy is manual via Configurador.
+**Document the parameter** in `.claude/plans/<slug>/pre-producao.md`: the deploy is manual via Configurador.
 
-## Type handling — careful with `X6_CONTEUD`
+## Type handling: careful with `X6_CONTEUD`
 
 `X6_CONTEUD` is always stored as a string. The runtime conversion is based on `X6_TIPO`:
 
-- `C` — kept as string.
-- `N` — converted via `Val()`.
-- `L` — must be the literal `.T.` or `.F.`.
-- `D` — must be the literal `ctod("DD/MM/YYYY")` expression.
+- `C`: kept as string.
+- `N`: converted via `Val()`.
+- `L`: must be the literal `.T.` or `.F.`.
+- `D`: must be the literal `ctod("DD/MM/YYYY")` expression.
 
-For dates, store as the string expression (`CTOD("01/01/2026")`) and let the reader evaluate it. Storing `20260101` (DTOS format) does not work — the engine doesn't know the type to parse it.
+For dates, store as the string expression (`CTOD("01/01/2026")`) and let the reader evaluate it. Storing `20260101` (DTOS format) does not work: the engine doesn't know the type to parse it.
 
 ## What survives a TOTVS upgrade (UPDDISTR)
 
 For SX6, UPDDISTR has a very specific rule (see [upddistr-rules.md](upddistr-rules.md)):
 
-- `X6_CONTEUD` (the actual value): **never overwritten**. Customer values are preserved across upgrades. This is intentional — the customer's configuration is the customer's choice.
+- `X6_CONTEUD` (the actual value): **never overwritten**. Customer values are preserved across upgrades. This is intentional: the customer's configuration is the customer's choice.
 - Descriptions (`X6_DESCRIC`, etc.): always overwritten by the new TOTVS values.
 - `X6_PROPRI`, `X6_PYME`, `X6_DEFPOR/SPA/ENG`: never overwritten.
 - `X6_VALID`: from the 2020-11-23 LIB, always overwritten.

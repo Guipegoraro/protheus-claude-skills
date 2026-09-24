@@ -27,7 +27,7 @@ via macro-execução.
 |---|---|
 | `refazer-relatorio.ps1` | Engine: transforma o fonte in-place (`-DryRun`, `-Prefix`, `-SkipComments`) |
 | `validar-relatorio.ps1` | Validação pós-engine, PASS/FAIL + exit 2 (`-IncludeDir`) |
-| `lib-segmentos.ps1` | Separa código × comentário e preserva a largura das caixas. Dot-source dos dois acima — **não rodar direto** |
+| `lib-segmentos.ps1` | Separa código × comentário e preserva a largura das caixas. Dot-source dos dois acima; **não rodar direto** |
 | `refazer-lote.ps1` | **Lote**: roda os passos 1–5 para N relatórios e emite 1 linha por relatório (ver seção *Lote*) |
 
 ## Pré-requisitos / entradas
@@ -35,26 +35,26 @@ via macro-execução.
 1. **Código do relatório clássico** (ex.: `FINR130`, `MATR320`). Se o usuário só
    souber o nome ("Títulos a Receber"), descobrir o código clássico primeiro
    (TDN, MCP `advpl-tlpp-mcp-docs`, ou de-para Smart View ↔ clássico).
-2. **Fonte do relatório** — em ordem de preferência:
+2. **Fonte do relatório**, em ordem de preferência:
    - **a) MCP `advpl-tlpp-mcp-docs`** (`get-code-chunks` por `filename="<CODIGO>.PRX"`
      ou `name="<CODIGO>"`): é a base de referência TOTVS, disponível a quem usa a
-     skill. **Conferir se veio COMPLETO** — o índice é por símbolo e pode não trazer
+     skill. **Conferir se veio COMPLETO**: o índice é por símbolo e pode não trazer
      o cabeçalho (`#include`, `#define`, `Static` de escopo de arquivo); se faltar,
      complementar ou usar (b). A versão do MCP normalmente já vem **com** a trava
-     `VldDescRel` — tudo bem, o engine remove.
+     `VldDescRel`; tudo bem, o engine remove.
    - **b) Se o MCP não tiver o relatório (ou vier incompleto): PERGUNTAR ao usuário
      onde está o fonte completo** (`.prx`/`.prw`) e o `<codigo>.ch`. Normalmente é
      baixado do **Portal do Cliente TOTVS** (área de fontes dos relatórios
-     descontinuados). **Não assumir nenhuma pasta** — cada ambiente é um.
+     descontinuados). **Não assumir nenhuma pasta**: cada ambiente é um.
 
    O `<codigo>.ch` (defines de `STRxxxx` via `FWI18NLang`) acompanha o fonte. Os
-   `.tres` (tradução) **não** precisam ser copiados — já estão no RPO.
-3. **Repo do projeto** + **pasta include do Protheus** — PERGUNTAR/confirmar com o
+   `.tres` (tradução) **não** precisam ser copiados: já estão no RPO.
+3. **Repo do projeto** + **pasta include do Protheus**. PERGUNTAR/confirmar com o
    usuário (variam por ambiente, não fixar):
    - destino do fonte: `src/<modulo>/relatorios/` (`modulo` conforme o relatório:
      financeiro, estoque, compras, faturamento…);
    - pasta include: a `\include` da instalação do Protheus do ambiente
-     (ex.: `<...>\Protheus\include`) — passar via `-IncludeDir` nos scripts.
+     (ex.: `<...>\Protheus\include`); passar via `-IncludeDir` nos scripts.
 
 ## Regras que este processo respeita (não quebrar)
 
@@ -75,10 +75,10 @@ via macro-execução.
   portal ANTES da trava não têm o bloco (nesse caso o engine remove 0 e segue).
 - **Prefixo `z`** em TODAS as funções do fonte; o entry-point vira `User Function`,
   as demais `Static Function`. (Evita `C2021 Redefinition` contra o RPO padrão.)
-  Uma `User Function` que já exista no fonte é **mantida** — ver a nota de
+  Uma `User Function` que já exista no fonte é **mantida**; ver a nota de
   entry-point no passo 3.
 - **Regra dos 10 caracteres** (`advpl-nome-funcao-10-caracteres`): os **símbolos**
-  gerados devem ser distintos nos 10 primeiros chars — `User Function X` gera
+  gerados devem ser distintos nos 10 primeiros chars; `User Function X` gera
   `U_X`, as demais geram `X`. O engine checa e ABORTA (exit 2) se houver colisão;
   nesse caso renomear a função ofensora manualmente e rodar de novo.
 - **`StaticCall(A,B)` → `&("StaticCall(A,B)")`**: sem chave de compilação, o
@@ -89,10 +89,10 @@ via macro-execução.
   renomear (`lib-segmentos.ps1`); sem essa separação o cabeçalho padrão TOTVS sai
   meio renomeado e com a caixa torta.
   - **No código**: renomeia declaração, `Nome(` e `U_Nome(`. Não toca alias de
-    work-area (`FTITPAI->`) nem `#include` — nenhum tem `(` logo após o nome.
+    work-area (`FTITPAI->`) nem `#include`: nenhum tem `(` logo após o nome.
     Strings **continuam** valendo como código de propósito: `&("zFoo()")` precisa
     do prefixo para a macro achar a função.
-  - **No comentário**: renomeia o nome **mesmo sem `(`** — é o formato do
+  - **No comentário**: renomeia o nome **mesmo sem `(`**; é o formato do
     cabeçalho box-art (`│Funçäo │ FINR130 │`, `│Sintaxe │ FINR130(void) │`).
     Em linha de caixa o engine **reabsorve o caractere a mais comendo um espaço
     da folga** (nunca um TAB, nunca juntando palavra), para a borda direita não
@@ -122,7 +122,7 @@ todos e emite **uma linha por relatório**:
 
 O fonte é localizado pelo **código** (não precisa informar o módulo) nas raízes
 default `Desktop\padrao\Fontes Relatorios Central TOTVS` e `Desktop\padrao\Fontes`
-— override com `-Fontes`. Saída de exemplo:
+(override com `-Fontes`). Saída de exemplo:
 
 ```
 CODIGO   FONTE       FUNCS TRAVA  STATICCALL ENGINE CH      VALIDADOR PARAMIXB?
@@ -132,7 +132,7 @@ MATR110  MATERIAIS   20    -      -          ok     copiado PASS      CHECAR
 ```
 
 **Ler só a tabela.** O detalhe completo (dry-run, engine e validador de cada
-relatório) fica em `$LogDir` (`%TEMP%\refazer-lote-<stamp>`, com `resumo.csv`) —
+relatório) fica em `$LogDir` (`%TEMP%\refazer-lote-<stamp>`, com `resumo.csv`);
 abrir apenas o do relatório que não deu `PASS`. Exit 2 se algum falhar.
 
 Comportamento nas exceções:
@@ -140,11 +140,11 @@ Comportamento nas exceções:
 - **Colisão de 10 chars** → marca `COLISAO-10CH` e **não** deixa fonte compilável
   no destino (renomeia para `.FALHOU`); resolver manual (seção 3) e rodar de novo.
 - **Falha do engine** → mesmo tratamento `.FALHOU`. Isso importa: quando o engine
-  falha ele não grava, então o arquivo no destino ainda é o **fonte padrão** — se
+  falha ele não grava, então o arquivo no destino ainda é o **fonte padrão**; se
   ficasse como `z<cod>.prw` seria compilado por engano e daria `C2021`.
 - **`z<cod>.prw` já existe** → marca `JA-EXISTE` e pula (use `-Force`).
 - **`PARAMIXB? = CHECAR`** → heurística: a `User Function` declara parâmetros, logo
-  o relatório *pode* ser chamado por rotina padrão via `MV_*`. Não é veredito —
+  o relatório *pode* ser chamado por rotina padrão via `MV_*`. Não é veredito;
   confirmar o contrato do `ExecBlock` na rotina chamadora antes de escrever o shim
   (**seção 7.1**).
 
@@ -153,7 +153,7 @@ testar. Compilar/testar (seção 7) continua sendo a única prova de 100%.
 
 ## Processo
 
-> Referência do que o lote executa por relatório — e o caminho a seguir quando for
+> Referência do que o lote executa por relatório, e o caminho a seguir quando for
 > um relatório só, ou quando o lote marcar exceção.
 
 ### 1. Obter o fonte e o `.ch`
@@ -177,8 +177,8 @@ e **CRLF**:
 ### 3. Transformar (engine PowerShell)
 Rodar o engine `refazer-relatorio.ps1` (mesma pasta desta skill). Ele faz, nesta
 ordem: (0) **remove a trava `VldDescRel`**; (1) separa código × comentário e
-detecta as funções — só as declaradas em **código**, para não pegar código
-comentado; (2) checa a regra dos 10 chars; (3) num passe único por linha:
+detecta as funções (só as declaradas em **código**, para não pegar código
+comentado); (2) checa a regra dos 10 chars; (3) num passe único por linha:
 `StaticCall` → macro, prefixa declaração / `Nome(` / `U_Nome(` no código, prefixa
 o nome nos comentários e **reajusta a largura das linhas de caixa**; ajusta a
 palavra-chave (`User`/`Static Function`) na mesma passada.
@@ -195,20 +195,20 @@ função ofensora com sufixo curto) antes de aplicar.
 
 > **Entry-point**: se o fonte **já tem** uma `User Function`, ela é o entry-point e
 > o engine a mantém (não cria uma segunda). Se não tem, a **1ª declaração** vira a
-> `User Function` — caso normal do TReport clássico (`Function <CODIGO>()` no topo).
+> `User Function`: caso normal do TReport clássico (`Function <CODIGO>()` no topo).
 > Isso cobre o clássico que declara um wrapper `Function TECR012()` chamando
 > `U_TECR012()`: o wrapper vira `Static Function zTECR012()` e passa a chamar
 > `U_zTECR012()` (a NOSSA cópia, não a padrão do RPO). Sem esse tratamento saíam
 > duas `User Function` de mesmo nome → `C2021` na compilação.
 
-### 4. Copiar o include (.ch) — VERBATIM, sem editar
+### 4. Copiar o include (.ch): VERBATIM, sem editar
 Para a pasta include do Protheus do ambiente (fora do sandbox do file-tools; use
 PowerShell). Confirmar o caminho da `\include` com o usuário:
 ```powershell
 Copy-Item "<fonte>\<codigo>.ch" "<pasta include do Protheus>\<codigo>.ch" -Force
 ```
 Includes **padrão** referenciados (`PROTHEUS.CH`, `FWCOMMAND.CH`,
-`FWLIBVERSION.CH`, …) já existem no RPO — não copiar. Conferir com um
+`FWLIBVERSION.CH`, …) já existem no RPO; não copiar. Conferir com um
 `Test-Path` quais faltam.
 
 ### 5. Validar pós-engine (OBRIGATÓRIO)
@@ -227,28 +227,28 @@ dispara checagem de código (e vice-versa). Checagens:
 1. Todas as funções com prefixo `z`.
 2. Exatamente **1** `User Function` (o entry-point).
 3. Nenhuma `Function` pública sobrando (todas `Static`, fora a principal).
-4. Regra dos **10 caracteres** (colisão C2021) sobre o **símbolo gerado** —
+4. Regra dos **10 caracteres** (colisão C2021) sobre o **símbolo gerado**:
    `User Function X` gera `U_X`, as demais geram `X`. São espaços distintos: um
    fonte com `Static Function zTECR012` **e** `User Function zTECR012` não colide.
-5. **Nenhuma chamada crua** das próprias funções — pega tanto `Nome(` quanto
+5. **Nenhuma chamada crua** das próprias funções: pega tanto `Nome(` quanto
    `U_Nome(` (esta última chamaria a função PADRÃO do RPO, não a cópia).
 6. `StaticCall` → `&("StaticCall(…)")` (nenhum cru).
-7. **Trava `VldDescRel` removida** (sem uso ativo — senão o relatório nasce
+7. **Trava `VldDescRel` removida** (sem uso ativo; senão o relatório nasce
    travado no release 12.1.2510+ e dá `Return` sem rodar).
 8. **Perigo real**: nenhuma função própria (agora `Static`) executada **por nome**
-   em `&("z…(")` / `ExecBlock("z…")` — macro **não enxerga** `Static`. Se aparecer,
+   em `&("z…(")` / `ExecBlock("z…")`; macro **não enxerga** `Static`. Se aparecer,
    converter essa função de volta para `User Function` (ou tratar caso a caso).
    Passar a função como argumento (`&(cVar):Set(zFoo(x))`) **não** é perigo: ali
    `zFoo` é código compilado, não faz parte da macro.
-9. Fim de linha **CRLF** (sem LF solto — gotcha `Syntax Error` do AdvPL,
+9. Fim de linha **CRLF** (sem LF solto; gotcha `Syntax Error` do AdvPL,
    ver [[advpl-lf-crlf-syntax-error]]).
 10. Todos os `#include` referenciados existem na pasta include.
 11. **AVISO** (não reprova): comentário que ainda cita o nome antigo. Só afeta
     documentação, nunca compilação.
 12. **`FunName()`/`ProcName()` comparado com o nome ANTIGO em literal.** Compila
-    liso e quebra em runtime, calado — ver a armadilha abaixo.
+    liso e quebra em runtime, calado; ver a armadilha abaixo.
 
-> **Armadilha `FunName()` — achada no FINR340 (ticket 00017641, 12/08/2026).**
+> **Armadilha `FunName()`: achada no FINR340 (ticket 00017641, 12/08/2026).**
 > `FunName()` devolve o **nome do programa como está no item de menu**, não a
 > função em execução. Como o item novo aponta para `U_z<Nome>`, toda comparação
 > com o literal antigo fica **sempre `.F.`** e o bloco que ela guarda nunca roda.
@@ -263,17 +263,17 @@ dispara checagem de código (e vice-versa). Checagens:
 > ```
 >
 > `ProcName(1)` usado só para montar texto de log (comum nos `FINRxxx` novos)
-> **não** é problema — o item 12 só reprova comparação com literal.
+> **não** é problema: o item 12 só reprova comparação com literal.
 
 > Só aceite avançar com **RESULTADO: PASS**. Qualquer FAIL: corrigir antes de
 > compilar (renomear função em colisão de 10 chars; reprefixar call site perdido;
 > reverter para `User Function` a que é chamada por macro; copiar include que falta).
 
-> **Fonte com LF solto acontece de verdade** — ~8% dos fontes do portal vêm com
+> **Fonte com LF solto acontece de verdade**: ~8% dos fontes do portal vêm com
 > quebra `LF` em vez de `CRLF`. O engine **normaliza sozinho** e informa quantas
 > linhas converteu (`-KeepEol` desliga, mas aí o item 9 reprova).
 
-### 6. Conferência visual (diff) — recomendado
+### 6. Conferência visual (diff): recomendado
 
 Para ter certeza de que o engine **só** mexeu em nome/declaração de função (e nada
 mais), rodar um diff do fonte **original** (antes do engine) contra o transformado.
@@ -286,7 +286,7 @@ git diff --no-index --ignore-cr-at-eol "<fonte original>" "<repo>\src\<modulo>\r
 
 Toda linha `-/+` deve ser uma destas três: declaração/chamada de função com prefixo
 `z`; o wrap do `StaticCall`; ou linha de **comentário** onde só o nome ganhou o `z`
-(nas linhas de caixa, com a largura preservada — confira que a borda direita
+(nas linhas de caixa, com a largura preservada; confira que a borda direita
 continua na mesma coluna das linhas vizinhas). `#include`, alias `Nome->`, ID do
 TReport e args literais ficam idênticos. Qualquer outra mudança, investigar.
 
@@ -302,13 +302,13 @@ As checagens 5–6 são mecânicas; a prova final é compilar e executar no ambi
    no menu apontando para essa função).
 3. Conferir que abre o `PrintDialog` e imprime.
 
-**Dependências de runtime** (não introduzidas por nós — o clássico já as exigia e
+**Dependências de runtime** (não introduzidas por nós; o clássico já as exigia e
 já as tinha no RPO do cliente): stored procedures (ex.: MAT056/FIN002), RDMAKEs
 externos chamados por `ExecBlock` (ex.: `F620QRY`, `FR150FLT`, `F130QRY`,
 `FR130TELC`) e grupos de pergunta SX1. **Se o relatório clássico rodava nesse
 cliente, a cópia `z` roda igual.**
 
-### 7.1 Relatório chamado por rotina padrão via parâmetro `MV_*` — shim PARAMIXB (OBRIGATÓRIO)
+### 7.1 Relatório chamado por rotina padrão via parâmetro `MV_*`: shim PARAMIXB (OBRIGATÓRIO)
 
 Vários clássicos não são chamados só pelo menu: a rotina padrão os invoca por um
 parâmetro SX6 que aponta para um RDMAKE de usuário. O fonte padrão sempre segue
@@ -340,12 +340,12 @@ No MATR110 isso zera `lAuto := (nReg != Nil)` e o relatório passa a imprimir pe
 | MATA120 | `A120Impri(cAlias,nRecno,nOpc)` | `MV_PCOMPRA` | `{ cAlias, nRecno, nOpc }` |
 | MATA123 | `A123Impri(cAlias,nRecno,nOpc)` | `MV_PCOMPRA` | `{ cAlias, nRecno, nOpc }` |
 | MATA103 | `A103Impri(cAlias,nRecno,nOpc)` | `MV_PIMPNFE` | `{ cAlias, nRecno, nOpc }` |
-| MATA125 | `A125Impri(cAlias,nRecno,nOpcx)` | `MV_CONTPAR` | `{ cAlias, nRecno, nOpcx }` — e **usa o retorno** do ExecBlock |
-| MATA105 | `A105Imprim(cAlias,nReg,nOpcx)` | `MV_RELSALM` | **`{ SCP->CP_EMISSAO, SCP->CP_NUM }`** — conteúdo diferente! |
-| MATA415 | `A415Impri()` | `MV_ORCIMPR` | **sem argumentos** — depende do registro posicionado |
+| MATA125 | `A125Impri(cAlias,nRecno,nOpcx)` | `MV_CONTPAR` | `{ cAlias, nRecno, nOpcx }` (e **usa o retorno** do ExecBlock) |
+| MATA105 | `A105Imprim(cAlias,nReg,nOpcx)` | `MV_RELSALM` | **`{ SCP->CP_EMISSAO, SCP->CP_NUM }`** (conteúdo diferente!) |
+| MATA415 | `A415Impri()` | `MV_ORCIMPR` | **sem argumentos** (depende do registro posicionado) |
 | LOJA010 | `lj010Orc()` | `MV_SCRORC` / `MV_SCRPED` | **sem argumentos** |
 
-**Nunca presuma o conteúdo do `PARAMIXB`** — as duas últimas linhas da tabela
+**Nunca presuma o conteúdo do `PARAMIXB`**. As duas últimas linhas da tabela
 mostram por quê: o MATA105 passa **campos** (`CP_EMISSAO`, `CP_NUM`), não
 alias/recno; MATA415 e LOJA010 não passam nada. Antes de escrever o shim,
 confirme o contrato da **sua** rotina:
@@ -355,7 +355,7 @@ confirme o contrato da **sua** rotina:
 2. Leia o array do `ExecBlock`: ele é **exatamente** o conteúdo de `PARAMIXB`, na ordem.
 3. Mapeie cada posição para os parâmetros da sua cópia `z`.
 
-**Correção (caso com argumentos)** — inserir logo após os `Local` da função
+**Correção (caso com argumentos)**. Inserir logo após os `Local` da função
 principal, ANTES de qualquer uso dos parâmetros (no MATR110, antes do
 `Private lAuto := (nReg!=Nil)`):
 
@@ -370,12 +370,12 @@ If nReg == Nil .And. Type("PARAMIXB") == "A"
 EndIf
 ```
 
-Ajuste os índices ao contrato levantado no passo 2 — no MATA105, por exemplo,
+Ajuste os índices ao contrato levantado no passo 2: no MATA105, por exemplo,
 `PARAMIXB[1]` é a **emissão** e `PARAMIXB[2]` o **número**, e o shim teria de
 posicionar o registro a partir desses campos em vez de atribuir alias/recno.
 
 **Caso sem argumentos** (MATA415, LOJA010): não há `PARAMIXB` para recuperar. O
-shim é desnecessário, mas os parâmetros posicionais **continuam chegando `Nil`** —
+shim é desnecessário, mas os parâmetros posicionais **continuam chegando `Nil`**;
 garanta um default sensato e lembre que o relatório depende do **registro
 posicionado** pela rotina chamadora.
 
@@ -384,7 +384,7 @@ o comportamento por perguntas se mantém). Ao testar (passo 7), exercitar **os d
 caminhos**: menu (`U_z<CODIGO>`) e a rotina padrão com o `MV_*` apontado para a
 cópia `z`.
 
-### 8. Observação — traduções (`STRxxxx`)
+### 8. Observação: traduções (`STRxxxx`)
 Se ao executar algum `STRxxxx` sair **em branco**, é porque o recurso `.tres`
 padrão não resolveu via `FWI18NLang`. Solução: aplicar a expedição do módulo, ou
 substituir os `STRxxxx` por literais no fonte. Não é motivo para copiar `.tres`
@@ -403,12 +403,12 @@ Um de-para Smart View → clássico levou a 4 relatórios reaproveitados:
 
 Caso instrutivo (FINR130): `FTITPAI` é ao mesmo tempo **função** (`FTITPAI()`) e
 **alias** de work-area (`'FTITPAI'`, `FTITPAI->`). A regra `Nome(` renomeou só
-a função (`zFTITPAI()`), deixando o alias intacto — exatamente o desejado.
+a função (`zFTITPAI()`), deixando o alias intacto, exatamente o desejado.
 
 Segundo caso instrutivo (também FINR130): o fonte tem **29 linhas de cabeçalho
 box-art**. Antes da separação código × comentário, as 7 que traziam o nome com
-parêntese (`│Sintaxe e │ FINR130(void)`) eram renomeadas e ganhavam 1 coluna —
-borda direita da caixa torta —, enquanto as 18 que traziam o nome sem parêntese
+parêntese (`│Sintaxe e │ FINR130(void)`) eram renomeadas e ganhavam 1 coluna
+(borda direita da caixa torta), enquanto as 18 que traziam o nome sem parêntese
 (`│Funçào │ FINR130 │`) ficavam documentando uma função que não existia mais.
 Hoje as 29 saem renomeadas e com a largura original.
 

@@ -32,15 +32,15 @@ Se o arquivo nao existir, informe:
 >
 > Contexto completo carregado. Pode continuar de onde parou.
 
-3. Internalize TODO o conteudo do arquivo — decisoes, padroes, gotchas, estado dos arquivos. A partir daqui, trabalhe como se tivesse participado da sessao anterior.
+3. Internalize TODO o conteudo do arquivo: decisoes, padroes, gotchas, estado dos arquivos. A partir daqui, trabalhe como se tivesse participado da sessao anterior.
 
 ### Passo 3: Oferecer limpeza
 
 Apos apresentar o resumo, pergunte:
 
 > **Deseja excluir o arquivo de resumo?**
-> 1. **Manter** — o arquivo fica disponivel para futuras referencias
-> 2. **Excluir** — removo `.claude/session-resume.md` para manter o diretorio limpo
+> 1. **Manter**: o arquivo fica disponivel para futuras referencias
+> 2. **Excluir**: removo `.claude/session-resume.md` para manter o diretorio limpo
 
 Se o usuario escolher excluir, delete o arquivo e confirme.
 

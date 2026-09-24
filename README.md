@@ -1,16 +1,16 @@
 # Protheus Claude Skills
 
-Skills customizadas para desenvolvimento TOTVS Protheus — ADVPL, TLPP, PO-UI e SQL — usadas com [Claude Code](https://claude.ai/claude-code).
+Skills customizadas para desenvolvimento TOTVS Protheus (ADVPL, TLPP, PO-UI e SQL), usadas com [Claude Code](https://claude.ai/claude-code).
 
 ## Origem das skills
 
 Este repositorio e um espelho da minha pasta de skills e mistura **cinco origens distintas**:
 
-1. **Autorais (Guilherme Pegoraro)** — criadas por mim para o meu fluxo de consultoria Protheus: `planejar-advpl`, `interrogatorio-advpl`, `prd-protheus`, `protheus-configurador-dicionario`, `protheus-consulta-padrao`, `refazer-relatorio-classico`, `apontamento-gerar`, `session-summary`, `session-resume`.
-2. **Comunidade TOTVS/engpro** — skills de terceiros (autoria Melkz Siqueira / Engenharia Protheus, MIT; `genericquery` de Johnni Moraes - TSC), adaptadas ao meu ambiente: `code-review`, `mvc-generator`, `entry-point-designer`, `tlpp-rest-endpoint-generator`, `fwrest-client-generator`, `fwmsprinter-pdf`, `data-dictionary-lookup`, `genericquery`. A antiga trinca SQL (query-builder / sql-code-review / sql-optimization, MIT) foi fundida e reescrita como `sql-protheus` a partir de pesquisa TDN/fontes-padrao (08/2026).
-3. **Adaptadas de [mattpocock/skills](https://github.com/mattpocock/skills)** (MIT, Matt Pocock) — skills de processo genericas, portadas quase-verbatim com adaptacoes minimas ao ecossistema Protheus (`.claude/plans/<slug>/` como tracker local): `grilling`, `domain-modeling`, `wayfinder`, `diagnosing-bugs`, `writing-for-agents`, `wait-what`, `to-questionnaire` (sincronizadas com o upstream v1.2.3 + main de 18/09/2026, 09/2026).
-4. **Wrapper de ferramenta externa** — `ordna`: o `SKILL.md` foi escrito aqui para dirigir o CLI [ordna](https://github.com/FreHilm/ordna) (`@frehilm/ordna-cli`, MIT, FreHilm); o `reference.md` da pasta e derivado do agent guide do proprio projeto.
-5. **Derivada de [brunobrigidovilanova/protheus-claude-skills](https://github.com/brunobrigidovilanova/protheus-claude-skills)** (MIT, Bruno Brigido Vilanova) — `criar-mit044`: `scripts/`, `assets/` (modelo oficial da MIT044 + `prototipos.xml`) e o exemplo JSON vem da `mit044-especificacao` v1.1.0; o `SKILL.md` e os guias da pasta foram escritos aqui (`REDACAO.md` adapta o `guia-redacao.md` do upstream), e o gerador/validador ganharam itens `imagem` e `tabela` e a checagem de travessao. Licenca original em `criar-mit044/LICENSE`.
+1. **Autorais (Guilherme Pegoraro)**, criadas por mim para o meu fluxo de consultoria Protheus: `planejar-advpl`, `interrogatorio-advpl`, `prd-protheus`, `protheus-configurador-dicionario`, `protheus-consulta-padrao`, `refazer-relatorio-classico`, `apontamento-gerar`, `session-summary`, `session-resume`.
+2. **Comunidade TOTVS/engpro**, skills de terceiros (autoria Melkz Siqueira / Engenharia Protheus, MIT; `genericquery` de Johnni Moraes - TSC), adaptadas ao meu ambiente: `code-review`, `mvc-generator`, `entry-point-designer`, `tlpp-rest-endpoint-generator`, `fwrest-client-generator`, `fwmsprinter-pdf`, `data-dictionary-lookup`, `genericquery`. A antiga trinca SQL (query-builder / sql-code-review / sql-optimization, MIT) foi fundida e reescrita como `sql-protheus` a partir de pesquisa TDN/fontes-padrao (08/2026).
+3. **Adaptadas de [mattpocock/skills](https://github.com/mattpocock/skills)** (MIT, Matt Pocock), skills de processo genericas, portadas quase-verbatim com adaptacoes minimas ao ecossistema Protheus (`.claude/plans/<slug>/` como tracker local): `grilling`, `domain-modeling`, `wayfinder`, `diagnosing-bugs`, `writing-for-agents`, `wait-what`, `to-questionnaire` (sincronizadas com o upstream v1.2.3 + main de 18/09/2026, 09/2026).
+4. **Wrapper de ferramenta externa** (`ordna`): o `SKILL.md` foi escrito aqui para dirigir o CLI [ordna](https://github.com/FreHilm/ordna) (`@frehilm/ordna-cli`, MIT, FreHilm); o `reference.md` da pasta e derivado do agent guide do proprio projeto.
+5. **Derivada de [brunobrigidovilanova/protheus-claude-skills](https://github.com/brunobrigidovilanova/protheus-claude-skills)** (MIT, Bruno Brigido Vilanova), `criar-mit044`: `scripts/`, `assets/` (modelo oficial da MIT044 + `prototipos.xml`) e o exemplo JSON vem da `mit044-especificacao` v1.1.0; o `SKILL.md` e os guias da pasta foram escritos aqui (`REDACAO.md` adapta o `guia-redacao.md` do upstream), e o gerador/validador ganharam itens `imagem` e `tabela` e a checagem de travessao. Licenca original em `criar-mit044/LICENSE`.
 
 Credito e licenca de cada origem permanecem nos respectivos arquivos.
 
@@ -25,10 +25,10 @@ git clone https://github.com/Guipegoraro/protheus-claude-skills.git ~/.claude/sk
 
 2. As skills ficam disponiveis automaticamente no Claude Code (todas as sessoes, qualquer projeto). Para uso em um unico projeto, copie as pastas desejadas para `.claude/skills/` do repositorio do projeto.
 
-## Uso — dois modos de invocacao
+## Uso: dois modos de invocacao
 
-- **Model-invoked** (padrao): a description fica carregada em toda sessao e o Claude dispara a skill sozinho pelos trigger words — ou voce chama por `/<nome>`. Custo: alguns tokens de contexto por skill, sempre.
-- **User-invoked** (`disable-model-invocation: true`, marcadas com `/` nas tabelas abaixo): SO disparam quando voce digita `/<nome>` — custo zero de contexto, mas voce e o indice que precisa lembrar que existem.
+- **Model-invoked** (padrao): a description fica carregada em toda sessao e o Claude dispara a skill sozinho pelos trigger words, ou voce chama por `/<nome>`. Custo: alguns tokens de contexto por skill, sempre.
+- **User-invoked** (`disable-model-invocation: true`, marcadas com `/` nas tabelas abaixo): SO disparam quando voce digita `/<nome>`; custo zero de contexto, mas voce e o indice que precisa lembrar que existem.
 
 As **user-invoked** deste repositorio sao 8: `/wayfinder`, `/diagnosing-bugs`, `/wait-what`, `/to-questionnaire`, `/criar-mit044`, `/session-summary`, `/session-resume` e `/apontamento-gerar`. Todas as demais sao model-invoked (disparam por contexto).
 
@@ -38,29 +38,29 @@ As **user-invoked** deste repositorio sao 8: `/wayfinder`, `/diagnosing-bugs`, `
 
 | Skill | Descricao |
 |-------|-----------|
-| `planejar-advpl` | Processo completo de planejamento de customizacao Protheus em 8 etapas — ideia, pesquisa, interrogatorio, PRD, kanban, QA, limpeza pre-producao e aplicacao. A Etapa 5 (`ETAPA-5-KANBAN.md`) descobre o **kanban provider** da maquina e pergunta o modo de aprovacao a cada sessao |
+| `planejar-advpl` | Processo completo de planejamento de customizacao Protheus em 8 etapas: ideia, pesquisa, interrogatorio, PRD, kanban, QA, limpeza pre-producao e aplicacao. A Etapa 5 (`ETAPA-5-KANBAN.md`) descobre o **kanban provider** da maquina e pergunta o modo de aprovacao a cada sessao |
 | `prd-protheus` | Gera PRDs (Documentos de Requisitos) para customizacoes Protheus via entrevista conversacional |
-| `interrogatorio-advpl` | Stress-test de planos de customizacao — questiona cada aspecto ate validar todas as decisoes |
+| `interrogatorio-advpl` | Stress-test de planos de customizacao: questiona cada aspecto ate validar todas as decisoes |
 | `/criar-mit044` | Redige a MIT044 (especificacao de customizacao que o cliente assina) a partir de um plano fechado: conteudo em `mit-conteudo.json` na pasta do plano, DOCX gerado no modelo oficial e conferido pelo validador |
-| `ordna` | Board Kanban derivado de arquivos (`tasks/*.md` + `.ordna/`) via CLI `ordna` — granularidade de leitura, ciclo da task, colunas e dependencias. E o kanban provider usado pela Etapa 5 do `planejar-advpl` quando instalado |
+| `ordna` | Board Kanban derivado de arquivos (`tasks/*.md` + `.ordna/`) via CLI `ordna`: granularidade de leitura, ciclo da task, colunas e dependencias. E o kanban provider usado pela Etapa 5 do `planejar-advpl` quando instalado |
 
 ### Processo generico (adaptadas de mattpocock/skills)
 
 | Skill | Descricao |
 |-------|-----------|
-| `/wayfinder` | Planeja trabalho grande demais para uma sessao como mapa de decision tickets em `.claude/plans/<slug>/` — fog of war, 1 decisao por sessao, mapa como indice. Feature que ninguem pediu so entra no destino com sim explicito; o hand-off leva Destination → `## Escopo declarado` (E-1..E-n) do `planejar-advpl` |
+| `/wayfinder` | Planeja trabalho grande demais para uma sessao como mapa de decision tickets em `.claude/plans/<slug>/`: fog of war, 1 decisao por sessao, mapa como indice. Feature que ninguem pediu so entra no destino com sim explicito; o hand-off leva Destination → `## Escopo declarado` (E-1..E-n) do `planejar-advpl` |
 | `grilling` | Primitiva de entrevista em rounds por fronteira: cada rodada pergunta todas as decisoes ja desbloqueadas, com recomendacao anexa; fatos vao para subagentes sem travar a rodada. `interrogatorio-advpl` = grilling + 10 dimensoes Protheus |
 | `domain-modeling` | Glossario vivo do dominio do cliente (CONTEXT.md) + ADRs de um paragrafo para decisoes dificeis de reverter |
 | `/diagnosing-bugs` | Debug disciplinado: construir o feedback loop red-capable ANTES de formar teoria; multi-hipotese falsificavel; logs com prefixo unico para cleanup |
-| `writing-for-agents` | Escrita de qualquer documento que agente consome (skill, CLAUDE.md, AGENTS.md) — context pointers, information hierarchy, leading words, no-ops (+ SKILL-MECHANICS.md). Substitui a antiga writing-great-skills |
-| `/wait-what` | "Nao entendi — re-explica": re-apresentacao em Linguagem Simples usando a linguagem ubiqua do CONTEXT.md/dominio.md |
-| `/to-questionnaire` | Transforma decisao que depende de terceiro em questionario Markdown ("grill the send, not the subject") — ideal para rodadas de perguntas-cliente.md |
+| `writing-for-agents` | Escrita de qualquer documento que agente consome (skill, CLAUDE.md, AGENTS.md): context pointers, information hierarchy, leading words, no-ops (+ SKILL-MECHANICS.md). Substitui a antiga writing-great-skills |
+| `/wait-what` | "Nao entendi, re-explica": re-apresentacao em Linguagem Simples usando a linguagem ubiqua do CONTEXT.md/dominio.md |
+| `/to-questionnaire` | Transforma decisao que depende de terceiro em questionario Markdown ("grill the send, not the subject"): ideal para rodadas de perguntas-cliente.md |
 
 ### PO-UI (frontend Angular + backend Protheus)
 
 | Skill | Descricao |
 |-------|-----------|
-| `po-ui-app` | Apps Angular com PO-UI, embarcados no Protheus (FwCallApp / protheus-lib-core) ou standalone via REST — contrato de API, componentes, templates dinamicos, autenticacao OAuth2, empacotamento `.app` |
+| `po-ui-app` | Apps Angular com PO-UI, embarcados no Protheus (FwCallApp / protheus-lib-core) ou standalone via REST: contrato de API, componentes, templates dinamicos, autenticacao OAuth2, empacotamento `.app` |
 | `protheus-api-poui` | APIs REST no Protheus (TLPP annotations, WSRESTFUL, FWAdapterBaseV2, FWRestModel) no padrao TOTVS/TTALK consumido pelo PO-UI, incluindo configuracao do appserver.ini (REST, CORS, OAuth2, MPP) |
 
 ### Geracao de codigo ADVPL/TLPP
@@ -71,16 +71,16 @@ As **user-invoked** deste repositorio sao 8: `/wayfinder`, `/diagnosing-bugs`, `
 | `entry-point-designer` | Design e documentacao de Pontos de Entrada (PARAMIXB, retornos, assinatura User Function) |
 | `tlpp-rest-endpoint-generator` | Endpoints REST TLPP com annotations (@Get/@Post/...) e objeto oRest no padrao TTALK |
 | `fwrest-client-generator` | Codigo AdvPL/TLPP que CONSOME APIs REST externas com FWRest (verbos, autenticacao, tratamento de erro) |
-| `fwmsprinter-pdf` | Referencia para criacao de PDFs com FWMSPrinter — coordenadas, metodos, layout |
+| `fwmsprinter-pdf` | Referencia para criacao de PDFs com FWMSPrinter: coordenadas, metodos, layout |
 | `refazer-relatorio-classico` | Refaz relatorio classico TOTVS descontinuado (FINRxxx, MATRxxx...) como copia customizada que compila sem chave de compilacao |
 
 ### Dicionario de dados (Configurador)
 
 | Skill | Descricao |
 |-------|-----------|
-| `protheus-configurador-dicionario` | Cria e audita entradas do dicionario via Configurador — tabelas (SX2), campos (SX3 + SXG), indices (SIX) e parametros (SX6). Cobre namespaces de cliente, atributos X_*, regras UPDDISTR e seguranca de migracao |
+| `protheus-configurador-dicionario` | Cria e audita entradas do dicionario via Configurador: tabelas (SX2), campos (SX3 + SXG), indices (SIX) e parametros (SX6). Cobre namespaces de cliente, atributos X_*, regras UPDDISTR e seguranca de migracao |
 | `protheus-consulta-padrao` | Desenha, audita e amarra Consulta Padrao (F3 / SXB). Cobre os 4 tipos de consulta, os 9 XB_TIPO, vinculo via X3_F3 e invocacao programatica (ConPad1, FWLookUp) |
-| `data-dictionary-lookup` | Consulta ao dicionario Protheus — SX2, SX3, SIX, SX6, SX5, SX7, SX1, SX9, SXB, SXG |
+| `data-dictionary-lookup` | Consulta ao dicionario Protheus: SX2, SX3, SIX, SX6, SX5, SX7, SX1, SX9, SXB, SXG |
 
 ### SQL
 
@@ -93,7 +93,7 @@ As **user-invoked** deste repositorio sao 8: `/wayfinder`, `/diagnosing-bugs`, `
 
 | Skill | Descricao |
 |-------|-----------|
-| `code-review` | Code review AdvPL/TLPP — regras SonarQube, Protheus.doc, seguranca, performance, clean code |
+| `code-review` | Code review AdvPL/TLPP: regras SonarQube, Protheus.doc, seguranca, performance, clean code |
 
 ### Sessao e setup
 
@@ -115,7 +115,7 @@ claude mcp add chrome-devtools --scope user -- cmd /c npx -y chrome-devtools-mcp
 
 (Em Linux/macOS, remova o `cmd /c`. Se usa Chromium em vez de Chrome, adicione `--executablePath <caminho do chrome.exe do Chromium>` ao chrome-devtools.)
 
-As skills de AdvPL/TLPP tambem aproveitam, quando disponiveis, um MCP de documentacao TOTVS (`advpl-tlpp-mcp-docs`) e um MCP de filesystem com suporte a CP1252 (`file-tools`) — fontes AdvPL/TLPP sao CP1252 e nao devem ser lidos/gravados como UTF-8.
+As skills de AdvPL/TLPP tambem aproveitam, quando disponiveis, um MCP de documentacao TOTVS (`advpl-tlpp-mcp-docs`) e um MCP de filesystem com suporte a CP1252 (`file-tools`): fontes AdvPL/TLPP sao CP1252 e nao devem ser lidos/gravados como UTF-8.
 
 ## Kanban recomendado
 
@@ -129,11 +129,11 @@ Sem o ordna instalado, a Etapa 5 procura outro kanban provider na sessao (MCP, p
 
 ## Fluxo recomendado
 
-1. **Planejamento** — para esforcos grandes demais para uma sessao, `/wayfinder` monta o mapa de decisoes primeiro; `/planejar-advpl` estrutura a customizacao (aciona `prd-protheus` e `interrogatorio-advpl` nas etapas certas) e produz o pacote em `.claude/plans/<slug>/`. Na Etapa 5 as tasks vao para o board do `ordna` (ou outro provider), no modo de aprovacao escolhido na hora.
-2. **Dicionario** — `/protheus-configurador-dicionario` desenha tabelas / campos / indices / parametros novos e gera o checklist em `pre-producao.md`. Para F3 / consultas padrao, `/protheus-consulta-padrao`.
-3. **Implementacao** — MVC (`/mvc-generator`), REST (`/tlpp-rest-endpoint-generator`, `/protheus-api-poui`), frontend (`/po-ui-app`), PDFs (`/fwmsprinter-pdf`), integracoes (`/fwrest-client-generator`) e consulta direta ao banco via `/genericquery` + `/sql-protheus`.
-4. **Qualidade** — `/code-review` e `/sql-protheus` (branch de review) antes de aplicar.
-5. **Sessoes longas** — `/session-summary` ao final; `/session-resume` para retomar apos `/clear`.
+1. **Planejamento**: para esforcos grandes demais para uma sessao, `/wayfinder` monta o mapa de decisoes primeiro; `/planejar-advpl` estrutura a customizacao (aciona `prd-protheus` e `interrogatorio-advpl` nas etapas certas) e produz o pacote em `.claude/plans/<slug>/`. Na Etapa 5 as tasks vao para o board do `ordna` (ou outro provider), no modo de aprovacao escolhido na hora.
+2. **Dicionario**: `/protheus-configurador-dicionario` desenha tabelas / campos / indices / parametros novos e gera o checklist em `pre-producao.md`. Para F3 / consultas padrao, `/protheus-consulta-padrao`.
+3. **Implementacao**: MVC (`/mvc-generator`), REST (`/tlpp-rest-endpoint-generator`, `/protheus-api-poui`), frontend (`/po-ui-app`), PDFs (`/fwmsprinter-pdf`), integracoes (`/fwrest-client-generator`) e consulta direta ao banco via `/genericquery` + `/sql-protheus`.
+4. **Qualidade**: `/code-review` e `/sql-protheus` (branch de review) antes de aplicar.
+5. **Sessoes longas**: `/session-summary` ao final; `/session-resume` para retomar apos `/clear`.
 
 ## Convencoes
 
@@ -142,4 +142,4 @@ Sem o ordna instalado, a Etapa 5 procura outro kanban provider na sessao (MCP, p
 - Slug: `<feature-slug>-<ticket>` quando houver ticket, apenas `<feature-slug>` caso contrario.
 - Dicionario sempre via Configurador, nunca via fonte. As skills `protheus-configurador-dicionario` e `protheus-consulta-padrao` documentam tudo em `pre-producao.md` para o consultor aplicar no deploy.
 - Outputs de desenvolvimento sempre em PT-BR (comentarios, commits, textos de UI); identificadores em ingles.
-- Contrato REST PO-UI/TOTVS tem fonte unica em `po-ui-app/references/api-contract.md` — a skill de backend aponta para ele.
+- Contrato REST PO-UI/TOTVS tem fonte unica em `po-ui-app/references/api-contract.md`; a skill de backend aponta para ele.

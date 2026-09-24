@@ -4,10 +4,10 @@ Detailed code examples and tables for security-related code review findings.
 
 ---
 
-## SQL Injection (CA2050 / CA2051) — CRITICAL
+## SQL Injection (CA2050 / CA2051): CRITICAL
 
 ```advpl
-// BAD: Concatenating user input into SQL — SQL Injection risk
+// BAD: Concatenating user input into SQL - SQL Injection risk
 cQuery := "SELECT * FROM " + RetSqlName("SA1") + " WHERE A1_COD = '" + cCodCli + "'"
 dbSelectArea("SA1")
 dbSetQuery(cQuery)
@@ -32,7 +32,7 @@ oStatement:Destroy()
 
 ---
 
-## Hardcoded Credentials (CA2052) — CRITICAL
+## Hardcoded Credentials (CA2052): CRITICAL
 
 ```advpl
 // BAD: Password exposed in source code
@@ -44,7 +44,7 @@ cPassword := GetMV("XX_SRVPASS")
 
 ---
 
-## Environment Context in REST/SOAP (BG1000) — MAJOR
+## Environment Context in REST/SOAP (BG1000): MAJOR
 
 ```advpl
 // BAD: Manual RpcSetEnv inside REST service
@@ -65,8 +65,8 @@ Return
 | Rule   | Function            | Severity | Action                                                                    |
 | ------ | ------------------- | -------- | ------------------------------------------------------------------------- |
 | CA2022 | `StaticCall()`      | CRITICAL | Replace with `FWLoadModel()`, `FWLoadMenuDef()`, or direct namespace call |
-| CA2023 | `PTInternal()`      | CRITICAL | Remove — prohibited without exception                                     |
-| CA2024 | `__cUserID := ...`  | CRITICAL | Never assign — read-only system variable                                  |
-| CA2025 | `cEmpAnt := ...`    | CRITICAL | Never assign — use environment APIs                                       |
+| CA2023 | `PTInternal()`      | CRITICAL | Remove: prohibited without exception                                      |
+| CA2024 | `__cUserID := ...`  | CRITICAL | Never assign: read-only system variable                                   |
+| CA2025 | `cEmpAnt := ...`    | CRITICAL | Never assign; use environment APIs                                        |
 | CA2053 | `CREATE PROCEDURE`  | CRITICAL | Use SPManager for procedure management                                    |
 | BG1200 | `ErrorBlock({...})` | INFO     | Migrate to `Try-Catch` (TLPP)                                             |

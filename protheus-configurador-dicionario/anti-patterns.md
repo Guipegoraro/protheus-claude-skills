@@ -5,7 +5,7 @@ Pitfalls collected from TDN release notes, the standard Protheus codebase, and f
 ## Dictionary mutation in source files
 
 ```advpl
-// WRONG — production source rewriting the dictionary
+// WRONG - production source rewriting the dictionary
 DbSelectArea("SX3")
 RecLock("SX3", .T.)
     X3_ARQUIVO := "SA1"
@@ -19,7 +19,7 @@ MsUnlock()
 **Why it's wrong**:
 
 - Inconsistent state if the script fails mid-way (one column committed, the rest not).
-- The new field exists in SX3 but not in the physical table — every query against SA1 with the new column breaks.
+- The new field exists in SX3 but not in the physical table; every query against SA1 with the new column breaks.
 - Cache: sessions already connected don't see the new field until reconnect; mixed-state errors abound.
 - UPDDISTR / Configurador audit logs flag the manual write as a tamper.
 - From recent LIBs, SX3 audit is non-disableable. The change is logged regardless.
@@ -52,18 +52,18 @@ X3_CAMPO   = "Z_LIMITE"   -- wrong prefix
 ## Direct read of `X3_USADO`, `X3_RESERV`, `X3_OBRIGAT`
 
 ```advpl
-// WRONG — relies on binary encoding that changed in 12.1.7
+// WRONG - relies on binary encoding that changed in 12.1.7
 If SubStr(Bin2Str(SX3->X3_USADO),101,1) == "x"
     // field is in use in module 101
 EndIf
 
-// WRONG — relies on string padding that the storage no longer guarantees
+// WRONG - relies on string padding that the storage no longer guarantees
 If Alltrim(Upper(SX3->X3_USADO)) <> Replicate(Chr(128), 14)
     // ...
 EndIf
 ```
 
-**Why**: from 12.1.7 the storage changed from binary to character with opaque packing. Direct introspection breaks silently — code returns wrong booleans, fields appear to be unused, validators skip rows they should hit.
+**Why**: from 12.1.7 the storage changed from binary to character with opaque packing. Direct introspection breaks silently: code returns wrong booleans, fields appear to be unused, validators skip rows they should hit.
 
 **Fix**:
 
@@ -99,12 +99,12 @@ SX3->A1_COD.X3_TAMANHO = 20   -- via Configurador, on a field with X3_GRPSXG set
 
 **Symptom**: the resize doesn't happen, or only happens on this one field while every other member of the group keeps the old size. Joins and seeks between the table and its siblings fail.
 
-**Fix**: resize the SXG group (`XG_SIZE`) instead. The group's size propagates to every member field atomically. If you really need to break out, remove the field from the group first (clear `X3_GRPSXG`) — but think hard before doing it; the conceptual coupling exists for a reason.
+**Fix**: resize the SXG group (`XG_SIZE`) instead. The group's size propagates to every member field atomically. If you really need to break out, remove the field from the group first (clear `X3_GRPSXG`), but think hard before doing it; the conceptual coupling exists for a reason.
 
 ## Using `DbSetOrder(n)` against a custom index
 
 ```advpl
-// WRONG — fragile
+// WRONG - fragile
 DBSelectArea("SA1")
 DBSetOrder(11)   // assumes the customer index is at ORDEM 11
 ```
@@ -123,7 +123,7 @@ The nickname is resolved to ORDEM at runtime. Stable across upgrades.
 ## Reading SX6 without a default
 
 ```advpl
-// WRONG — crashes if the parameter doesn't exist
+// WRONG - crashes if the parameter doesn't exist
 Local nLimit := SuperGetMV("MV_ESCRDLM")
 ```
 
@@ -153,7 +153,7 @@ PutMV("MV_ESCRDLM", 2000.00)   -- in production source
 SX3->A1_COD.X3_TAMANHO = 10   -- TOTVS field, no SXG group
 ```
 
-**Symptom**: UPDDISTR overwrites the new size with the TOTVS default on the next release. Worse, if you went from `C(6)` to `C(10)` and inserted data with the 10-char form, the migrator reverts the metadata and the existing data becomes inconsistent — values truncated, key seeks failing.
+**Symptom**: UPDDISTR overwrites the new size with the TOTVS default on the next release. Worse, if you went from `C(6)` to `C(10)` and inserted data with the 10-char form, the migrator reverts the metadata and the existing data becomes inconsistent: values truncated, key seeks failing.
 
 **Fix**: don't change the TOTVS field. If you need a wider field, add a new custom field (`A1_MYCOD`) or extend the SXG group (which TOTVS respects per the UPDDISTR rules).
 
@@ -164,7 +164,7 @@ SX2->SA1 already has 200 fields, X3_CAMPO uses up A1_ABCDEFG ...
 SX3->A1_MYFLD2   -- the customer ran out of A1_* combinations
 ```
 
-**Symptom**: rare in practice, but when it happens, the temptation is to put data under a "Z_*" prefix on SA1 — which then doesn't render in standard browses.
+**Symptom**: rare in practice, but when it happens, the temptation is to put data under a "Z_*" prefix on SA1, which then doesn't render in standard browses.
 
 **Fix**: create a satellite table (`ZA0` keyed by `A1_COD + A1_LOJA`) and store the extra columns there. The 1-to-1 cardinality matches what you want; the data is cleanly separated.
 
@@ -217,11 +217,11 @@ MsUnlock()
 
 ## Disabling `X2_STAMP = 2` to "revert" the audit column
 
-`X2_STAMP = 1` creates `S_T_A_M_P_` on the physical table. Setting `X2_STAMP = 2` afterwards does **not** drop the column — the SX2 flag and the physical schema have diverged.
+`X2_STAMP = 1` creates `S_T_A_M_P_` on the physical table. Setting `X2_STAMP = 2` afterwards does **not** drop the column; the SX2 flag and the physical schema have diverged.
 
 **Symptom**: the column still exists on the DB; queries that select `*` still return it; some routines stop populating it; partial data.
 
-**Fix**: if the audit column is genuinely unwanted, drop it manually at the DB level (after backup) and set `X2_STAMP = 2`. Or, more commonly, just leave it on — the overhead is negligible.
+**Fix**: if the audit column is genuinely unwanted, drop it manually at the DB level (after backup) and set `X2_STAMP = 2`. Or, more commonly, just leave it on; the overhead is negligible.
 
 ## Multi-language parameter content split across `X6_CONTEUD` and `X6_CONTSPA`
 

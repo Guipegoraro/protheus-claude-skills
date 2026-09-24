@@ -1,4 +1,4 @@
-# SQL Queries — Protheus Data Dictionary
+# SQL Queries: Protheus Data Dictionary
 
 Complete SQL queries for the `execute-sql` tool. Replace `{PLACEHOLDER}` with the desired values.
 
@@ -6,7 +6,7 @@ Complete SQL queries for the `execute-sql` tool. Replace `{PLACEHOLDER}` with th
 
 ---
 
-## 1. SX2 — System Tables
+## 1. SX2: System Tables
 
 **Search table by alias:**
 ```sql
@@ -47,7 +47,7 @@ ORDER BY x2_chave
 
 ---
 
-## 2. SX3 — Table Fields
+## 2. SX3: Table Fields
 
 **List all fields of a table:**
 ```sql
@@ -111,7 +111,7 @@ ORDER BY x3_ordem
 
 ---
 
-## 3. SIX — Table Indexes
+## 3. SIX: Table Indexes
 
 **List indexes of a table:**
 ```sql
@@ -129,7 +129,7 @@ ORDER BY ordem
 
 ---
 
-## 4. SX6 — System Parameters
+## 4. SX6: System Parameters
 
 **Query parameter by name:**
 ```sql
@@ -162,7 +162,7 @@ ORDER BY x6_var
 
 ---
 
-## 5. SX5 — Generic Tables
+## 5. SX5: Generic Tables
 
 **Query values of a generic table:**
 ```sql
@@ -187,7 +187,7 @@ ORDER BY table_code
 
 ---
 
-## 6. SX7 — Triggers
+## 6. SX7: Triggers
 
 **List triggers for a field:**
 ```sql
@@ -222,7 +222,7 @@ ORDER BY x7_campo, x7_sequenc
 
 ---
 
-## 7. SX1 — Parameterization Questions
+## 7. SX1: Parameterization Questions
 
 **Query questions for a group:**
 ```sql
@@ -244,7 +244,7 @@ ORDER BY x1_ordem
 
 ---
 
-## 8. SX9 — Table Relationships
+## 8. SX9: Table Relationships
 
 **Query relationships for a table:**
 ```sql
@@ -262,7 +262,7 @@ ORDER BY x9_dom, x9_cdom
 
 ---
 
-## 9. SXB — Standard Lookups (F3)
+## 9. SXB: Standard Lookups (F3)
 
 **Query configuration of a standard lookup:**
 ```sql

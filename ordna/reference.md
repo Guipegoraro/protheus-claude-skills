@@ -1,4 +1,4 @@
-# Ordna — Agent Guide
+# Ordna: Agent Guide
 
 This project uses **Ordna**, a Git-native project management framework. Tasks
 are markdown files in `tasks/`, the Kanban board is *derived* from those files,
@@ -21,7 +21,7 @@ tasks/
   T-001.md         # one file per task
   T-002.md
 .ordna/
-  config.yaml      # optional — see §3
+  config.yaml      # optional - see §3
 ```
 
 The `tasks/` folder is the entire schema. Adding a file creates a task;
@@ -88,7 +88,7 @@ Append-only log of what has happened so far.
 ```
 
 The `Acceptance Criteria` checkboxes (`- [ ]` / `- [x]`) are the source of
-truth for AC progress — they are parsed structurally; there is no separate
+truth for AC progress: they are parsed structurally; there is no separate
 frontmatter field for them.
 
 ### Backlog.md compatibility
@@ -122,11 +122,11 @@ remove them.
 IDs are zero-padded with the configured prefix. Defaults: prefix `T`, 3-digit
 padding → `T-001`, `T-002`, …, `T-1000`. Each new task is auto-incremented
 from the highest existing numeric ID. Merge conflicts on IDs are resolved by
-the developer — Ordna does not renumber files.
+the developer: Ordna does not renumber files.
 
 ---
 
-## 3. Config — `.ordna/config.yaml`
+## 3. Config: `.ordna/config.yaml`
 
 The config file is **optional**. With no config file, Ordna behaves exactly
 as documented above.
@@ -153,7 +153,7 @@ webPort: 7420                           # default port for `ordna web`
 **Rules**
 
 - The file lives at `.ordna/config.yaml` in the project root.
-- Configuration is **additive** — it expands capability (more statuses, custom
+- Configuration is **additive**: it expands capability (more statuses, custom
   folder, Backlog compat) but never replaces the documented defaults.
 - Changing `tasksDir` only changes where Ordna *looks*; existing files are not
   moved for you.
@@ -165,17 +165,17 @@ webPort: 7420                           # default port for `ordna web`
 The config may set `storage:` to one of three values. **Check this before
 assuming you can read or write `tasks/*.md`:**
 
-- **`storage: file`** (default) — everything documented above applies. Tasks
+- **`storage: file`** (default): everything documented above applies. Tasks
   are markdown files in `tasksDir`; you can `cat`, `grep`, and edit them
   directly. This is what most projects use.
-- **`storage: hybrid`** — tasks are still files in `tasksDir`, AND a git
+- **`storage: hybrid`**: tasks are still files in `tasksDir`, AND a git
   ref (`refs/ordna/state`) holds a shared next-id allocator + audit log.
   Read/write the files normally; ID allocation goes through the ref under
   the hood (no agent action needed). You can still `cat` and `grep`.
-- **`storage: namespace`** — tasks live as **git blobs** at
+- **`storage: namespace`**: tasks live as **git blobs** at
   `refs/ordna/tasks/<id>`. **There are no task files on disk.** `cat
   tasks/T-001.md` will fail. Use the CLI (`ordna show T-001`, `ordna
-  list`, `ordna create`, etc.) for everything — direct file access is
+  list`, `ordna create`, etc.) for everything; direct file access is
   not possible.
 
 When in doubt, run `ordna list` and inspect the output rather than
@@ -230,8 +230,8 @@ ordna commit -m "tasks: progress on T-001"
 
 ### Exit codes
 
-- `0` — success
-- `1` — user-visible error (missing task, blocked dependency, invalid status, etc.)
+- `0`: success
+- `1`: user-visible error (missing task, blocked dependency, invalid status, etc.)
 
 ### What the CLI does **not** do
 

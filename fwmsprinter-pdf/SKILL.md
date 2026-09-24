@@ -167,7 +167,7 @@ Local cFile := AllTrim(cPedido) + "_" + StrTran(AllTrim(cVendNom), " ", "_") + "
 | `Transform(@E)` negative numbers | Use `Str()` + `StrTran(".",",")` helper |
 | `SetViewPDF` before `StartPage` | Place AFTER `EndPage`, BEFORE `Print` |
 | `GetTempPath(.F.)` in WebApp | Use `GetTempPath()` without params or explicit path |
-| `lAdjustToLegacy = .T.` | Always `.F.` for PDF — avoids Box/Line distortion |
+| `lAdjustToLegacy = .T.` | Always `.F.` for PDF; avoids Box/Line distortion |
 | Coordinates assume 595x842 (standard A4) | FWMSPrinter A4 = 620x876pt (per TDN) |
 | Not calling `FreeObj` on fonts/printer | Memory leak on repeated calls |
 

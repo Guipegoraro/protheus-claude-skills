@@ -25,7 +25,7 @@ D1_COD       SB1     Produto
 ```
 
 - `X3_F3` holds the `XB_ALIAS` of the consulta to invoke.
-- This wiring is data, not code — set it via the **Configurador**, not via `RecLock("SX3")` in a font.
+- This wiring is data, not code; set it via the **Configurador**, not via `RecLock("SX3")` in a font.
 - A field with `X3_F3` empty has no F3 lookup, even if a matching consulta exists in SXB.
 - The same consulta can be wired to many fields (`SA1` is wired to `C5_CLIENTE`, `D1_CLIENTE`, `E1_CLIENTE`, etc.).
 
@@ -61,7 +61,7 @@ EndFunc
 
 `VAR_IXB` is the public variable the SXB engine reads after the function returns. The type-5 row evaluates against it.
 
-**Validating an alias before opening** — pattern used in standard sources:
+**Validating an alias before opening** (pattern used in standard sources):
 
 ```advpl
 Function A926FIL()
@@ -72,7 +72,7 @@ EndFunc
 
 ## MVC views: `FWLookUp`
 
-MVC views (`FWFormView`) hook lookups via the model's field metadata. The `X3_F3` on the field is enough — the framework wires the F3 automatically.
+MVC views (`FWFormView`) hook lookups via the model's field metadata. The `X3_F3` on the field is enough: the framework wires the F3 automatically.
 
 When the lookup needs runtime context (e.g. a filter that depends on another field on the same form), override the lookup at view level with `FWLookUp`:
 
@@ -87,7 +87,7 @@ For Smart View / web parameter lookups, the framework calls `GenericLookupServic
 - A concatenation of SX3 fields (`A1_COD + A1_LOJA`)
 - A `Posicione(...)` expression
 
-Anything else — functions, `IF`/`IIF`, `&`, `@`, `#` markers — is silently ignored. If your consulta needs Smart View / REST exposure, keep type 5 boring.
+Anything else (functions, `IF`/`IIF`, `&`, `@`, `#` markers) is silently ignored. If your consulta needs Smart View / REST exposure, keep type 5 boring.
 
 ## Workflow/ECM: `FWWFLookUp`
 
@@ -100,7 +100,7 @@ FWWFLookUp( nType, bRetFunc ) → lRet
 - `nType`: `1` = group, `2` = user.
 - `bRetFunc`: codeblock invoked with the selection. Use it to project the picked id/name back into your form.
 
-This is independent of SXB — it queries the ECM entity store, not the consulta dictionary.
+This is independent of SXB: it queries the ECM entity store, not the consulta dictionary.
 
 ## Helper functions
 

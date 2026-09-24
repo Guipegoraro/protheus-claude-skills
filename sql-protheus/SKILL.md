@@ -1,13 +1,13 @@
 ---
 name: sql-protheus
-description: "Builds, reviews, and tunes SQL in AdvPL/TLPP for TOTVS Protheus — FWExecStatement/FWPreparedStatement, Embedded SQL, mandatory D_E_L_E_T_/filial filters, SIX indexes, TOTVS pagination, cross-database MSSQL/Oracle/PostgreSQL. Use when writing, reviewing, or optimizing Protheus queries, or when the user says 'query', 'SQL', 'FWExecStatement', 'TCQuery', 'slow query', 'index', 'execution plan'."
+description: "Builds, reviews, and tunes SQL in AdvPL/TLPP for TOTVS Protheus: FWExecStatement/FWPreparedStatement, Embedded SQL, mandatory D_E_L_E_T_/filial filters, SIX indexes, TOTVS pagination, cross-database MSSQL/Oracle/PostgreSQL. Use when writing, reviewing, or optimizing Protheus queries, or when the user says 'query', 'SQL', 'FWExecStatement', 'TCQuery', 'slow query', 'index', 'execution plan'."
 ---
 
 # SQL Protheus
 
 Skill unica para SQL em AdvPL/TLPP: construir, revisar e otimizar. Baseada na documentacao TDN oficial e no codigo-padrao TOTVS 12.1.2310+ (pesquisa 08/2026); substitui as antigas query-builder, sql-code-review e sql-optimization.
 
-## Branches — carregue a reference do que for fazer
+## Branches: carregue a reference do que for fazer
 
 | Tarefa | Reference |
 | --- | --- |
@@ -29,9 +29,9 @@ Toda query sobre tabela Protheus inclui, para CADA tabela (inclusive as do JOIN)
 | Nome fisico | `RetSqlName("XXX")` | hardcode (`SA1010`) |
 | WHERE | sempre presente, nem que seja `1=1` | query sem WHERE + GROUP BY = erro quando o filtro de acesso por empresa/filial e injetado |
 
-Join entre tabelas com compartilhamento diferente: `FwJoinFilial(cAlias1, cAlias2)` — nunca `A._FILIAL = B._FILIAL` a mao.
+Join entre tabelas com compartilhamento diferente: `FwJoinFilial(cAlias1, cAlias2)`; nunca `A._FILIAL = B._FILIAL` a mao.
 
-## Decisao rapida — qual API usar
+## Decisao rapida: qual API usar
 
 | Cenario | Use |
 | --- | --- |
@@ -39,11 +39,11 @@ Join entre tabelas com compartilhamento diferente: `FwJoinFilial(cAlias1, cAlias
 | Query totalmente estatica e literal | Embedded SQL (`BeginSql` com `%table:%`, `%xfilial:%`, `%notDel%`, `%exp:%`) |
 | Um valor escalar | `oStmt:ExecScalar('COL')` ou `MPSysExecScalar` |
 | Resultado pequeno sem workarea (APIs) | `TCSqlToArr` |
-| DML/DDL | `TCSQLExec` — checar retorno `< 0` + `TCSQLError()`; nao atualiza campos de controle do DBAccess |
+| DML/DDL | `TCSQLExec`: checar retorno `< 0` + `TCSQLError()`; nao atualiza campos de controle do DBAccess |
 | Carga em massa | `FWBulk` (com `CanBulk()` + fallback RecLock) |
 | Tabela temporaria | `FWTemporaryTable` (`SharedTable` se cruzar threads); nunca alias fixo `TRB` |
 | Banco EXTERNO | `FWDBAccess` + `FWPreparedStatement:setConnection()`; `Finish()` obrigatorio |
-| Lookup de 1 registro por chave de indice | Workarea (`DbSelectArea`/`DbSetOrder`/`DbSeek`). Validacoes/gatilhos SX7 executam so via ExecAuto/MVC — nem RecLock nem SQL os disparam; gravacao que precisa deles vai por `MsExecAuto` |
+| Lookup de 1 registro por chave de indice | Workarea (`DbSelectArea`/`DbSetOrder`/`DbSeek`). Validacoes/gatilhos SX7 executam so via ExecAuto/MVC (nem RecLock nem SQL os disparam); gravacao que precisa deles vai por `MsExecAuto` |
 | Varredura sequencial grande | SQL, nao ISAM (dbSkip em massa e a forma mais lenta de acesso) |
 
 `?` no conteudo da query ou dos valores => nao use Embedded SQL (o `?` e reservado do pre-processador); use FWExecStatement.
@@ -62,7 +62,7 @@ cQuery += "   AND SE1.E1_CLIENTE = ? "
 cQuery += "   AND SE1.D_E_L_E_T_ = ? "
 cQuery += " ORDER BY SE1.E1_NUM "
 
-oStmt := FwExecStatement():New( ChangeQuery(cQuery) )   // ChangeQuery ANTES do New — obrigatoria salvo casos especiais
+oStmt := FwExecStatement():New( ChangeQuery(cQuery) )   // ChangeQuery ANTES do New - obrigatoria salvo casos especiais
 oStmt:SetString(1, xFilial("SE1"))
 oStmt:SetString(2, cCliente)
 oStmt:SetString(3, " ")                                  // espaco, nunca ''
@@ -78,14 +78,14 @@ oStmt:Destroy()
 FwFreeObj(oStmt)
 ```
 
-Regras do template: parametros de bind comecam em 1; `SetString` sem aspas simples no valor; `GetNextAlias()` quando precisar nomear alias; fechar alias e destruir statement em todos os caminhos (incluindo erro). `FWPreparedStatement:getFixQuery()` substitui valores no lado da aplicacao — protege contra injection mas nao reusa plano; `FWExecStatement:OpenAlias/ExecScalar` fazem bind no SGBD.
+Regras do template: parametros de bind comecam em 1; `SetString` sem aspas simples no valor; `GetNextAlias()` quando precisar nomear alias; fechar alias e destruir statement em todos os caminhos (incluindo erro). `FWPreparedStatement:getFixQuery()` substitui valores no lado da aplicacao (protege contra injection mas nao reusa plano); `FWExecStatement:OpenAlias/ExecScalar` fazem bind no SGBD.
 
-## Seguranca — injection
+## Seguranca: injection
 
 - Todo valor de origem externa (query param de REST, tela, arquivo) entra por bind (`SetString/SetNumeric/SetDate/SetIn`).
-- `SetUnsafe` SOMENTE para identificadores construidos internamente (`RetSqlName`, `FwJoinFilial`, lista de campos) — nunca para valor de requisicao.
+- `SetUnsafe` SOMENTE para identificadores construidos internamente (`RetSqlName`, `FwJoinFilial`, lista de campos); nunca para valor de requisicao.
 - Embedded SQL: `%exp:var%` e a forma segura (escapa o valor); montar fragmento SQL fora e injeta-lo via `%exp:%` anula o escape.
-- Macro-execucao `&(cVar)` e concatenacao de input em `TCSQLExec` sao vetores classicos — proibidos.
+- Macro-execucao `&(cVar)` e concatenacao de input em `TCSQLExec` sao vetores classicos: proibidos.
 - LIKE: montar `"%" + cBusca + "%"` no AdvPL e bindar a string inteira como um unico `?`.
 
 ## Anti-padroes (flaggear em qualquer branch)
@@ -98,7 +98,7 @@ Regras do template: parametros de bind comecam em 1; `SetString` sem aspas simpl
 | `SELECT *` | Dezenas de campos de sistema; limite de 255 colunas por query | Listar campos |
 | Query sem WHERE | Filtro de acesso injetado + GROUP BY = erro de execucao | WHERE sempre (minimo `1=1`) |
 | Funcao especifica de um SGBD (`ISNULL`, `NVL`, `CONVERT`, `TO_CHAR`) | Nao ha traducao automatica | `COALESCE`, `CASE WHEN` (ANSI) ou branch por `TCGetDB()` |
-| `TOP` / `LIMIT` / `OFFSET` esperando traducao | ChangeQuery NAO traduz paginacao | `ROW_NUMBER() OVER(...)` — denominador comum (ver otimizar.md) |
+| `TOP` / `LIMIT` / `OFFSET` esperando traducao | ChangeQuery NAO traduz paginacao | `ROW_NUMBER() OVER(...)`: denominador comum (ver otimizar.md) |
 | `MPSysOpenQuery`/query dentro de loop | Comentario oficial: "nao e nem um pouco aconselhavel" | Uma query que resolva o conjunto |
 | ISAM (`dbSeek`+`dbSkip`) para varrer conjunto grande | Caso real TDN: 1 dbSkip de 20 min | SQL |
 | `TCRefresh` rotineiro | Prejudica performance (removido ate da FWBulk) | So apos DDL via TCSQLExec |
@@ -120,8 +120,8 @@ Regras do template: parametros de bind comecam em 1; `SetString` sem aspas simpl
 
 ## Ecossistema
 
-- Dicionario real do cliente (campos custom, tamanhos): consulte via skill `genericquery` — a base MCP e referencia TOTVS, nao o cliente.
+- Dicionario real do cliente (campos custom, tamanhos): consulte via skill `genericquery`; a base MCP e referencia TOTVS, nao o cliente.
 - Query nova que exige indice novo: registrar em `pre-producao.md` via skill `protheus-configurador-dicionario` (indice via Configurador, nunca ad-hoc em producao).
-- Paginacao de API REST: contrato TOTVS `page`/`pageSize` + `{hasNext, items}` — fonte unica na skill `protheus-api-poui`.
+- Paginacao de API REST: contrato TOTVS `page`/`pageSize` + `{hasNext, items}`; fonte unica na skill `protheus-api-poui`.
 
 <!-- Fusao das skills query-builder / sql-code-review / sql-optimization (MIT, Melkz Siqueira - Engenharia Protheus) reescrita a partir de pesquisa TDN + codigo-padrao TOTVS em 08/2026. -->

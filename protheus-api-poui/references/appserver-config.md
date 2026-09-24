@@ -19,7 +19,7 @@ URIs=HTTPURI              ; comma list allowed
 Security=1                ; REQUIRED in production (see version notes)
 InactiveTimeout=60        ; lib 20230403+
 MaxRequests=0             ; 0 = unlimited per connection
-; SSL/TLS — keys define the MINIMUM accepted version:
+; SSL/TLS - keys define the MINIMUM accepted version:
 SSL2=0
 SSL3=0
 TLS1_2=1
@@ -29,11 +29,11 @@ SSLCertificateCA=         ; absolute CA path
 
 [HTTPURI]
 URL=/rest                 ; base path
-PrepareIn=ALL             ; or "01,10" (empresa,filial) — each prepared thread consumes license!
+PrepareIn=ALL             ; or "01,10" (empresa,filial) - each prepared thread consumes license!
 Instances=2,5,1,1         ; working threads (REQUIRED)
 CORSEnable=1              ; REQUIRED =1 for external SPAs (standalone PO-UI apps)
 AllowOrigin=*             ; or explicit origin list
-; Public=class/path/get   ; endpoints WITHOUT auth — avoid
+; Public=class/path/get   ; endpoints WITHOUT auth - avoid
 ; NoTenant=class/path/get ; validates user only, skips empresa/filial
 ; Stateless=1             ; Intera licensing (license on demand)
 ; Module=46               ; per-module license id (ex.: Meu Coletor=46)
@@ -49,7 +49,7 @@ RefreshRate=30
 
 ## Version-critical notes
 
-- **12.1.33 (2021):** default flipped to REQUIRE auth when `Security` absent; classic ADVPL REST server discontinued — REST 2.0 (binary layer) takes over (`[HTTPV11] ADVPL=0/1` transition key; REST 2.0 default from lib 20210809 + AppServer ≥ 19.3.1.8).
+- **12.1.33 (2021):** default flipped to REQUIRE auth when `Security` absent; classic ADVPL REST server discontinued. REST 2.0 (binary layer) takes over (`[HTTPV11] ADVPL=0/1` transition key; REST 2.0 default from lib 20210809 + AppServer ≥ 19.3.1.8).
 - **12.1.2410 (2024):** `Security` can NO LONGER be disabled.
 - `Security=0` (older versions, dev only) runs everything as administrator.
 - TLS 1.3 from lib 20221128. Keys set the minimum version (enabling only TLS1_3 rejects 1.2 clients).
@@ -57,12 +57,12 @@ RefreshRate=30
 
 ## OAuth2 endpoints (served by this REST)
 
-- `POST /api/oauth2/v1/token?grant_type=password` — credentials in headers `username`/`password`. Returns access_token (JWT, 1h) + refresh_token (24h) — durations NOT configurable.
-- `POST /api/oauth2/v1/token?grant_type=refresh_token&refresh_token=<t>` — renews both.
-- `GET /api/oauth2/v1/jwks` (lib 20210517+) — public keys.
+- `POST /api/oauth2/v1/token?grant_type=password`: credentials in headers `username`/`password`. Returns access_token (JWT, 1h) + refresh_token (24h); durations NOT configurable.
+- `POST /api/oauth2/v1/token?grant_type=refresh_token&refresh_token=<t>`: renews both.
+- `GET /api/oauth2/v1/jwks` (lib 20210517+): public keys.
 - Protected API + expired/absent token → 401.
 
-## MPP (Multi-Protocol Port) — embedded PO-UI apps
+## MPP (Multi-Protocol Port): embedded PO-UI apps
 
 ```ini
 [Drivers]
@@ -75,7 +75,7 @@ PORT=1234
 App_Environment=Environment_Name
 ```
 
-- The MPP hosts a SEPARATE REST 2.0 instance (active when `App_Environment` is set) EXCLUSIVE to embedded apps opened via FwCallApp — external origins get a CORS error BY DESIGN. It can coexist with [HTTPREST] (MPP for embedded apps, HTTPREST for portals/standalone).
+- The MPP hosts a SEPARATE REST 2.0 instance (active when `App_Environment` is set) EXCLUSIVE to embedded apps opened via FwCallApp; external origins get a CORS error BY DESIGN. It can coexist with [HTTPREST] (MPP for embedded apps, HTTPREST for portals/standalone).
 - Web access: `https://server:<mpp-port>/webapp/`; app resources under `/app-root/`.
 - Requirements: AppServer 19.3.1.2+ (Lobo-guará), lib 20201123+.
 
@@ -96,7 +96,7 @@ locations=HTTP_ROOT
 Path=/totvs                    ; virtual path → https://ip:444/totvs/<endpoint>
 ```
 
-Use for TLPP APIs detached from the Protheus environment (own auth via tlpp-oAuth2 — github.com/totvs/tlpp-oAuth2).
+Use for TLPP APIs detached from the Protheus environment (own auth via tlpp-oAuth2: github.com/totvs/tlpp-oAuth2).
 
 ## Operational gotchas
 
