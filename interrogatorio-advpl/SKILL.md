@@ -5,10 +5,16 @@ description: Use when user wants to stress-test a Protheus customization plan, v
 
 Interrogue-me implacavelmente sobre cada aspecto deste plano de customizacao Protheus ate chegarmos a um entendimento compartilhado. Mapeie o plano como uma **arvore de design**: cada decisao ramifica nas decisoes que dependem dela.
 
-Trabalhe a arvore em **rounds por fronteira**. A fronteira e toda decisao cujos pre-requisitos ja estao resolvidos — as perguntas que da para fazer AGORA sem chutar respostas que ainda nao vieram. Pergunte a fronteira inteira numa rodada, cada pergunta numerada no formato:
+Trabalhe a arvore em **rounds por fronteira**. A fronteira e toda decisao cujos pre-requisitos ja estao resolvidos — as perguntas que da para fazer AGORA sem chutar respostas que ainda nao vieram. Pergunte a fronteira inteira numa rodada, cada pergunta numerada e separada da seguinte por uma linha horizontal:
 
 ```
 ❓ **Q1** - **<titulo>**: <corpo da pergunta, com alternativas quando couber>
+
+➡️ <sua resposta recomendada>
+
+---
+
+❓ **Q2** - **<titulo>**: <corpo da pergunta, com alternativas quando couber>
 
 ➡️ <sua resposta recomendada>
 ```
