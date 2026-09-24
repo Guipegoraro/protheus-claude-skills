@@ -117,6 +117,16 @@ claude mcp add chrome-devtools --scope user -- cmd /c npx -y chrome-devtools-mcp
 
 As skills de AdvPL/TLPP tambem aproveitam, quando disponiveis, um MCP de documentacao TOTVS (`advpl-tlpp-mcp-docs`) e um MCP de filesystem com suporte a CP1252 (`file-tools`) — fontes AdvPL/TLPP sao CP1252 e nao devem ser lidos/gravados como UTF-8.
 
+## Kanban recomendado
+
+O organizador kanban recomendado e o [ordna](https://github.com/FreHilm/ordna): board em arquivos markdown (`tasks/*.md` + `.ordna/`) que vivem dentro da pasta do plano e sao versionados junto com ela. E o provider que a Etapa 5 do `planejar-advpl` procura primeiro, dirigido pela skill `ordna`.
+
+```bash
+npm install -g @frehilm/ordna-cli
+```
+
+Sem o ordna instalado, a Etapa 5 procura outro kanban provider na sessao (MCP, plugin ou skill) e, nao achando, cai no `kanban.md` da pasta do plano.
+
 ## Fluxo recomendado
 
 1. **Planejamento** — para esforcos grandes demais para uma sessao, `/wayfinder` monta o mapa de decisoes primeiro; `/planejar-advpl` estrutura a customizacao (aciona `prd-protheus` e `interrogatorio-advpl` nas etapas certas) e produz o pacote em `.claude/plans/<slug>/`. Na Etapa 5 as tasks vao para o board do `ordna` (ou outro provider), no modo de aprovacao escolhido na hora.
